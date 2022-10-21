@@ -9,16 +9,20 @@ import time
 import sys
 
 # Variables
-reverse=0
+reverse=1
 steps = int(sys.argv[1])
 if steps<0:
    steps=-1*steps
-   reverse=1
+   reverse=0
 steps=steps-1
 delay = float(sys.argv[2]) * 0.0075
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
+
+# set the sensor pin
+limit_gpio=5
+GPIO.setup(limit_gpio, GPIO.IN)
 
 # Enable pins for IN1-4 to control step sequence
 
@@ -46,6 +50,9 @@ def setStep(w1, w2, w3, w4):
 j=0
 if reverse==0:
 	for i in range(0, steps):
+	        if GPIO.input(limit_gpio)==0:
+			print("Limit switch activated")
+			break
 		j=j+1
 		if j==1:
 			setStep(1,0,1,0)
@@ -69,6 +76,9 @@ if reverse==0:
 # Reverse previous step sequence to reverse motor direction
 else:
 	for i in range(0, steps):
+	        if GPIO.input(limit_gpio)==0:
+			print("Limit switch activated")
+			break
 		j=j+1
 		if j==1:
 			setStep(0,0,1,0)

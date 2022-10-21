@@ -50,9 +50,6 @@ def setStep(w1, w2, w3, w4):
 j=0
 if reverse==0:
 	for i in range(0, steps):
-		if GPIO.input(limit_gpio)==0:
-			print("Limit switch activated")
-			break
 		j=j+1
 		if j==1:
 			setStep(1,0,1,0)

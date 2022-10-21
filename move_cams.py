@@ -72,13 +72,14 @@ if reverse==0:
 		if j==8:
 			setStep(0,0,1,0)
 			j=0
-
+	
 
 # Reverse previous step sequence to reverse motor direction
 else:
 	for i in range(0, steps):
 		if GPIO.input(limit_gpio)==0:
 			print("Limit switch activated")
+			setStep(0,0,0,0)
 			break
 		j=j+1
 		if j==1:

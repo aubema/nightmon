@@ -14,6 +14,9 @@ steps = int(sys.argv[1])
 if steps<0:
    steps=-1*steps
    reverse=0
+   # set a maximum number of steps
+   if steps>1600:
+   	steps=1600
 steps=steps-1
 delay = float(sys.argv[2]) * 0.0075
 

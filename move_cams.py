@@ -15,8 +15,9 @@ if steps<0:
    steps=-1*steps
    reverse=0
    # set a maximum number of steps
-   if steps>1600:
-   	steps=1600
+   if steps>1500:
+   	steps=1500
+   	print("Too much steps")
 steps=steps-1
 delay = float(sys.argv[2]) * 0.0075
 

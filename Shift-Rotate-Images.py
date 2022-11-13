@@ -9,9 +9,12 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+import scipy
 from skyfield.api import E, N, load, wgs84
 from skyfield.framelib import galactic_frame
 from scipy import ndimage, misc
+from matplotlib.pyplot import imread
+
 # read site coordinates
 # Load Parameters
 with open("input_params.in") as f:
@@ -58,13 +61,7 @@ moon_position = here_now.observe(eph["moon"]).apparent()
 sun_position = here_now.observe(eph["sun"]).apparent()
 alts, azis, ds = sun_position.altaz()
 altm, azim, dm = moon_position.altaz()
-#
-#  LOAD IMAGES
-#
-#  CONVERT TO GREY
-#
-#
-#
+
 
 print(f"Moon altitude: {altm.degrees:.4f}")
 print(f"Moon azimuth: {azim.degrees:.4f}")
@@ -75,7 +72,14 @@ for band, xzen, yzen, xpol, ypol, img in (
     ("V", p["XzenithV"], p["YzenithV"], p["XpolarisV"], p["YpolarisV"], Vfile),
     ("R", p["XzenithR"], p["YzenithR"], p["XpolarisR"], p["YpolarisR"], Rfile),):
     print(f"Processing Johnson {band} camera...")
-
+    #
+    #  LOAD grey IMAGES
+    #
+    print(img)
+    imag = imread(img)
+    #
+    #
+    #
     y, x = np.indices((1516, 2024))
 
     # computing the distance to zenith in pixels
@@ -89,18 +93,21 @@ for band, xzen, yzen, xpol, ypol, img in (
 
     # shift images
     z = ndimage.shift(z, [ (758-yzen) , (1012-xzen) ], mode='nearest')
-    img = ndimage.shift(img, [ (758-yzen) , (1012-xzen) ], mode='nearest' )
+    imag = ndimage.shift(imag, [ (758-yzen) , (1012-xzen) ], mode='nearest' )
 
     # rotate images
     z = ndimage.rotate(z, -azpol, reshape=False, mode='nearest')
-    img = ndimage.rotate(img, -azpol, reshape=False, mode='nearest')
+    imag = ndimage.rotate(imag, -azpol, reshape=False, mode='nearest')
 
     # mask non sense zenith angles
+    imag [z > 90] = np.nan
     z [z > 90] = np.nan
-    img [z > 90] = np.nan
+
 
     plt.figure()
-    plt.imshow(np.round(img), cmap = 'rainbow')
+    plt.imshow(imag, cmap = 'rainbow')
     plt.colorbar()
     plt.title('Sky Image : Johnson ' + band)
+
+
 plt.show()

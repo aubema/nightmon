@@ -92,15 +92,18 @@ for band, xzen, yzen, xpol, ypol, img in (
     az = np.where(az < 0, az + 360, az)
 
     # shift images
+    az = ndimage.shift(az, [ (758-yzen) , (1012-xzen) ], mode='nearest')
     z = ndimage.shift(z, [ (758-yzen) , (1012-xzen) ], mode='nearest')
     imag = ndimage.shift(imag, [ (758-yzen) , (1012-xzen) ], mode='nearest' )
 
     # rotate images
+    az = ndimage.rotate(az, -azpol, reshape=False, mode='nearest')
     z = ndimage.rotate(z, -azpol, reshape=False, mode='nearest')
     imag = ndimage.rotate(imag, -azpol, reshape=False, mode='nearest')
 
     # mask non sense zenith angles
     imag [z > 90] = np.nan
+    az [z > 90] = np.nan
     z [z > 90] = np.nan
 
 
@@ -108,6 +111,16 @@ for band, xzen, yzen, xpol, ypol, img in (
     plt.imshow(imag, cmap = 'rainbow')
     plt.colorbar()
     plt.title('Sky Image : Johnson ' + band)
+
+    plt.figure()
+    plt.imshow(az, cmap = 'rainbow')
+    plt.colorbar()
+    plt.title('Azimuth angle' + band)
+
+plt.figure()
+plt.imshow(z, cmap = 'rainbow')
+plt.colorbar()
+plt.title('Zenith angle')
 
 
 plt.show()

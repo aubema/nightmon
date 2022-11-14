@@ -6,14 +6,13 @@
 # ====================
 import getopt
 import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
-import scipy
-from skyfield.api import E, N, load, wgs84
-from skyfield.framelib import galactic_frame
-from scipy import ndimage, misc
 from matplotlib.pyplot import imread
+from scipy import ndimage
+from skyfield.api import E, N, load, wgs84
 
 # read site coordinates
 # Load Parameters
@@ -35,7 +34,7 @@ def input(argv):
     try:
         opts, args = getopt.getopt(argv, "h:v:r:", ["help=", "vfile=", "rfile="])
     except getopt.GetoptError:
-        pprint("test.py -v <Vfile> -r <Rfile>")
+        print("test.py -v <Vfile> -r <Rfile>")
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -47,7 +46,8 @@ def input(argv):
             Rfile = arg
     print("Johnson V file is ", Vfile)
     print("Johnson R file is ", Rfile)
-    return Vfile , Rfile
+    return Vfile, Rfile
+
 
 Vfile, Rfile = input(sys.argv[1:])
 
@@ -70,7 +70,8 @@ print(f"Sun azimuth: {azis.degrees:.4f}")
 
 for band, xzen, yzen, xpol, ypol, img in (
     ("V", p["XzenithV"], p["YzenithV"], p["XpolarisV"], p["YpolarisV"], Vfile),
-    ("R", p["XzenithR"], p["YzenithR"], p["XpolarisR"], p["YpolarisR"], Rfile),):
+    ("R", p["XzenithR"], p["YzenithR"], p["XpolarisR"], p["YpolarisR"], Rfile),
+):
     print(f"Processing Johnson {band} camera...")
     #
     #  LOAD grey IMAGES
@@ -85,42 +86,41 @@ for band, xzen, yzen, xpol, ypol, img in (
     # computing the distance to zenith in pixels
     d = np.hypot(x - xzen, y - yzen)
     z = p["Zconstant"] + p["Zslope"] * d + p["Zquad"] * d**2
-    #z = np.where(z > 90, np.nan, z)
-    azpol = np.arctan2(xpol - xzen,yzen - ypol)*180/np.pi
-    az = np.arctan2(-x + xzen,-y + yzen)*180/np.pi
-    az = (az - azpol)
+    # z = np.where(z > 90, np.nan, z)
+    azpol = np.arctan2(xpol - xzen, yzen - ypol) * 180 / np.pi
+    az = np.arctan2(-x + xzen, -y + yzen) * 180 / np.pi
+    az = az - azpol
     az = np.where(az < 0, az + 360, az)
 
     # shift images
-    az = ndimage.shift(az, [ (758-yzen) , (1012-xzen) ], mode='nearest')
-    z = ndimage.shift(z, [ (758-yzen) , (1012-xzen) ], mode='nearest')
-    imag = ndimage.shift(imag, [ (758-yzen) , (1012-xzen) ], mode='nearest' )
+    az = ndimage.shift(az, [(758 - yzen), (1012 - xzen)], mode="nearest")
+    z = ndimage.shift(z, [(758 - yzen), (1012 - xzen)], mode="nearest")
+    imag = ndimage.shift(imag, [(758 - yzen), (1012 - xzen)], mode="nearest")
 
     # rotate images
-    az = ndimage.rotate(az, -azpol, reshape=False, mode='nearest')
-    z = ndimage.rotate(z, -azpol, reshape=False, mode='nearest')
-    imag = ndimage.rotate(imag, -azpol, reshape=False, mode='nearest')
+    az = ndimage.rotate(az, -azpol, reshape=False, mode="nearest")
+    z = ndimage.rotate(z, -azpol, reshape=False, mode="nearest")
+    imag = ndimage.rotate(imag, -azpol, reshape=False, mode="nearest")
 
     # mask non sense zenith angles
-    imag [z > 90] = np.nan
-    az [z > 90] = np.nan
-    z [z > 90] = np.nan
-
-
-    plt.figure()
-    plt.imshow(imag, cmap = 'rainbow')
-    plt.colorbar()
-    plt.title('Sky Image : Johnson ' + band)
+    imag[z > 90] = np.nan
+    az[z > 90] = np.nan
+    z[z > 90] = np.nan
 
     plt.figure()
-    plt.imshow(az, cmap = 'rainbow')
+    plt.imshow(imag, cmap="rainbow")
     plt.colorbar()
-    plt.title('Azimuth angle' + band)
+    plt.title("Sky Image : Johnson " + band)
+
+    plt.figure()
+    plt.imshow(az, cmap="rainbow")
+    plt.colorbar()
+    plt.title("Azimuth angle" + band)
 
 plt.figure()
-plt.imshow(z, cmap = 'rainbow')
+plt.imshow(z, cmap="rainbow")
 plt.colorbar()
-plt.title('Zenith angle')
+plt.title("Zenith angle")
 
 
 plt.show()

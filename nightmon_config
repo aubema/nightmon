@@ -1,0 +1,16 @@
+# input parameters for NightMon
+SITE : ORM
+LONGITUDE : -71.67772  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+LATITUDE : 45.735241
+ELEVATION : 0
+XpolarisV : 1000
+YpolarisV : 625
+XzenithV : 1000
+YzenithV : 750
+XpolarisR : 0
+YpolarisR : 1375
+XzenithR : 800
+YzenithR : 750
+Zconstant : 0
+Zslope : 0.12
+Zquad : 0

@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-# move the filter wheel using half step mode on a bipolar stepper
-# 
-# usage: move_filter.py steps slow_level
-# steps = number of steps (400 for a complete rotation)
+# move the camera assemply using half step mode on a bipolar stepper
+#
+# usage: move_cams.py steps slow_level
+# steps = number of steps
 # slow_level 1=fastest n=max_speed/n
 import RPi.GPIO as GPIO
 import time
@@ -72,7 +72,7 @@ if reverse==0:
 		if j==8:
 			setStep(0,0,1,0)
 			j=0
-	
+
 
 # Reverse previous step sequence to reverse motor direction
 else:

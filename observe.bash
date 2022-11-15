@@ -162,3 +162,4 @@ mv capture_2.dng $basepath/$y/$m/R-$tr-$basename.dng
 mv capture_2.jpg $basepath/$y/$m/R-$tr-$basename.jpg
 echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
 echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
+PixelAngles.py >> $basepath/$y/$m/nightmon.log

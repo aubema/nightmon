@@ -5,18 +5,20 @@
 #
 # ====================
 import getopt
+import os
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
-from matplotlib.pyplot import imread
 from scipy import ndimage
 from skyfield.api import E, N, load, wgs84
 
 # read site coordinates
 # Load Parameters
-with open("input_params.in") as f:
+home = os.path.expanduser("~")
+with open(home + "/nightmon_config") as f:
+
     p = yaml.safe_load(f)
 
 ts = load.timescale()
@@ -50,7 +52,14 @@ def input(argv):
 
 
 Vfile, Rfile = input(sys.argv[1:])
+# TODO: open raw images Vfile and Rfile
 
+# TODO: Convert raw to grayscale with coeffs RC GC and BC output array aray are Vgray and Rgray
+RC = p["R2GRAYCOEF"]
+GC = p["G2GRAYCOEF"]
+BC = p["B2GRAYCOEF"]
+Vgray = None
+Rgray = None
 # astronomical objects and ephemerides
 eph = load("de421.bsp")
 here = eph["earth"] + wgs84.latlon(
@@ -68,16 +77,27 @@ print(f"Moon azimuth: {azim.degrees:.4f}")
 print(f"Sun altitude: {alts.degrees:.4f}")
 print(f"Sun azimuth: {azis.degrees:.4f}")
 
-for band, xzen, yzen, xpol, ypol, img in (
-    ("V", p["XzenithV"], p["YzenithV"], p["XpolarisV"], p["YpolarisV"], Vfile),
-    ("R", p["XzenithR"], p["YzenithR"], p["XpolarisR"], p["YpolarisR"], Rfile),
+for band, xzen, yzen, xpol, ypol, imag, outf in (
+    (
+        "V",
+        p["XzenithV"],
+        p["YzenithV"],
+        p["XpolarisV"],
+        p["YpolarisV"],
+        Vgray,
+        "VImage.npy",
+    ),
+    (
+        "R",
+        p["XzenithR"],
+        p["YzenithR"],
+        p["XpolarisR"],
+        p["YpolarisR"],
+        Rgray,
+        "RImage.npy",
+    ),
 ):
     print(f"Processing Johnson {band} camera...")
-    #
-    #  LOAD grey IMAGES
-    #
-    print(img)
-    imag = imread(img)
     #
     #
     #
@@ -103,9 +123,11 @@ for band, xzen, yzen, xpol, ypol, img in (
     imag = ndimage.rotate(imag, -azpol, reshape=False, mode="nearest")
 
     # mask non sense zenith angles
+
     imag[z > 90] = np.nan
     az[z > 90] = np.nan
     z[z > 90] = np.nan
+    np.save(outf, imag)
 
     plt.figure()
     plt.imshow(imag, cmap="rainbow")
@@ -123,4 +145,4 @@ plt.colorbar()
 plt.title("Zenith angle")
 
 
-plt.show()
+# plt.show()

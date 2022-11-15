@@ -14,6 +14,8 @@ import yaml
 from scipy import ndimage
 from skyfield.api import E, N, load, wgs84
 
+from toolbox import open_raw, to_grayscale
+
 # read site coordinates
 # Load Parameters
 home = os.path.expanduser("~")
@@ -52,14 +54,15 @@ def input(argv):
 
 
 Vfile, Rfile = input(sys.argv[1:])
-# TODO: open raw images Vfile and Rfile
+Vimg = open_raw(Vfile)
+Rimg = open_raw(Rfile)
 
-# TODO: Convert raw to grayscale with coeffs RC GC and BC output array aray are Vgray and Rgray
 RC = p["R2GRAYCOEF"]
 GC = p["G2GRAYCOEF"]
 BC = p["B2GRAYCOEF"]
-Vgray = None
-Rgray = None
+Vgray = to_grayscale(Vimg, [RC, GC, BC], normalize=False)
+Rgray = to_grayscale(Rimg, [RC, GC, BC], normalize=False)
+
 # astronomical objects and ephemerides
 eph = load("de421.bsp")
 here = eph["earth"] + wgs84.latlon(

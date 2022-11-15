@@ -6,6 +6,7 @@
 # ====================
 import getopt
 import sys
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
@@ -17,7 +18,9 @@ from matplotlib.pyplot import imread
 
 # read site coordinates
 # Load Parameters
-with open("$HOME/nightmon_config") as f:
+home = os.path.expanduser('~')
+with open(home + "/nightmon_config") as f:
+
     p = yaml.safe_load(f)
 
 ts = load.timescale()

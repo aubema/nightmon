@@ -104,6 +104,13 @@ theta_moon [z > 90] = np.nan
 z [z > 90] = np.nan
 #img [z > 90] = np.nan
 
+np.save(SolarAngle, theta_sun)
+np.save(MoonAngle, theta_moon)
+np.save(GalacticLattitude, galactic_lat)
+np.save(AzimuthAngle, az)
+np.save(ZenithAngle,z)
+
+
 plt.figure()
 plt.imshow(np.round(theta_sun), cmap = 'rainbow')
 plt.colorbar()
@@ -124,4 +131,4 @@ plt.imshow(np.round(az), cmap = 'rainbow')
 plt.colorbar()
 plt.title('Azimuth')
 y, x = np.indices((1516, 2024))
-plt.show()
+#plt.show()

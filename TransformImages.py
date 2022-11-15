@@ -55,7 +55,7 @@ def input(argv):
 Vfile, Rfile = input(sys.argv[1:])
 # TODO: open raw images Vfile and Rfile
 
-# TODO: Convert RGB to grayscale with coeffs RC GC and BC
+# TODO: Convert raw to grayscale with coeffs RC GC and BC output array aray are Vgray and Rgray
 RC = p["R2GRAYCOEF"]
 GC = p["G2GRAYCOEF"]
 BC = p["B2GRAYCOEF"]

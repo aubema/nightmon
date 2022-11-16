@@ -40,12 +40,11 @@ print(f"Moon altitude: {altm.degrees:.4f}")
 print(f"Moon azimuth: {azim.degrees:.4f}")
 print(f"Sun altitude: {alts.degrees:.4f}")
 print(f"Sun azimuth: {azis.degrees:.4f}")
-
-exit()
+# half size of superpixel image (i.e. 1/4 of the original)
 xzen = 1012
 yzen = 758
 xpol = 1012
-ypol = 758
+ypol = 400
 y, x = np.indices((1516, 2024))
 
 # computing the distance to zenith in pixels
@@ -98,5 +97,5 @@ plt.figure()
 plt.imshow(np.round(az), cmap="rainbow")
 plt.colorbar()
 plt.title("Azimuth")
-y, x = np.indices((1516, 2024))
-# plt.show()
+
+#plt.show()

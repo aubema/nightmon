@@ -22,8 +22,8 @@ ts = load.timescale()
 # time=ts.utc(2020, 1, 1, 10, 35, 7)
 time = ts.now()
 
-print(time)
-print(time.utc_jpl())
+#print(time)
+#print(time.utc_jpl())
 
 # astronomical objects and ephemerides
 eph = load("de421.bsp")

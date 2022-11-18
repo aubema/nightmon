@@ -131,13 +131,9 @@ h=`date +%H`
 mi=`date +%M`
 s=`date +%S`
 basename=`date +%Y-%m-%d_%H-%M-%S`
+
 #basepath="/var/www/html/data"
-
-
-
 basepath="./test"
-
-
 
 if [ ! -d $basepath/$y ]
 then mkdir $basepath/$y
@@ -145,28 +141,21 @@ fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
-
-
 take_pictures
-# check for sufficient darkness while on park position
+# check for the night
 if [ $tv -lt $max_lum ]
 then "Echo too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
 else move_cams.py 2000 1
 fi
-
-
 # writing to logfile
 echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
 echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
 PixelAngles.py >> $basepath/$y/$m/nightmon.log
 echo "=============================="
-# Convert raw images to npy
-
-# Convert
-# rotate and shift sky IMAGES
-python3 TransformImages.py -v capture_1.dng -r capture_2.dng
+# process sky IMAGES
+python3 ProcessNightMon.py -v capture_1.dng -r capture_2.dng >> $basepath/$y/$m/nightmon.log
 mv Vimage.npy $basepath/$y/$m/$basename_V.npy
 mv Rimage.npy $basepath/$y/$m/$basename_R.npy
 # rename pictures

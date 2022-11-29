@@ -23,7 +23,7 @@
 # =============================
 # find appropriate integration time
 #
-take_pictures() {
+take_pictureV() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking pictures"
 		 read tv bidon < Current_V_tint.tmp
@@ -39,7 +39,7 @@ take_pictures() {
 		 let satmax=100
 		 # capture an image with V camera
 		 while [ $satmax -gt 75 ]
-		 do	rm -f capture_2*
+		 do	rm -f capture_1*
 		 		python3 captureA.py -i $tv
 				if [ test -f capture_1.dng ]
 		    then lisc perc capture_1.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
@@ -69,6 +69,19 @@ take_pictures() {
 					 exit 0
 				fi
 		 done
+		 echo  $tv > Current_V_tint.tmp
+		 echo "V integration time: " $tv >> nightmon.log
+}
+
+take_pictureVR() {
+		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
+		 		 echo "Taking pictures"
+		 		 read tr bidon < Current_R_tint.tmp
+		 		 if [ -z "$tr" ]
+		 		 then echo "tr not available, setting it to 1/10s"
+		 		      let tr=100000
+		 		 fi
+		 		 let satmax=100
 		 let satmax=100
 		 while [ $satmax -gt 75 ]
 		 do	rm -f capture_2*
@@ -101,9 +114,7 @@ take_pictures() {
 						 exit 0
 				fi
 		 done
-		 echo  $tv > Current_V_tint.tmp
 		 echo  $tr > Current_R_tint.tmp
-		 echo "V integration time: " $tv >> nightmon.log
 		 echo "R integration time: " $tv >> nightmon.log
 }
 
@@ -135,36 +146,70 @@ basename=`date +%Y-%m-%d_%H-%M-%S`
 #basepath="/var/www/html/data"
 basepath="./test"
 
+
+take_pictureV
+y=`date +%Y`
+mo=`date +%m`
+d=`date +%d`
+h=`date +%H`
+mi=`date +%M`
+s=`date +%S`
+basename=`date +%Y-%m-%d_%H-%M-%S`
+read  tv toto < Current_V_tint.tmp
+# writing to logfile
 if [ ! -d $basepath/$y ]
 then mkdir $basepath/$y
 fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
-take_pictures
-# check for the night
+echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
+echo "=============================="
+# rename pictures
+cp capture_1.dng $basepath/$y/$m/$basename_V.dng
+cp capture_1.jpg $basepath/$y/$m/$basename_V.jpg
+
+
+take_pictureR
+y=`date +%Y`
+mo=`date +%m`
+d=`date +%d`
+h=`date +%H`
+mi=`date +%M`
+s=`date +%S`
+basename=`date +%Y-%m-%d_%H-%M-%S`
+read  tr toto < Current_R_tint.tmp
+# writing to logfile
+if [ ! -d $basepath/$y ]
+then mkdir $basepath/$y
+fi
+if [ ! -d $basepath/$y/$mo ]
+then /bin/mkdir $basepath/$y/$mo
+fi
+echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/R-$tr-$basename.dng >> $basepath/$y/$m/nightmon.log
+echo "=============================="
+# rename pictures
+cp capture_1.dng $basepath/$y/$m/$basename_V.dng
+cp capture_1.jpg $basepath/$y/$m/$basename_V.jpg
+
+
+# check for the night by reading the latest optimal integration time
 if [ $tv -lt $max_lum ]
 then "Echo too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
 else move_cams.py 2000 1
 fi
-# writing to logfile
-echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
-echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
-PixelAngles.py >> $basepath/$y/$m/nightmon.log
+
 echo "=============================="
 # process sky IMAGES
-python3 ProcessNightMon.py -v capture_1.dng -r capture_2.dng >> $basepath/$y/$m/nightmon.log
-mv Vimage.npy $basepath/$y/$m/$basename_V.npy
-mv Rimage.npy $basepath/$y/$m/$basename_R.npy
+python3 ProcessNightMon-JVR2H.py -v capture_1.dng -r capture_2.dng >> $basepath/$y/$m/nightmon.log
 # rename pictures
-mv capture_1.dng $basepath/$y/$m/$basename_V.dng
-mv capture_1.jpg $basepath/$y/$m/$basename_V.jpg
-mv capture_2.dng $basepath/$y/$m/$basename_R.dng
-mv capture_2.jpg $basepath/$y/$m/$basename_R.jpg
-mv SolarAngle.npy $basepath/$y/$m/$basename_SolarAngle.npy
-mv MoonAngle.npy $basepath/$y/$m/$basename_MoonAngle.npy
-mv GalacticLattitude.npy $basepath/$y/$m/$basename_GalacticLattitude.npy
-mv AzimuthAngle.npy $basepath/$y/$m/$basename_AzimuthAngle.npy
-mv ZenithAngle.npy $basepath/$y/$m/$basename_ZenithAngle.npy
+mv BackgroundV.npy $basepath/$y/$m/$basename_BackgroundV.npy
+mv BackgroundR.npy $basepath/$y/$m/$basename_BackgroundR.npy
+mv Vzeropoint_corr.png $basepath/$y/$m/$basename_Vzeropoint_corr.png
+mv Rzeropoint_corr.png $basepath/$y/$m/$basename_Rzeropoint_corr.png
+mv VcalSbBkg.png $basepath/$y/$m/$basename_VcalSbBkg.png
+mv RcalSbBkg.png $basepath/$y/$m/$basename_RcalSbBkg.png
+mv VStars_Match.png $basepath/$y/$m/$basename_VStars_Match.png
+mv RStars_Match.png $basepath/$y/$m/$basename_RStars_Match.png

@@ -217,6 +217,8 @@ print("Polaris located at : ",polindex[0,1],polindex[0,0])
 # selecting reference stars in the simbad database
 limiti = 3.7 # limitting stars magnitude NEED TO BE LOWER THAN 6
 limits = 1.2
+
+
 stars_selected = ds[(ds['MagV'] < limiti) & (ds['MagV'] > limits)]
 
 coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
@@ -255,7 +257,7 @@ magv = np.delete(magv, np.where(altstar < elmin))
 magr = np.delete(magr, np.where(altstar < elmin))
 iden = np.delete(iden, np.where(altstar < elmin))
 altstar = np.delete(altstar, np.where(altstar < elmin))
-
+brightest = np.amin(magv)
 # find position of simbad stars on the image array
 index  = find_close_indices(az, el, azistar , altstar)
 ishape=int(np.shape(index)[0])
@@ -381,9 +383,9 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
         positions = positions[ rn < rnmax]
         Flux = Flux[ rn < rnmax]
         maxflux = Flux.max()
-        sources = sources[Flux > maxflux / 2.5**limiti ]
-        positions = positions[Flux > maxflux / 2.5**limiti ]
-        Flux = Flux[Flux > maxflux / 2.5**limiti ]
+        sources = sources[Flux > maxflux / 2.5**(limiti-brightest) ]
+        positions = positions[Flux > maxflux / 2.5**(limiti-brightest) ]
+        Flux = Flux[Flux > maxflux / 2.5**(limiti-brightest) ]
         #Flux = Flux[ rn < rnmax]
         # find most probable Polaris
         dtopol = np.hypot(polindex[0,1]-positions[:,0],polindex[0,0]-positions[:,1])
@@ -432,7 +434,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
     StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
     avggap , mediangap, stdgap = sigma_clipped_stats(StarMatch[:,4], sigma=2.0)
     print("Average distance between nearest star :", avggap,"+/-",stdgap)
-    StarMatch = np.delete(StarMatch, np.where(StarMatch[:,4] > avggap + 0 * stdgap), axis=0)
+    StarMatch = np.delete(StarMatch, np.where(StarMatch[:,4] > avggap + 1 * stdgap), axis=0)
     StarMatch = np.delete(StarMatch, np.where(StarMatch[:,9] == 0), axis=0)
 
     if ( band == "V"):

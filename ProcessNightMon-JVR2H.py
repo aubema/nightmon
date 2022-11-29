@@ -22,6 +22,7 @@ from skyfield import almanac
 from astropy.stats import sigma_clipped_stats, SigmaClip
 from astropy.visualization import SqrtStretch
 from astropy.visualization.mpl_normalize import ImageNormalize
+from astropy.visualization import simple_norm
 from astropy.convolution import convolve
 from astropy.convolution import  Box2DKernel
 from astropy.convolution import Gaussian2DKernel
@@ -34,13 +35,12 @@ from datetime import date, timedelta
 # find indices of pixels of a list of alt az coordinates
 def find_close_indices(array1, array2, value1, value2):
     # 1 = azimuth, 2 = elevation, 3 = radius, all in degrees
-    minindex = np.zeros([1], dtype=int)
+    minindex = [0,0]
     for n in range(np.shape(value1)[0]):
-        dist = np.sqrt(((array1-value1[n])*np.cos(np.pi*(array2-value2[n])/2/180))**2+(array2-value2[n])**2)
+        dist = np.sqrt(((array1-value1[n])*np.cos(np.pi*(array2+value2[n])/2/180))**2+(array2-value2[n])**2)
         min = np.nanmin(dist)
-        mini = np.where( dist == min )
-        minindex = np.append(minindex, mini)
-    minindex = minindex[minindex > 0]
+        imin = np.where( dist == min )
+        minindex = np.append(minindex, imin)
     return minindex
 
 def closest_node(node, nodes):
@@ -49,10 +49,10 @@ def closest_node(node, nodes):
 
 def airmass(elevat):
     zenith_rad = (90 - elevat) * np.pi / 180
-    AM = ( (1.002432*((np.cos(zenith_rad)) ** 2) +
-            0.148386*(np.cos(zenith_rad)) + 0.0096467) /
-            (np.cos(zenith_rad) ** 3 +
-            0.149864*(np.cos(zenith_rad) ** 2) +
+    AM = ( (1.002432*((np.cos(zenith_rad)) ** 2) + \
+            0.148386*(np.cos(zenith_rad)) + 0.0096467) / \
+            (np.cos(zenith_rad) ** 3 + \
+            0.149864*(np.cos(zenith_rad) ** 2) + \
             0.0102963*(np.cos(zenith_rad)) + 0.000303978) )
     return AM
 
@@ -73,8 +73,8 @@ def input(argv):
             Vfile = arg
         elif opt in ("-r", "--rfile"):
             Rfile = arg
-    print("Johnson V file is ", Vfile)
-    print("Johnson R file is ", Rfile)
+    print("Johnson V file is :", Vfile)
+    print("Johnson R file is :", Rfile)
     return Vfile, Rfile
 # ================================================
 # MAIN
@@ -83,9 +83,9 @@ sberr = 0
 mflag = "False"
 FWHM = 3
 norm = ImageNormalize(stretch=SqrtStretch())
-elmin = 10  # set the minimum elevation
-# calculate maximum zenith angle
-zemax = 90 - elmin
+
+elmin = 5  # set the minimum elevation
+
 # read site coordinates
 # Load Parameters
 home = os.path.expanduser("~")
@@ -108,7 +108,7 @@ num_pts = np.shape(tpt)[0]
 print("Number of points to extract :", num_pts)
 
 ts = load.timescale()
-time=ts.utc(2020, 9, 22, 4, 32, 53)
+time=ts.utc(2020, 9, 22, 4, 22, 53)
 #time = ts.now()
 
 
@@ -134,7 +134,46 @@ azim = azim.degrees
 alts = alts.degrees
 azis = azis.degrees
 moonphase = almanac.moon_phase(eph, time).degrees
+# reading V and R images names from the input parameters
+Vfile, Rfile = input(sys.argv[1:])
+Vimg = open_raw(Vfile)
+Rimg = open_raw(Rfile)
+# reading coefficients to convert RGB into gray scale
+RC = p["R2GrayCoef"]
+GC = p["G2GrayCoef"]
+BC = p["B2GrayCoef"]
+# create the grayscale images
+Vgray = to_grayscale(Vimg, [RC, GC, BC], normalize=False)
+Rgray = to_grayscale(Rimg, [RC, GC, BC], normalize=False)
+ny = np.shape(Vgray)[0]
+nx = np.shape(Vgray)[1]
+# set the minimum elevation to the limit of the image if required
+if (elmin < 90 - 0.98 * (ny/2 * p["Zslope"] + (ny/2)**2 * p["Zquad"])):
+    elmin = 90 - 0.98 * (ny/2 * p["Zslope"] + (ny/2)**2 * p["Zquad"])
 
+print("Minimum elevation :",elmin)
+# calculate maximum zenith angle
+zemax = 90 - elmin
+rnmax = ( -p["Zslope"] + np.sqrt(p["Zslope"]**2 - 4 * p["Zquad"] * -zemax))/(2 * p["Zquad"])
+
+# creating elevation, azimith maps
+print("Creating Azimuth and elevation maps...")
+y, x = np.indices((ny, nx))
+# computing the distance to zenith in pixels
+d = np.hypot(x - nx/2, y - ny/2)
+d[d < 0.5] = 0.5
+z =   p["Zslope"] * d + p["Zquad"] * d**2
+z[z < 0] = 0
+# computing azimuth
+az = np.arctan2(-x + nx/2, -y + ny/2) * 180 / np.pi
+#az = az - azpol
+az = np.where(az < 0, az + 360, az)
+# solid angle in sq arc second
+sec2 = ((p["Zslope"]+p["Zquad"]) * 180 * 3600**2 * np.sin((z)*np.pi/180))/(d*np.pi)
+# compute elevation angle
+el = 90 - z
+ImgAirm = airmass(el)
+ImgAirm[z>=90] = np.nan
 
 # setting moon flag to 1 if its elevation is positive
 if (altm > 0):
@@ -144,14 +183,14 @@ print(f"Moon azimuth: {azim:.4f}")
 print(f"Sun altitude: {alts:.4f}")
 print(f"Sun azimuth: {azis:.4f}")
 # creating star map with the SIMBAD stars database
-limit = 4  # limitting stars magnitude
 ds = pd.read_csv(home + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv",header=0,sep=";")
-stars_selected = ds[ds['MagV'] < limit]
+
 #stars_selected=ds[ds['MagR'] < limit]
+
+
+# locating Polaris
 polaris = ds.loc[ds["identifier"] == "* alf UMi"]
-coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
 radpolaris = polaris["coord1_ICRS,J2000/2000_"]
-coords = coordsradec.to_numpy(dtype="str")
 coordspolaris = radpolaris.to_numpy(dtype="str")
 cpolaris = coordspolaris[0].split(" ")
 etoilepol = Star(ra_hours=(float(cpolaris[0]), float(cpolaris[1]), float(cpolaris[2])),dec_degrees=(float(cpolaris[3]), float(cpolaris[4]), float(cpolaris[5])))
@@ -159,21 +198,42 @@ epol = here_now.observe(etoilepol).apparent()
 alt_star, azi_star, distance = epol.altaz()
 alt_pol=alt_star.degrees
 azi_pol=azi_star.degrees
-altpol = np.zeros(1)
-azipol = np.zeros(1)
+altpol = np.empty([2],dtype=float)
+azipol = np.empty([2],dtype=float)
 azipol[0] = azi_pol
 altpol[0] = alt_pol
+azipol[1] = azi_pol
+altpol[1] = alt_pol
+# position of Polaris on the image grid
+print("Position Polaris on the image grid...")
+polindex = find_close_indices(az, el, azipol , altpol)
+polshape=int(np.shape(polindex)[0])
+polshape=int(polshape/2)
+polindex = polindex.reshape(polshape,2)
+polindex = np.delete(polindex, (0), axis=0)
+polshape=int(np.shape(polindex)[0])
+print("Polaris located at : ",polindex[0,1],polindex[0,0])
+
+# selecting reference stars in the simbad database
+limiti = 3.7 # limitting stars magnitude NEED TO BE LOWER THAN 6
+limits = 1.2
+stars_selected = ds[(ds['MagV'] < limiti) & (ds['MagV'] > limits)]
+
+coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
+coords = coordsradec.to_numpy(dtype="str")
 identity = stars_selected["identifier"]
 iden = identity.to_numpy(dtype="str")
 magnitudev = stars_selected["MagV"]
 magv = magnitudev.to_numpy(dtype="float")
 magnituder = stars_selected["MagR"]
 magr = magnituder.to_numpy(dtype="float")
+# find pixel positions of the SIMBAD stars on the array grid corresponding to image size
+print("Position simbad stars on the image grid...")
 
-# create np array for stars
-i=0
 altstar = np.zeros(np.shape(coords)[0])
 azistar = np.zeros(np.shape(coords)[0])
+
+# create np array for stars
 for i in range(np.shape(coords)[0]):
     posstar = coords[i].split(" ")
     rah=float(posstar[0])
@@ -189,41 +249,33 @@ for i in range(np.shape(coords)[0]):
     azi_star=azi_star.degrees
     azistar[i]=azi_star
     altstar[i]=alt_star
-# keep stars above horizon
-azistar[ altstar < elmin ] = np.nan
-magv[ altstar < elmin ] = np.nan
-magr[ altstar < elmin ] = np.nan
-altstar[ altstar < elmin ] = np.nan
-iden[ altstar < elmin ] = np.nan
-# remove stars without R magnitude
-azistar[ np.isnan(magr) ] = np.nan
-altstar[ np.isnan(magr) ] = np.nan
-magv[ np.isnan(magr) ] = np.nan
-iden[ np.isnan(magr) ] = "unknown"
-# remove nan
-azistar = azistar[ ~np.isnan(azistar) ]
-altstar = altstar[ ~np.isnan(altstar) ]
-magv = magv[ ~np.isnan(magv) ]
-magr = magr[ ~np.isnan(magr) ]
-iden = np.delete(iden, np.where(iden == "unknown"))
+# keep stars above horizon limitz = 0.95 * ny/2 * p["Zslope"]
+azistar = np.delete(azistar, np.where(altstar < elmin))
+magv = np.delete(magv, np.where(altstar < elmin))
+magr = np.delete(magr, np.where(altstar < elmin))
+iden = np.delete(iden, np.where(altstar < elmin))
+altstar = np.delete(altstar, np.where(altstar < elmin))
+
+# find position of simbad stars on the image array
+index  = find_close_indices(az, el, azistar , altstar)
+ishape=int(np.shape(index)[0])
+ishape=int(ishape/2)
+index = index.reshape(ishape,2)
+index = np.delete(index, (0), axis=0)
+ishape=int(np.shape(index)[0])
+
+# index first column = y and second = x
+
+print("Number of SIMBAD reference stars above",elmin,"degrees :", ishape)
+
+
 # calculating airmass with A. T. Young, "AIR-MASS AND REFRACTION," Applied Optics, vol. 33,
 #    pp. 1108-1110, Feb 1994.
 AirM = airmass(altstar)
+
 # =====================================
 # sky image analysis
-# reading V and R images names from the input parameters
-Vfile, Rfile = input(sys.argv[1:])
-Vimg = open_raw(Vfile)
-Rimg = open_raw(Rfile)
-# reading coefficients to convert RGB into gray scale
-RC = p["R2GrayCoef"]
-GC = p["G2GrayCoef"]
-BC = p["B2GrayCoef"]
-# create the grayscale images
-Vgray = to_grayscale(Vimg, [RC, GC, BC], normalize=False)
-Rgray = to_grayscale(Rimg, [RC, GC, BC], normalize=False)
-ny = np.shape(Vgray)[0]
-nx = np.shape(Vgray)[1]
+
 
 # **************************** supprimer
 rm = 0.635
@@ -237,55 +289,9 @@ rrr=np.sqrt(xxx*xxx+yyy*yyy)/rm
 rrr[rrr>1.0]=0.0
 r=np.linspace(0,1,100)
 flat=np.interp(rrr,r,vv)
-# ******************************
-
-# plt.figure()
-# plt.imshow(Vgray, cmap="rainbow")
-# plt.colorbar()
-# plt.title("Original")
 
 Vgray = Vgray / flat
 
-# plt.figure()
-# plt.imshow(Vgray, cmap="rainbow")
-# plt.colorbar()
-# plt.title("Flat corrected ")
-#
-# plt.figure()
-# plt.imshow(flat, cmap="rainbow")
-# plt.colorbar()
-# plt.title("flat ")
-
-y, x = np.indices((ny, nx))
-# computing the distance to zenith in pixels
-d = np.hypot(x - nx/2, y - ny/2)
-d[d < 0.5] = 0.5
-#z = p["Zconstant"] + p["Zslope"] * d + p["Zquad"] * d**2
-z =   p["Zslope"] * d + p["Zquad"] * d**2
-z[z < 0] = 0
-# computing azimuth
-az = np.arctan2(-x + nx/2, -y + ny/2) * 180 / np.pi
-#az = az - azpol
-az = np.where(az < 0, az + 360, az)
-# solid angle in sq arc second
-sec2 = ((p["Zslope"]+p["Zquad"]) * 180 * 3600**2 * np.sin((z)*np.pi/180))/(d*np.pi)
-# compute elevation angle
-el = 90 - z
-
-
-
-
-
-# plt.figure()
-# plt.imshow(sec2, cmap="inferno")
-# plt.colorbar()
-# plt.title("Solid angle ")
-# plt.figure()
-# plt.imshow(z, cmap="inferno")
-# plt.colorbar()
-# plt.title("Zenith angle ")
-# plt.show()
-#
 outname= "calibrated" + "_"  + basename + "_sky.csv"
 # create the data file if it do not exists
 if (os.path.exists(outname) == False):
@@ -303,15 +309,7 @@ Vbkg = np.zeros([ny,nx])
 Rbkg = np.zeros([ny,nx])
 Vstars = np.zeros([ny,nx])
 Rstars = np.zeros([ny,nx])
-# find pixel positions of the SIMBAD stars on the array grid corresponding to image size
-index  = find_close_indices(az, el, azistar , altstar)
-polindex = find_close_indices(az, el, azipol , altpol)
-shape=int(np.shape(index)[0])
-shape=int(shape/2)
-index = index.reshape(shape,2)
-# index first column = y and second = x
-StarMatch = np.zeros([shape,11])
-print("Number of SIMBAD reference stars : ", shape)
+
 # ================================
 # loop over the two bands
 for band, xpoli, ypoli, imagi, imbkg, imstars   in (
@@ -335,80 +333,87 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
     print(f"Processing Johnson {band} camera...")
     # iterative process to find correct zenith position xzen Yzenith
     xzen=nx/2
-    yzen=nx/2
+    yzen=ny/2
     xpol = xpoli
     ypol = ypoli
     gap = 100
-    gaptx = 0
-    gapty = 0
-    angle = 0
+
     imag = imagi
-    print("Searching zenith in image ",band," ...")
-    while gap > 0.5 :
-        # calculate polaris azimuth
-        angpol =  np.arctan2(xpol - xzen, yzen - ypol) * 180 / np.pi
-        angpol = angpol - azi_pol
-        xpol = -np.hypot(xzen-xpol, yzen-ypol)*np.sin(angpol*np.pi/180.)+xzen
-        ypol = -np.hypot(xzen-xpol, yzen-ypol)*np.cos(angpol*np.pi/180.)+yzen
-        gapx = xpol - polindex[1]
-        gapy = ypol - polindex[0]
-        gap = np.hypot(gapx, gapy)
-        xzen = xzen - gapx
-        yzen = yzen - gapy
-        xpol = xpol - gapx
-        ypol = ypol - gapy
-        gaptx = gaptx + gapx
-        gapty = gapty + gapy
-        angle = angle + angpol
-    angpol =  np.arctan2(xpoli - xzen, yzen - ypoli) * 180 / np.pi
-    angpol = angpol + azi_pol
-    shiftx = xzen - nx /2
-    shifty = yzen - ny /2
-    print("Zenith position: ",xzen,yzen)
-    imag = ndimage.shift(imag, [ shiftx,  shifty], mode="nearest")
-    imag = ndimage.rotate(imag, angpol, reshape=False, mode="nearest")
+    shiftx=0
+    shifty=0
+    for i in range(2):
+        shiftx = polindex[0,1] - xpoli
+        shifty = polindex[0,0] - ypoli
+        theta1 = np.arctan2(ypoli - ny/2, xpoli - nx/2)*180/np.pi
+        theta2 = np.arctan2(polindex[0,0] - ny/2, polindex[0,1] - nx/2)*180/np.pi
+        theta = theta1 - theta2
+        angpol1 = np.arctan2(xpoli - nx/2, ny/2 - ypoli) * 180 / np.pi
+        angpol = angpol1 + azi_pol
+        imag = ndimage.shift(imag, [ shifty,  shiftx ], mode="nearest")
+        padX = [imag.shape[1] - polindex[0,1], polindex[0,1]]
+        padY = [imag.shape[0] - polindex[0,0], polindex[0,0]]
+        imgP = np.pad(imag, [padY, padX], 'constant')
+        imag = ndimage.rotate(imgP, theta, reshape=False, mode="nearest")
+        imag = imag[padY[0] : -padY[1], padX[0] : -padX[1]]
 
-    # find background
-    sigma_clip = SigmaClip(sigma=2.)
-    bkg_estimator = MedianBackground()
-    # background image
-    bkg = Background2D(imag, (9, 9), filter_size=(int(FWHM), int(FWHM)),
-                       sigma_clip=sigma_clip, bkg_estimator=bkg_estimator)
-    imbkg = bkg.background
-    # image without background
-    imstars = imag - imbkg
+        # find background
+        sigma_clip = SigmaClip(sigma=2.)
+        bkg_estimator = MedianBackground()
+        # background image
+        bkg = Background2D(imag, (9, 9), filter_size=(int(FWHM), int(FWHM)),
+                           sigma_clip=sigma_clip, bkg_estimator=bkg_estimator)
+        imbkg = bkg.background
+        # image without background
+        imstars = imag - imbkg
 
-    mean, median, std = sigma_clipped_stats(imstars, sigma=5.0)
-    daofind = DAOStarFinder(fwhm=FWHM, threshold=5.*std)
-    sources = daofind(imstars)
-    print(sources)
-    maxflux = sources["flux"].max()
-    #sources = sources[sources['flux'] > maxflux / 5 ]
-    # get the flux
-    Flux = sources["flux"]
-    # keep stars with elevation > elmin degrees
-    for col in sources.colnames:
-        sources[col].info.format = '%.8g'  # for consistent table output
-    positions = np.transpose((sources['xcentroid'], sources['ycentroid']))
-    radius = np.hypot(positions[:,0]-nx/2,positions[:,1]-ny/2)
-    sources = sources[radius > ny/3 ]
-    #positions[:, 1] = ny - positions[:, 1]
-    apertures = CircularAperture(positions, r=4.)
+        mean, median, std = sigma_clipped_stats(imstars, sigma=5.0)
+        daofind = DAOStarFinder(fwhm=FWHM, threshold=5.*std)
+        sources = daofind(imstars)
 
 
-    ns=0
+        # keep stars with elevation > elmin degrees
+        for col in sources.colnames:
+            sources[col].info.format = '%.8g'  # for consistent table output
+        positions = np.transpose((sources['xcentroid'], sources['ycentroid']))
+        Flux = sources["flux"]
+        rn = np.hypot(positions[:,0]-nx/2,positions[:,1]-ny/2)
+        sources = sources[ rn < rnmax]
+        positions = positions[ rn < rnmax]
+        Flux = Flux[ rn < rnmax]
+        maxflux = Flux.max()
+        sources = sources[Flux > maxflux / 2.5**limiti ]
+        positions = positions[Flux > maxflux / 2.5**limiti ]
+        Flux = Flux[Flux > maxflux / 2.5**limiti ]
+        #Flux = Flux[ rn < rnmax]
+        # find most probable Polaris
+        dtopol = np.hypot(polindex[0,1]-positions[:,0],polindex[0,0]-positions[:,1])
+        mintopol = np.nanmin(dtopol)
+        indtopol = np.where( dtopol == mintopol )
+        xpoli = float(positions[indtopol,0])
+        ypoli = float(positions[indtopol,1])
+
+
+
+
+
+
+        radius = np.hypot(positions[:,0]-nx/2,positions[:,1]-ny/2)
+        #sources = sources[radius > ny/3 ]
+        #positions[:, 1] = ny - positions[:, 1]
+        apertures = CircularAperture(positions, r=4.)
+
+    StarMatch = np.zeros([ishape,10])
     n=0
-    nistars = shape
+    nistars = ishape
     # searching for correspondance between stars in simbad and found stars in image
     dstar=np.zeros(np.shape(positions)[0])
-    for ns in range(shape):
-        for npos in range(np.shape(positions)[0]):
-            dstar[npos] = np.hypot(positions[npos,0]-index[ns,1],positions[npos,1]-index[ns,0])
+    for ns in range(ishape):
+        # for npos in range(np.shape(positions)[0]-1):
+        #     dstar[npos] = np.hypot(positions[npos,0]-index[ns,1],positions[npos,1]-index[ns,0])
+        dstar = np.hypot(positions[:,0]-index[ns,1],positions[:,1]-index[ns,0])**2/Flux
         dmin = np.amin(dstar)
         dmin_index = dstar.argmin()
-        if ( dmin < 20 ):
-            #noeuds, gap , ind_noeuds = closest_node(a_star, positions)  # FAUDRAIT QUE CETTE FONCTION RETOURNE LE FLUX
-            #print("noeuds",noeuds)
+        if ( dmin < 2000000 ):
             StarMatch[n,0] = index[ns,1]
             StarMatch[n,1] = index[ns,0]
             StarMatch[n,2] = positions[dmin_index,0] #noeuds[0]
@@ -416,94 +421,108 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
             StarMatch[n,4] = dmin
             StarMatch[n,5] = positions[dmin_index,0] - index[ns,1] #noeuds[0] - index[ns,1]
             StarMatch[n,6] = positions[dmin_index,1] - index[ns,0] #noeuds[1] - index[ns,0]
-            StarMatch[n,7] = magv[ns]
-            StarMatch[n,8] = magr[ns]
-            StarMatch[n,9] = AirM[ns]
-            StarMatch[n,10] = Flux[dmin_index]
+            if (band == "V"):
+                StarMatch[n,7] = magv[ns]
+            elif (band == "R"):
+                StarMatch[n,7] = magr[ns]
+            StarMatch[n,8] = AirM[ns]
+            StarMatch[n,9] = Flux[dmin_index]
             n=n+1
+    StarMatch[np.isnan(StarMatch)] = 0
+    StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
+    avggap , mediangap, stdgap = sigma_clipped_stats(StarMatch[:,4], sigma=2.0)
+    print("Average distance between nearest star :", avggap,"+/-",stdgap)
+    StarMatch = np.delete(StarMatch, np.where(StarMatch[:,4] > avggap + 0 * stdgap), axis=0)
+    StarMatch = np.delete(StarMatch, np.where(StarMatch[:,9] == 0), axis=0)
 
-    nfstars=np.shape(StarMatch)[0]
-    Approx_cloud = 1 - nfstars / nistars
-    avggap , mediangap, stdgap = sigma_clipped_stats(StarMatch[:,4], sigma=3.0)
-    print("Average distance between nearest star: ", avggap)
-
-    am = StarMatch[:,9]
-    am = np.delete(am, np.where((StarMatch[:,4] > avggap + 2 * stdgap) & (StarMatch[:,4] < avggap - 2 * stdgap)))
-    am = np.delete(am, np.where(StarMatch[:,10] == 0))
-    mvtoa = StarMatch[:,7]
-    mvtoa = np.delete(mvtoa, np.where((StarMatch[:,4] > avggap + 2 * stdgap) & (StarMatch[:,4] < avggap - 2 * stdgap)))
-    mvtoa = np.delete(mvtoa, np.where(StarMatch[:,10] == 0))
-    umv = StarMatch[:,10]
-    umv = np.delete(umv, np.where((StarMatch[:,4] > avggap + 2 * stdgap) & (StarMatch[:,4] < avggap - 2 * stdgap)))
-    umv = np.delete(umv, np.where(StarMatch[:,10] == 0))
-
-    # calculate uncalibrated mag, extinction, calibration factor
-    uncalMag = -2.5 * np.log10(umv)
-    # print(uncalMag)
-    # print(mvtoa)
-    # print(Flux)
-    deltam = uncalMag - mvtoa
-
-    # filter outliers zscore = (x - mean)/std
-    df = pd.DataFrame(zip(deltam, am))
-    df = df[(np.abs(stats.zscore(df)) < 2.5).all(axis=1)]
-    co = np.polyfit(df[1],df[0],1)
-
-    slope = co[0]
-    origin = co[1]
-    zeropoint = -origin
-
-
-    testcal = -2.5 * np.log10(umv) - origin
-    plt.figure()
-    plt.plot(mvtoa,testcal,"or",markersize=2)
-    plt.title("verif calib")
-
-
-    print("Slope = ",slope," Origin = ", origin)
-    fx = np.linspace(0,np.amax(am),100)
-    fy = co[1] + fx * co[0]
-    # atmospheric optical depth (aerosols + molecules)
-    tau = slope / (2.5 * np.log10(np.e))
-    extinction = slope
-    #  molecular optical depth - Bodhaine et al. (1999)
     if ( band == "V"):
         lambm = 551
+        k = 0.102
     elif (band == "R"):
         lambm = 658
-    tau_mol = (0.0021520*(1.0455996-341.29061*(lambm/1000.)**
-        -2.-0.90230850*(lambm/1000.)**2.)/(1.+0.0027059889*(lambm/1000.)**
-        -2.-85.968563*(lambm/1000.)**2.))
-    AOD = tau-tau_mol
-    print("Atmospheric optical depth =", tau)
-    print("Aerosol optical depth =",AOD," at ",lambm," nm")
-    print("Zenith atmospheric extinction (mag) =",extinction)
+        k = 0.0547
+
+    print("Zenith atmospheric extinction (mag) :",k)
+
+
+    # calculate uncalibrated mag, extinction, calibration factor
+    uncalMag = -2.5 * np.log10(StarMatch[:,9])
+    calMag = StarMatch[:,7] + k * StarMatch[:,8]
+
+
+
+
+    deltam = uncalMag - calMag
+
+    # fit de la magnitude hors atm en fonction de la mag non calibrée
+    ci = np.polyfit(uncalMag,calMag,1)
+    slopei = ci[0]
+    origini = ci[1]
+    plt.figure()
+    title = band + " Zero point"
+    plt.plot(uncalMag,calMag,'ob')
+    gx = np.linspace(np.amin(uncalMag),np.amax(uncalMag),100)
+    gy = ci[1] + gx * ci[0]
+    plt.plot(gx,gy,'r')
+    plt.title(title)
+    plt.ylabel("Calibrated Magnitude")
+    plt.xlabel("Uncalibrated Magnitude")
+    file = band  + "zeropoint_corr.png"
+    plt.savefig(file)
+
+    zeropoint=origini
     print("Zero point (mag) =",zeropoint)
+
+
+    # filter outliers zscore = (x - mean)/std
+    am = StarMatch[:,8]
+    co = np.polyfit(am,deltam,1)
+    slope = co[0]
+    origin = co[1]
+    fx = np.linspace(0,np.amax(am),100)
+    fy = co[1] + fx * co[0]
+    title = band + " dDelta_Mag vs Air Mass"
+    plt.figure()
+    plt.plot(am,deltam,"or",markersize=2)
+    plt.plot(fx,fy,'b')
+    plt.title(title)
+    plt.xlabel("Air Mass")
+    plt.ylabel("Delta Magnitude")
+    # atmospheric optical depth (aerosols + molecules)
+    # tau = slope / (2.5 * np.log10(np.e))
+    # extinction = slope
+    #  molecular optical depth - Bodhaine et al. (1999)
+    # tau_mol = (0.0021520*(1.0455996-341.29061*(lambm/1000.)**
+    #     -2.-0.90230850*(lambm/1000.)**2.)/(1.+0.0027059889*(lambm/1000.)**
+    #     -2.-85.968563*(lambm/1000.)**2.))
+    # AOD = tau-tau_mol
+    # print("Atmospheric optical depth =", tau)
+    # print("Aerosol optical depth =",AOD," at ",lambm," nm")
+
 
     # calculate a calibrated magnitude
     # calMag = -2.5 * np.log10(pixel_value) - origin
-    calMagTot = -2.5 * np.log10(imag) - origin
-    calMagBkg = -2.5 * np.log10(imbkg) - origin
+    #calMagTot = -2.5 * np.log10(imag) - origini + k * AirM
+    calMagBkg = -2.5 * np.log10(imbkg) + origini - k * ImgAirm
     # calibrated surface brightness in mag /sq arc sec
-    calSbTot = calMagTot + 2.5 * np.log10(sec2)
+    #calSbTot = calMagTot + 2.5 * np.log10(sec2)
     calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
 
+    # plt.figure()
+    # plt.imshow(ImgAirm, cmap="inferno", norm = norm )
+    # plt.colorbar()
+    # plt.title("airmass")
+
+    norm1 = simple_norm(calSbBkg, 'sqrt')
     title = band + " background Surface Brightness"
     file =  band + "calSbBkg.png"
     plt.figure()
-    plt.imshow(calSbBkg, cmap="inferno", norm = norm )
-    plt.zlim(22, 16)
+    plt.imshow(-calSbBkg, cmap="inferno" )
     plt.colorbar()
     plt.savefig(file)
     plt.title(title)
 
-    file = band  + "zeropoint_corr.png"
-    title = band + " delta_Mag vs Airmass"
-    plt.figure()
-    plt.plot(df[1],df[0],"or",markersize=2)
-    plt.plot(fx,fy,'b')
-    plt.title(title)
-    plt.savefig(file)
+
 
     file = band  + "Stars_Match.png"
     title = band + " Stars correspondance"
@@ -517,9 +536,9 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
     plt.savefig(file)
 
     # file = band  + "Sky.png"
-    # title = band + " Sky image"
+    # title = band + " Stars image"
     # plt.figure()
-    # plt.imshow(imag, cmap="inferno", norm = norm )
+    # plt.imshow(imstars, cmap="inferno" )
     # plt.colorbar()
     # plt.title(title)
     # plt.savefig('Sky.png')
@@ -539,47 +558,41 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
     stars_full=np.nan_to_num(stars_full,nan=0.0)
     # weighted with solid angle
     cloud_cover=1-np.sum(stars_count*sec2)/np.sum(stars_full*sec2)
-    print("Cloud fraction : ",cloud_cover, Approx_cloud)
+    print("Cloud fraction (%) : ",cloud_cover*100)
 
     if ( band == "V"):
         calSbBkgV = calSbBkg
         cloud_coverV = cloud_cover
-        Approx_cloudV = Approx_cloud
-        extinctionV = extinction
-        AODV = AOD
+        extinctionV = k
+        #AODV = AOD
         zeropointV = zeropoint
-        os.system('mv zeropoint_corr.png zeropoint_corrV.png')
         errV = sberr
         # saving transformed sky image
-        os.system('mv Sky.png SkyV.png')
+        # os.system('mv Sky.png SkyV.png')
         # saving sky background
         np.save("BackgroundV.npy", calSbBkgV)
-        os.system('mv calSbBkg.png calSbBkgV.png')
-        os.system('mv Stars_Match.png Stars_MatchV.png')
-
     elif ( band == "R" ):
         calSbBkgR = calSbBkg
         cloud_coverR = cloud_cover
-        Approx_cloudR = Approx_cloud
-        extinctionR = extinction
-        AODR = AOD
+        extinctionR = k
+        #AODR = AOD
         zeropointR = zeropoint
-        os.system('mv zeropoint_corr.png zeropoint_corrR.png')
         errR = sberr
         # saving transformed sky image
-        os.system('mv Sky.png SkyR.png')
+        #os.system('mv Sky.png SkyR.png')
         # saving sky background
         np.save("BackgroundR.npy", calSbBkgR)
-        os.system('mv calSbBkg.png calSbBkgR.png')
-        os.system('mv Stars_Match.png Stars_MatchR.png')
+
 
 # Extract points and write data
 index  = find_close_indices(az, el, apt , ept)
-shape=int(np.shape(index)[0])
-shape=int(shape/2)
-index = index.reshape(shape,2)
+pshape=int(np.shape(index)[0])
+pshape=int(pshape/2)
+index = index.reshape(pshape,2)
+index = np.delete(index, (0), axis=0)
+pshape=int(np.shape(index)[0])
 
-for no in range(num_pts):
+for no in range(num_pts-1):
     posx=str(index[no,1])
     posy=str(index[no,0])
     direction = here_now.from_altaz(alt_degrees=ept[no], az_degrees=apt[no])
@@ -594,9 +607,6 @@ for no in range(num_pts):
     # read R sky Brightness
     Rmago = calSbBkgR[index[no,0],index[no,1]]
     cloud_covero = (cloud_coverV + cloud_coverR) / 2
-    Approx_cloudo = (Approx_cloudV + Approx_cloudR) / 2
-    # check reliability of the cloud cover values
-
 
     o = open(outname, "a")
     outputline = Site + " , " + posx + " , " + posy + " , " + \
@@ -609,7 +619,7 @@ for no in range(num_pts):
     str("{:6.3f}".format(zeropointV)) + " , "  + \
     str("{:6.3f}".format(Rmago)) + " , " + \
     str("{:6.3f}".format(errR)) + " , " + \
-    str("{:6.3f}".format(zeropointV)) + " , "  + \
+    str("{:6.3f}".format(zeropointR)) + " , "  + \
     str("{:6.2f}".format(theta_sun)) + " , " + \
     str("{:6.2f}".format(theta_moon)) + " , " + \
     str("{:6.2f}".format(galactic_lat)) + " , " + \

@@ -425,9 +425,11 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
 
     if ( band == "V"):
         lambm = 551
+        cfactor = 1200
         k = extinc_v
     elif (band == "R"):
         lambm = 658
+        cfactor = 400
         k = extinc_r
     print("Zenith atmospheric extinction (mag) :",k)
 
@@ -522,21 +524,40 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
     # plt.savefig('Sky.png')
 
     # determine cloud cover
-    threshold = 0.001
-    stars_binary = np.full((ny,nx),np.nan)
-    stars_full = np.full((ny,nx), 1.)
+
+    threshold = np.amax(imstars)/cfactor
+    #stars_binary = np.full((ny,nx),np.nan)
+    stars_binary = np.full((ny,nx),0)
+    stars_full = np.full((ny,nx), 0)
     stars_binary[imstars>=threshold] = 1.
-    stars_binary[z > 90] = np.nan
-    window = 11  #  1 deg clouds ~= 10
+    stars_full[imstars>=threshold/100] = 1.
+    stars_binary[z > 90] = 0
+    stars_full[z > 90] = 0
+    window = 19  #  1 deg clouds ~= 10
     kernel=Box2DKernel(width=window, mode='integrate')
     stars_count = convolve(stars_binary, kernel)
     stars_count[z > 90] = 0.
-    stars_full[z > 90] = 0.
-    stars_count=np.nan_to_num(stars_count,nan=0.0)
-    stars_full=np.nan_to_num(stars_full,nan=0.0)
+    stars_full_count = convolve(stars_full, kernel)
+    stars_full_count[z > 90] = 0.
+    stars_count[stars_count>0]=1
+    stars_full_count[stars_full_count>0]=1
     # weighted with solid angle
-    cloud_cover=1-np.sum(stars_count*sec2)/np.sum(stars_full*sec2)
-    print("Cloud fraction (%) : ",cloud_cover*100)
+    cloud_cover=int((1-np.sum(stars_count*sec2)/np.sum(stars_full_count*sec2))*100)
+    print("Cloud cover (%) : ",cloud_cover)
+
+    # plt.figure()
+    # plt.imshow(stars_count, cmap="inferno" )
+    # plt.colorbar()
+    #
+    # plt.figure()
+    # plt.title("stars_full")
+    # plt.imshow(stars_full_count, cmap="inferno" )
+    # plt.colorbar()
+    #
+    # plt.figure()
+    # plt.title("stars")
+    # plt.imshow(imstars, cmap="inferno" )
+    # plt.colorbar()
 
     if ( band == "V"):
         np.save("BackgroundV.npy", calSbBkg)
@@ -570,7 +591,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
         str("{:6.2f}".format(apt[no])) + " , " + \
         str("{:5.2f}".format(ept[no])) + " , " + \
         str("{:4.2f}".format(airmo)) + " , " + str("{:5.3f}".format(k))  + " , " + timestamp + " , " + mflag +  " , " + \
-        str("{:5.1f}".format(cloud_cover*100)) + " , " + \
+        str("{:5.1f}".format(cloud_cover)) + " , " + \
         str("{:6.3f}".format(mago)) + " , " + \
         str("{:6.3f}".format(sberr)) + " , "  + \
         str("{:6.3f}".format(zeropoint)) + " , "  + \
@@ -578,8 +599,8 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
         str("{:6.2f}".format(theta_moon)) + " , " + \
         str("{:6.2f}".format(galactic_lat)) + " , " + \
         str("{:6.2f}".format(moonphase)) + "\n"
-        print(band," : ",outputline)
+        print(outputline)
         o.write(outputline)
         o.close()
 
-plt.show()
+# plt.show()

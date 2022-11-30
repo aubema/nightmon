@@ -38,7 +38,7 @@ take_pictureV() {
 		 fi
 		 let satmax=100
 		 # capture an image with V camera
-		 while [ $satmax -gt 75 ]
+		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_1*
 		 		python3 captureA.py -i $tv
 				if [ test -f capture_1.dng ]
@@ -62,8 +62,8 @@ take_pictureV() {
 		 		   satmax = `echo "${sat[*]}" | sort -nr | head -n1`
 		 		   if (satmax -ge 100)
 		       then let tv=tv/2
-		 		   elif (satmax -lt 75)
-			     then let tv=75*tv/satmax
+				 elif (satmax -lt 70)
+			     then let tv=80*tv/satmax
 			     fi
 			  else echo "Problem with V camera."
 					 exit 0
@@ -83,7 +83,7 @@ take_pictureVR() {
 		 		 fi
 		 		 let satmax=100
 		 let satmax=100
-		 while [ $satmax -gt 75 ]
+		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_2*
 		 		python3 captureB.py -i $tr
 				if [ test -f capture_2.dng ]
@@ -107,8 +107,8 @@ take_pictureVR() {
 				 		satmax = `echo "${sat[*]}" | sort -nr | head -n1`
 				 		if (satmax -ge 100)
 				    	then let tr=tr/2
-				 		elif (satmax -lt 75)
-					  	then let tr=75*tr/satmax
+				 		elif (satmax -lt 70)
+					  	then let tr=80*tr/satmax
 						fi
 				else echo "Problem with R camera."
 						 exit 0

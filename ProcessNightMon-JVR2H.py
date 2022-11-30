@@ -585,7 +585,6 @@ for band, xpoli, ypoli, imagi, imbkg, imstars   in (
         airmo = airmass(ept[no])
         # read V sky Brightness
         mago = calSbBkg[index[no,0],index[no,1]]
-        # TODO : AJOUTER FILTER A LA LISTE ET FAIRE UNE LIGNE DIFFERENTE PORU CHAQUE FILTRE
         o = open(outname, "a")
         outputline = Site + " , " + band + " , " + posx + " , " + posy + " , " + \
         str("{:6.2f}".format(apt[no])) + " , " + \

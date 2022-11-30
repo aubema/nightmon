@@ -133,19 +133,9 @@ read bidon bidon sitename bidon < ligne.tmp
 #
 # main loop
 #
-time1=`date +%s`
-i=0
-y=`date +%Y`
-mo=`date +%m`
-d=`date +%d`
-h=`date +%H`
-mi=`date +%M`
-s=`date +%S`
-basename=`date +%Y-%m-%d_%H-%M-%S`
 
 #basepath="/var/www/html/data"
 basepath="./test"
-
 
 take_pictureV
 y=`date +%Y`
@@ -163,11 +153,11 @@ fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
-echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/V-$tv-$basename.dng >> $basepath/$y/$m/nightmon.log
+echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_1.dng $basepath/$y/$m/$basename_V.dng
-cp capture_1.jpg $basepath/$y/$m/$basename_V.jpg
+cp capture_1.dng $basepath/$y/$m/$basename"_V_"$tv".dng"
+cp capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv".jpg"
 
 
 take_pictureR
@@ -189,8 +179,8 @@ fi
 echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/R-$tr-$basename.dng >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_1.dng $basepath/$y/$m/$basename_V.dng
-cp capture_1.jpg $basepath/$y/$m/$basename_V.jpg
+cp capture_2.dng $basepath/$y/$m/$basename"_R_"$tv".dng"
+cp capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv".jpg"
 
 
 # check for the night by reading the latest optimal integration time

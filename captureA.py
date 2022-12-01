@@ -14,20 +14,22 @@ gp.setup(12, gp.OUT)
 
 def input(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:t:", ["help=", "itime="])
+        opts, args = getopt.getopt(argv, "h:t:g:", ["help=", "itime=", "gain="])
     except getopt.GetoptError:
-        print("captureA.py -t <itime>")
+        print("captureA.py -t <itime> -g <gain>")
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print("captureA.py -t <itime>")
+            print("captureA.py -t <itime> -g <gain>")
             sys.exit()
         elif opt in ("-t", "--itime"):
             itime = arg
-        return itime
+        elif opt in ("-t", "--itime"):
+            gain = arg
+        return itime, gain
 
 
-itime = input(sys.argv[1:])
+itime, gain = input(sys.argv[1:])
 
 
 def main():
@@ -44,7 +46,7 @@ def main():
 def capture(cam):
     # cmd = "libcamera-hello -t 0"
     cmd = (
-        "libcamera-still --analoggain 8 --shutter itime --denoise off --rawfull "
+        "libcamera-still --analoggain gain --shutter itime --denoise off --rawfull "
         "--raw --awbgains 1,1 --nopreview -o capture_%d.jpg" % cam
     )
     os.system(cmd)

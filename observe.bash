@@ -40,7 +40,7 @@ take_pictureV() {
 		 # capture an image with V camera
 		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_1*
-		 		python3 captureA.py -i $tv
+		 		python3 captureA.py -i $tv -g $gain
 				if [ test -f capture_1.dng ]
 		    then lisc perc capture_1.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
 		 	   	 read unitr decr unitg decg unitb decb bidon  < capture.tmp
@@ -85,7 +85,7 @@ take_pictureVR() {
 		 let satmax=100
 		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_2*
-		 		python3 captureB.py -i $tr
+		 		python3 captureB.py -i $tr -g $gain
 				if [ test -f capture_2.dng ]
 				then lisc perc capture_2.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
 				 		read unitr decr unitg decg unitb decb bidon  < capture.tmp
@@ -124,7 +124,9 @@ take_pictureVR() {
 #
 # main
 #
+gain = 8
 max_lum=10000  # 1000000 = 1sec
+darkimg = "dark-gain16-t100000.dng"
 # get the site name
 /bin/grep "SITE" $HOME/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp
@@ -153,11 +155,11 @@ fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
-echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv".dng" >> $basepath/$y/$m/nightmon.log
+echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_1.dng $basepath/$y/$m/$basename"_V_"$tv".dng"
-cp capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv".jpg"
+cp capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
+cp capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
 
 
 take_pictureR
@@ -176,11 +178,11 @@ fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
-echo $y $mo $d $h $mi $s " R " $tr $basepath/$y/$m/R-$tr-$basename.dng >> $basepath/$y/$m/nightmon.log
+echo $y $mo $d $h $mi $s " R " $tr $basename"_R_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_2.dng $basepath/$y/$m/$basename"_R_"$tv".dng"
-cp capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv".jpg"
+cp capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
+cp capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
 
 
 # check for the night by reading the latest optimal integration time
@@ -193,7 +195,7 @@ fi
 
 echo "=============================="
 # process sky IMAGES
-python3 ProcessNightMon-JVR2H.py -v capture_1.dng -r capture_2.dng >> $basepath/$y/$m/nightmon.log
+python3 ProcessNightMon-JVR2H.py -v capture_1.dng -r capture_2.dng -d $HOME/$darkimg >> $basepath/$y/$m/nightmon.log
 # rename pictures
 mv BackgroundV.npy $basepath/$y/$m/$basename_BackgroundV.npy
 mv BackgroundR.npy $basepath/$y/$m/$basename_BackgroundR.npy

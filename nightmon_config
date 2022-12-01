@@ -1,16 +1,17 @@
 # input parameters for NightMon
-SITE : ORM
-LONGITUDE : -71.67772  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
-LATITUDE : 45.735241
-ELEVATION : 0
-XpolarisV : 1000
-YpolarisV : 625
-XzenithV : 1000
-YzenithV : 750
-XpolarisR : 0
-YpolarisR : 1375
-XzenithR : 800
-YzenithR : 750
-Zconstant : 0
-Zslope : 0.12
-Zquad : 0
+Site : Mont_Hereford   # No spaces in site name
+Longitude : -71.60168  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+Latitude : 45.08263
+Altitude : 864
+XpolarisV : 1019
+YpolarisV : 329
+XpolarisR : 1019
+YpolarisR : 329
+Zslope : 1.21679222e-01
+Zquad : -2.09108975e-05
+R2GrayCoef : 0.2
+G2GrayCoef : 1
+B2GrayCoef : 0.1
+VZeroPoint : 20
+RZeroPoint : 19
+#-2.09108975e-05

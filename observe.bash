@@ -85,36 +85,36 @@ take_pictureR() {
 		 		captureB.py -t $tr -g $gain
 				lisc perc capture_2.dng -p 99.9
 				if [ -f "capture_2.dng" ]
-				then lisc perc capture_2.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g'> capture.tmp
-				 		read unitr decr unitg decg unitb decb bidon  < capture.tmp
-						echo $unitr $decr $unitg $decg $unitb $decb ${decr:0:1}
-						# remove leading zero to the sky brightness
-      		   if [ ${decr:0:1} == 0 ]
-      		   then decr=`echo $decr | sed -e 's/0//g'`
-      		   fi
-      		   if [ ${decg:0:1} == 0 ]
-      		   then decg=`echo $decg | sed -e 's/0//g'`
-      		   fi
-      	     if [ ${decb:0:1} == 0 ]
-      		   then decb=`echo $decb | sed -e 's/0//g'`
-      		   fi
-      		   let satr=unitr*1000+decr
- 	   		     let satg=unitg*1000+decg
-      		   let satb=unitb*1000+decb
- 		 		   sat=($satr $satg $satg)
- 		 	   	 IFS=$'\n'
- 		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
- 		 		   if [ $satmax -ge 1000 ]
- 		       then let tv=tv/2
-				 elif [ $satmax -lt 700 ]
- 			     then let tv=80*tv/satmax
- 			     fi
-				else echo "Problem with R camera."
-						 exit 0
+		    then lisc perc capture_1.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g' > capture.tmp
+		 	   	 read unitr decr unitg decg unitb decb bidon  < capture.tmp
+					 						echo $unitr $decr $unitg $decg $unitb $decb
+     		   # remove leading zero to the sky brightness
+     		   if [ ${decr:0:1} == 0 ]
+     		   then decr=`echo $decr | sed -e 's/0//g'`
+     		   fi
+     		   if [ ${decg:0:1} == 0 ]
+     		   then decg=`echo $decg | sed -e 's/0//g'`
+     		   fi
+     	     if [ ${decb:0:1} == 0 ]
+     		   then decb=`echo $decb | sed -e 's/0//g'`
+     		   fi
+     		   let satr=unitr*1000+decr
+	   		   let satg=unitg*1000+decg
+     		   let satb=unitb*1000+decb
+		 		   sat=($satr $satg $satg)
+		 	   	 IFS=$'\n'
+		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
+		 		   if [ $satmax -ge 1000 ]
+		       then let tr=tr/2
+				   elif [ $satmax -lt 700 ]
+			     then let tr=80*tr/satmax
+			     fi
+			  else echo "Problem with V camera."
+					 exit 0
 				fi
 		 done
 		 echo  $tr > Current_R_tint.tmp
-		 echo "R integration time: " $tv >> nightmon.log
+		 echo "R integration time: " $tr >> nightmon.log
 }
 
 

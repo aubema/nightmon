@@ -50,7 +50,7 @@ def main():
 def capture(cam):
     # cmd = "libcamera-hello -t 0"
     cmd = (
-        "libcamera-still --analoggain gain --shutter itime --denoise off --rawfull "
+        "libcamera-still --analoggain 8 --shutter itime --denoise off --rawfull "
         "--raw --awbgains 1,1 --nopreview -o capture_%d.jpg" % cam
     )
     os.system(cmd)

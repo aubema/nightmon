@@ -124,7 +124,7 @@ take_pictureVR() {
 #
 # main
 #
-gain = 8
+gain=8
 max_lum=10000  # 1000000 = 1sec
 darkimg = "dark-gain16-t100000.dng"
 # get the site name

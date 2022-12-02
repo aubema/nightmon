@@ -43,6 +43,7 @@ take_pictureV() {
 				if [ -f "capture_1.dng" ]
 		    then lisc perc capture_1.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
 		 	   	 read unitr decr unitg decg unitb decb bidon  < capture.tmp
+					 echo $unitr $decr $unitg $decg $unitb $decb
      		   # remove leading zero to the sky brightness
      		   if [ ${unitr:0:1} == 0 ]
      		   then unitr=`echo $unitr | sed -e 's/0//g'`

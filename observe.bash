@@ -86,7 +86,7 @@ take_pictureR() {
 				 		read unitr decr unitg decg unitb decb bidon  < capture.tmp
 						echo $unitr $decr $unitg $decg $unitb $decb
 						# remove leading zero to the sky brightness
-      		   if [ ${decr:0:1} == 0 ]
+      		   if [ ${decr:0:1} == "0" ]
       		   then decr=`echo $decr | sed -e 's/0//g'`
       		   fi
       		   if [ ${decg:0:1} == 0 ]

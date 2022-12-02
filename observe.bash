@@ -55,7 +55,7 @@ take_pictureV() {
 		 		   sat=($satr $satg $satg)
 		 	   	 IFS=$'\n'
 		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
-		 		   if ($satmax -ge 1000)
+		 		   if [ $satmax -ge 1000 ]
 		       then let tv=tv/2
 				 elif ($satmax -lt 700)
 			     then let tv=80*tv/satmax
@@ -100,9 +100,9 @@ take_pictureR() {
  		 		   sat=($satr $satg $satg)
  		 	   	 IFS=$'\n'
  		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
- 		 		   if ($satmax -ge 1000)
+ 		 		   if [ $satmax -ge 1000 ]
  		       then let tv=tv/2
-				   elif ($satmax -lt 700)
+				 elif [ $satmax -lt 700 ]
  			     then let tv=80*tv/satmax
  			     fi
 				else echo "Problem with R camera."

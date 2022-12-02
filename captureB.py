@@ -32,6 +32,7 @@ def input(argv):
 
 
 itime, gain = input(sys.argv[1:])
+print(itime, gain)
 
 
 def main():

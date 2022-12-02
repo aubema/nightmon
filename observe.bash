@@ -136,8 +136,8 @@ read bidon bidon sitename bidon < ligne.tmp
 # main loop
 #
 
-#basepath="/var/www/html/data"
-basepath="./test"
+basepath="/var/www/html/data"
+backpath="/home/sand/data"
 
 take_pictureV
 y=`date +%Y`
@@ -147,6 +147,7 @@ h=`date +%H`
 mi=`date +%M`
 s=`date +%S`
 basename=`date +%Y-%m-%d_%H-%M-%S`
+baseday=`date +%Y-%m-%d`
 read  tv toto < Current_V_tint.tmp
 # writing to logfile
 if [ ! -d $basepath/$y ]
@@ -197,11 +198,22 @@ echo "=============================="
 # process sky IMAGES
 python3 ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d $HOME/$darkimg >> $basepath/$y/$m/nightmon.log
 # rename pictures
-mv BackgroundV.npy $basepath/$y/$m/$basename_BackgroundV.npy
-mv BackgroundR.npy $basepath/$y/$m/$basename_BackgroundR.npy
 mv Vzeropoint_corr.png $basepath/$y/$m/$basename_Vzeropoint_corr.png
 mv Rzeropoint_corr.png $basepath/$y/$m/$basename_Rzeropoint_corr.png
 mv VcalSbBkg.png $basepath/$y/$m/$basename_VcalSbBkg.png
 mv RcalSbBkg.png $basepath/$y/$m/$basename_RcalSbBkg.png
 mv VStars_Match.png $basepath/$y/$m/$basename_VStars_Match.png
 mv RStars_Match.png $basepath/$y/$m/$basename_RStars_Match.png
+# backup important files
+if [ ! -d $backpath/$y ]
+then mkdir $backpath/$y
+fi
+if [ ! -d $backpath/$y/$mo ]
+then /bin/mkdir $backpath/$y/$mo
+fi
+cp -f $basepath/$y/$m/$basename_Vzeropoint_corr.png $backpath/
+cp -f $basepath/$y/$m/$basename_Rzeropoint_corr.png $backpath/
+cp -f $basepath/$y/$m/$basename_VStars_Match.png $backpath/
+cp -f $basepath/$y/$m/$basename_RStars_Match.png $backpath/
+cp -f $basepath/$y/$m/nightmon.log $backpath/
+cp -f $basepath/$y/$m/"calibrated_"$baseday"_sky.csv"

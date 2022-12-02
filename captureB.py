@@ -26,7 +26,7 @@ def input(argv):
             sys.exit()
         elif opt in ("-t", "--itime"):
             itime = arg
-        elif opt in ("-t", "--itime"):
+        elif opt in ("-g", "--gain"):
             gain = arg
         return itime, gain
 

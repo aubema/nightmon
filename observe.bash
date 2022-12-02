@@ -58,7 +58,7 @@ take_pictureV() {
      		   let satb=unitb*1000+decb
 		 		   sat=($satr $satg $satg)
 		 	   	 IFS=$'\n'
-		 		   satmax = `echo "${sat[*]}" | sort -nr | head -n1`
+		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
 		 		   if (satmax -ge 1000)
 		       then let tv=tv/2
 				   elif (satmax -lt 700)
@@ -103,7 +103,7 @@ take_pictureVR() {
       		   let satb=unitb*1000+decb
  		 		   sat=($satr $satg $satg)
  		 	   	 IFS=$'\n'
- 		 		   satmax = `echo "${sat[*]}" | sort -nr | head -n1`
+ 		 		   satmax=`echo "${sat[*]}" | sort -nr | head -n1`
  		 		   if (satmax -ge 1000)
  		       then let tv=tv/2
  				   elif (satmax -lt 700)

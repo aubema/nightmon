@@ -33,16 +33,16 @@ take_pictureV() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ $satmax -gt 800 ]
+		 while [ "$satmax" -gt 800 ]
 		 do	rm -f capture_1*
 		 		captureA.py -t $tv -g $gain
 				if [ -f "capture_1.dng" ]
 				then lisc perc capture_1.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g' > capture.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
-			       if [ $satmax -ge 100 ]
+			       if [ "$satmax" -ge 100 ]
 			       then  let tv=tv/2
-			       elif [ $satmax -lt 70 ]
+					 elif [ "$satmax" -lt 70 ]
 			       then let tr=80*tr/satmax
 					   fi
 			  else echo "Problem with V camera."
@@ -63,7 +63,7 @@ take_pictureR() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ $satmax -gt 800 ]
+		 while [ "$satmax" -gt 800 ]
 		 do	rm -f capture_2*
 		 		captureB.py -t $tr -g $gain
 				lisc perc capture_2.dng -p 99.9
@@ -71,9 +71,9 @@ take_pictureR() {
 		    then lisc perc capture_2.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g' > capture.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
-			       if [ $satmax -ge 100 ]
+			       if [ "$satmax" -ge 100 ]
 			       then  let tv=tv/2
-			       elif [ $satmax -lt 70 ]
+			       elif [ "$satmax" -lt 70 ]
 			       then let tr=80*tr/satmax
 					   fi
 			  else echo "Problem with V camera."

@@ -72,7 +72,7 @@ take_pictureV() {
 		 echo "V integration time: " $tv >> nightmon.log
 }
 
-take_pictureVR() {
+take_pictureR() {
 		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 		 echo "Taking pictures"
 		 		 read tr bidon < Current_R_tint.tmp

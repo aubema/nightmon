@@ -126,7 +126,7 @@ take_pictureVR() {
 #
 gain=8
 max_lum=10000  # 1000000 = 1sec
-darkimg = "dark-gain16-t100000.dng"
+darkimg="dark-gain16-t100000.dng"
 # get the site name
 /bin/grep "SITE" $HOME/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp

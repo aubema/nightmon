@@ -28,7 +28,7 @@ def input(argv):
             itime = arg
         elif opt in ("-g", "--gain"):
             gain = arg
-        return itime, gain
+    return itime, gain
 
 
 itime, gain = input(sys.argv[1:])

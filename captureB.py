@@ -49,7 +49,8 @@ def main():
 
 def capture(cam):
     # cmd = "libcamera-hello -t 0"
-    cmd = "libcamera-still --analoggain " + str(gain) " --shutter" + str(itime) + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_2.jpg"
+    cmd = "libcamera-still --analoggain " + str(gain) " --shutter " + str(itime) + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_2.jpg"
+    print(cmd)
     os.system(cmd)
 
 

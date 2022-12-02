@@ -31,13 +31,9 @@ take_pictureV() {
 		 then echo "tv not available, setting it to 1/10s"
 		      let tv=100000
 		 fi
-		 if [ -z "$tr" ]
-		 then echo "tr not available, setting it to 1/10s"
-		      let tr=100000
-		 fi
-		 let satmax=100
+		 let satmax=1000
 		 # capture an image with V camera
-		 while [ $satmax -gt 80 ]
+		 while [ $satmax -gt 800 ]
 		 do	rm -f capture_1*
 		 		captureA.py -t $tv -g $gain
 				if [ -f "capture_1.dng" ]
@@ -80,9 +76,9 @@ take_pictureR() {
 		 		 then echo "tr not available, setting it to 1/10s"
 		 		      let tr=100000
 		 		 fi
-		 		 let satmax=100
-		 let satmax=100
-		 while [ $satmax -gt 80 ]
+		 		 let satmax=1000
+		 let satmax=1000
+		 while [ $satmax -gt 800 ]
 		 do	rm -f capture_2*
 		 		captureB.py -t $tr -g $gain
 				if [ -f "capture_2.dng" ]

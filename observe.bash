@@ -39,7 +39,7 @@ take_pictureV() {
 		 # capture an image with V camera
 		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_1*
-		 		python3 captureA.py -i $tv -g $gain
+		 		captureA.py -i $tv -g $gain
 				if [ test -f capture_1.dng ]
 		    then lisc perc capture_1.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
 		 	   	 read unitr decr unitg decg unitb decb bidon  < capture.tmp
@@ -84,7 +84,7 @@ take_pictureVR() {
 		 let satmax=100
 		 while [ $satmax -gt 80 ]
 		 do	rm -f capture_2*
-		 		python3 captureB.py -i $tr -g $gain
+		 		captureB.py -i $tr -g $gain
 				if [ test -f capture_2.dng ]
 				then lisc perc capture_2.dng -p 99.9 | sed -e 's/=//g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' > capture.tmp
 				 		read unitr decr unitg decg unitb decb bidon  < capture.tmp

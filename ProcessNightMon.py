@@ -51,7 +51,7 @@ def find_close_indices(array1, array2, value1, value2, value3):
 mflag = 0
 # read site coordinates
 # Load Parameters
-home = os.path.expanduser("~")
+home = "/home/sand"
 with open(home + "/nightmon_config") as f:
     p = yaml.safe_load(f)
 

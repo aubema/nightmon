@@ -382,6 +382,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
     basename = time.utc_strftime("%Y-%m-%d")
     outname = "calibrated" + "_" + basename + "_sky.csv"
     timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
+    baseout = time.utc_strftime("%Y-%m-%d_%H-%M-%S")
     here_now = here.at(time)
     # calculation sun and moon positions
     moon_position = here_now.observe(eph["moon"]).apparent()
@@ -626,7 +627,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
     plt.title(title)
     plt.ylabel("Calibrated Magnitude")
     plt.xlabel("Uncalibrated Magnitude")
-    file = band + "zeropoint_corr.png"
+    file = band + "zeropoint_corr" + baseout + ".png"
     plt.savefig(file)
 
     zeropoint = origini
@@ -672,14 +673,14 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
 
     norm1 = simple_norm(calSbBkg, "sqrt")
     title = band + " background Surface Brightness"
-    file = band + "calSbBkg.png"
+    file = band + "calSbBkg" + baseout + ".png"
     plt.figure()
     plt.imshow(-calSbBkg, cmap="inferno")
     plt.colorbar()
     plt.savefig(file)
     plt.title(title)
 
-    file = band + "Stars_Match.png"
+    file = band + "Stars_Match" + baseout + ".png"
     title = band + " Stars correspondance"
     plt.figure()
     plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)
@@ -736,10 +737,10 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
     # plt.imshow(imstars, cmap="inferno" )
     # plt.colorbar()
 
-    if band == "V":
-        np.save("BackgroundV.npy", calSbBkg)
-    elif band == "R":
-        np.save("BackgroundR.npy", calSbBkg)
+    # if band == "V":
+    #     np.save("BackgroundV" + baseout + ".npy", calSbBkg)
+    # elif band == "R":
+    #     np.save("BackgroundR" + baseout + ".npy", calSbBkg)
 
     # Extract points and write data
     index = find_close_indices(az, el, apt, ept)

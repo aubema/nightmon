@@ -158,8 +158,8 @@ fi
 echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
-cp capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
+mv capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
+mv capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
 
 
 take_pictureR
@@ -181,8 +181,8 @@ fi
 echo $y $mo $d $h $mi $s " R " $tr $basename"_R_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-cp capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
-cp capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
+mv capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
+mv capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
 
 
 # check for the night by reading the latest optimal integration time
@@ -195,7 +195,7 @@ fi
 
 echo "=============================="
 # process sky IMAGES
-python3 ProcessNightMon-JVR2H.py -v capture_1.dng -r capture_2.dng -d $HOME/$darkimg >> $basepath/$y/$m/nightmon.log
+python3 ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d $HOME/$darkimg >> $basepath/$y/$m/nightmon.log
 # rename pictures
 mv BackgroundV.npy $basepath/$y/$m/$basename_BackgroundV.npy
 mv BackgroundR.npy $basepath/$y/$m/$basename_BackgroundR.npy

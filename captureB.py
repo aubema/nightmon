@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import getopt
 import os
 import sys

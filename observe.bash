@@ -27,7 +27,6 @@ take_pictureV() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking pictures"
 		 read tv bidon < Current_V_tint.tmp
-		 read tr bidon < Current_R_tint.tmp
 		 if [ -z "$tv" ]
 		 then echo "tv not available, setting it to 1/10s"
 		      let tv=100000
@@ -127,6 +126,8 @@ take_pictureVR() {
 gain=8
 max_lum=10000  # 1000000 = 1sec
 darkimg="dark-gain16-t100000.dng"
+echo  "10000" > Current_V_tint.tmp
+echo  "10000" > Current_R_tint.tmp
 # get the site name
 /bin/grep "SITE" $HOME/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp

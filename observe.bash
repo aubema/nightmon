@@ -25,7 +25,7 @@
 #
 take_pictureV() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
-		 echo "Taking pictures"
+		 echo "Taking V picture"
 		 read tv bidon < Current_V_tint.tmp
 		 if [ -z "$tv" ]
 		 then echo "tv not available, setting it to 1/10s"
@@ -131,15 +131,10 @@ echo  "10000 us" > Current_R_tint.tmp
 # get the site name
 /bin/grep "SITE" $HOME/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp
-# Sets gpio 13 as an output for the LED
-#=====
-#
-# main loop
-#
 
 basepath="/var/www/html/data"
 backpath="/home/sand/data"
-
+echo "Johnson V shot"
 take_pictureV
 y=`date +%Y`
 mo=`date +%m`
@@ -163,7 +158,7 @@ echo "=============================="
 mv capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
 mv capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
 
-
+echo "Johnson R shot"
 take_pictureR
 y=`date +%Y`
 mo=`date +%m`

@@ -56,7 +56,6 @@ def capture(cam):
         + str(itime)
         + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_2.jpg"
     )
-    print(cmd)
     os.system(cmd)
 
 

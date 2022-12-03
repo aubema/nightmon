@@ -37,7 +37,7 @@ take_pictureV() {
 		 do	rm -f capture_1*
 		 		captureA.py -t $tv -g $gain
 				if [ -f "capture_1.dng" ]
-				then lisc perc capture_1.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g' > capture.tmp
+				then lisc perc capture_1.dng -p 99.9  > saturation.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
 			       if [ "$satmax" -ge 100 ]
@@ -68,7 +68,7 @@ take_pictureR() {
 		 		captureB.py -t $tr -g $gain
 				lisc perc capture_2.dng -p 99.9
 				if [ -f "capture_2.dng" ]
-		    then lisc perc capture_2.dng -p 99.9 | sed -e 's/= //g' | sed -e 's/R//g' | sed -e 's/G//g' | sed -e 's/B//g'| sed -e 's/\./ /g' | sed -e 's/  / /g' | sed -e 's/  / /g' | sed -e 's/  / /g' > capture.tmp
+		    then lisc perc capture_2.dng -p 99.9  > saturation.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
 			       if [ "$satmax" -ge 100 ]

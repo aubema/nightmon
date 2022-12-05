@@ -33,7 +33,7 @@ take_pictureV() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ "$satmax" -gt 800 ]
+		 while [ "$satmax" -gt 80 ]
 		 do	rm -f capture_1*
 		    echo "Tv=" $tv
 		 		captureA.py -t $tv -g $gain
@@ -41,6 +41,7 @@ take_pictureV() {
 				then lisc perc capture_1.dng -p 99.9  > saturation.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
+						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let tv=tv/2
 					 elif [ "$satmax" -lt 70 ]
@@ -64,7 +65,7 @@ take_pictureR() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ "$satmax" -gt 800 ]
+		 while [ "$satmax" -gt 80 ]
 		 do	rm -f capture_2*
 		    echo "Tr=" $tr
 		 		captureB.py -t $tr -g $gain
@@ -73,6 +74,7 @@ take_pictureR() {
 		    then lisc perc capture_2.dng -p 99.9  > saturation.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
+						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let tr=tr/2
 			       elif [ "$satmax" -lt 70 ]
@@ -156,6 +158,7 @@ if [ $tv -lt $max_lum ]
 then echo "Too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
+		 echo "Let's keep the camera inside for 15 min"
 else move_cams.py 2000 1
 fi
 

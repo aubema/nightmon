@@ -33,7 +33,7 @@ take_pictureV() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ "$satmax" -gt 80 ]
+		 while [ "$satmax" -gt 90 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f capture_1*
 		    echo "Tv=" $tv
 		 		captureA.py -t $tv -g $gain
@@ -45,7 +45,7 @@ take_pictureV() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let tv=tv/2
 					 elif [ "$satmax" -lt 70 ]
-			       then let tv=80*tv/satmax
+			       then let tv=90*tv/satmax
 					   fi
 			  else echo "Problem with V camera."
 				  	 exit 0
@@ -65,7 +65,7 @@ take_pictureR() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ "$satmax" -gt 80 ]
+		 while [ "$satmax" -gt 90 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f capture_2*
 		    echo "Tr=" $tr
 		 		captureB.py -t $tr -g $gain
@@ -78,7 +78,7 @@ take_pictureR() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let tr=tr/2
 			       elif [ "$satmax" -lt 70 ]
-			       then let tr=80*tr/satmax
+			       then let tr=90*tr/satmax
 					   fi
 			  else echo "Problem with V camera."
 				  	 exit 0
@@ -126,8 +126,9 @@ fi
 echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-mv capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
-mv capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
+cp -f capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
+cp -f capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
+mv capture_2.dng $basename"_R_"$tv"_"$gain".dng"
 
 echo "Johnson R shot"
 take_pictureR
@@ -149,8 +150,9 @@ fi
 echo $y $mo $d $h $mi $s " R " $tr $basename"_R_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
 echo "=============================="
 # rename pictures
-mv capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
-mv capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
+cp -f capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
+cp -f capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
+mv capture_2.dng $basename"_R_"$tv"_"$gain".dng"
 
 
 # check for the night by reading the latest optimal integration time

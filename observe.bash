@@ -35,6 +35,7 @@ take_pictureV() {
 		 # capture an image with V camera
 		 while [ "$satmax" -gt 800 ]
 		 do	rm -f capture_1*
+		    echo "Tv=" $tv
 		 		captureA.py -t $tv -g $gain
 				if [ -f "capture_1.dng" ]
 				then lisc perc capture_1.dng -p 99.9  > saturation.tmp
@@ -43,7 +44,7 @@ take_pictureV() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let tv=tv/2
 					 elif [ "$satmax" -lt 70 ]
-			       then let tr=80*tr/satmax
+			       then let tv=80*tv/satmax
 					   fi
 			  else echo "Problem with V camera."
 				  	 exit 0
@@ -65,6 +66,7 @@ take_pictureR() {
 		 let satmax=1000
 		 while [ "$satmax" -gt 800 ]
 		 do	rm -f capture_2*
+		    echo "Tr=" $tr
 		 		captureB.py -t $tr -g $gain
 				lisc perc capture_2.dng -p 99.9
 				if [ -f "capture_2.dng" ]
@@ -72,7 +74,7 @@ take_pictureR() {
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
 			       if [ "$satmax" -ge 100 ]
-			       then  let tv=tv/2
+			       then  let tr=tr/2
 			       elif [ "$satmax" -lt 70 ]
 			       then let tr=80*tr/satmax
 					   fi
@@ -96,7 +98,7 @@ darkimg="dark-gain16-t100000.dng"
 echo  "10000 us" > Current_V_tint.tmp
 echo  "10000 us" > Current_R_tint.tmp
 # get the site name
-/bin/grep "SITE" $HOME/nightmon_config > ligne.tmp
+/bin/grep "SITE" /home/sand/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp
 
 basepath="/var/www/html/data"
@@ -151,7 +153,7 @@ mv capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
 
 # check for the night by reading the latest optimal integration time
 if [ $tv -lt $max_lum ]
-then "Echo too much light. It is probably daytime."
+then echo "Too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
 else move_cams.py 2000 1
@@ -159,7 +161,7 @@ fi
 
 echo "=============================="
 # process sky IMAGES
-ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d $HOME/$darkimg >> $basepath/$y/$m/nightmon.log
+ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d /home/sand/$darkimg >> $basepath/$y/$m/nightmon.log
 # rename pictures
 mv Vzeropoint_corr.png $basepath/$y/$m/$basename_Vzeropoint_corr.png
 mv Rzeropoint_corr.png $basepath/$y/$m/$basename_Rzeropoint_corr.png

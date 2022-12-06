@@ -169,7 +169,7 @@ mv VcalSbBkg$basenameV.png $basepath/$yV/$moV/
 mv RcalSbBkg$basenameV.png $basepath/$yR/$moR/RcalSbBkg$basenameR.png
 mv VStars_Match$basenameV.png $basepath/$yV/$moV/
 mv RStars_Match$basenameV.png $basepath/$yR/$moR/RStars_Match$basenameR.png
-cat "calibrated_"$basedayV"_sky.csv" >> $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv"
+cat "calibrated_"$basedayV"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv"
 # backup important files
 if [ ! -d $backpath/$yV ]
 then mkdir $backpath/$yV

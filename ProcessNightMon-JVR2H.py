@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # angle between pixels and the moon, sun and galactic altitude
 #
 # prior to use that script you need to install skyfield
@@ -125,6 +126,7 @@ limits = 1.2
 # load command line parameters
 Vfile, Rfile, Dfile, extinc_v, extinc_r = input(sys.argv[1:])
 # open images
+print("Reading images...")
 Vimg = open_raw(Vfile)
 Rimg = open_raw(Rfile)
 Dimg = open_raw(Dfile)

@@ -135,7 +135,7 @@ Dimg = open_raw(Dfile)
 # Load Parameters
 home = os.path.expanduser("~")
 # read NightMon config file
-with open(home + "/nightmon_config") as f:
+with open("/home/sand/nightmon_config") as f:
     p = yaml.safe_load(f)
 Site = p["Site"]
 # reading coefficients to convert RGB into gray scale
@@ -143,7 +143,7 @@ RC = p["R2GrayCoef"]
 GC = p["G2GrayCoef"]
 BC = p["B2GrayCoef"]
 # load sky brightness extraction points
-pt = open(home + "/points_list", "r")
+pt = open("/home/sand/points_list", "r")
 pt.readline()  # skip one line
 tpt = []
 apt = []

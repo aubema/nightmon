@@ -169,6 +169,7 @@ mv VcalSbBkg$basenameV.png $basepath/$yV/$moV/
 mv RcalSbBkg$basenameV.png $basepath/$yR/$moR/RcalSbBkg$basenameR.png
 mv VStars_Match$basenameV.png $basepath/$yV/$moV/
 mv RStars_Match$basenameV.png $basepath/$yR/$moR/RStars_Match$basenameR.png
+mv "calibrated_"$basedayV"_sky.csv" $basepath/$yV/$moV/
 # backup important files
 if [ ! -d $backpath/$yV ]
 then mkdir $backpath/$yV

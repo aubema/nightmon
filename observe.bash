@@ -161,7 +161,7 @@ fi
 echo "=============================="
 # process sky IMAGES
 echo
-python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basenameV"_V_"$tv"_"$gain".dng" -r $basenameR"_R_"$tv"_"$gain".dng" -d /home/sand/git/data/Darks/$darkimg
+python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basenameV"_V_"$tv"_"$gain".dng" -r $basenameR"_R_"$tv"_"$gain".dng" -d /home/sand/git/nightmon/data/Darks/$darkimg
 # rename pictures
 mv Vzeropoint_corr.png $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png
 mv Rzeropoint_corr.png $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png

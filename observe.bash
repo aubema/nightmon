@@ -107,51 +107,45 @@ basepath="/var/www/html/data"
 backpath="/home/sand/data"
 echo "Johnson V shot"
 take_pictureV
-y=`date +%Y`
-mo=`date +%m`
-d=`date +%d`
-h=`date +%H`
-mi=`date +%M`
-s=`date +%S`
-basename=`date +%Y-%m-%d_%H-%M-%S`
-baseday=`date +%Y-%m-%d`
+yV=`date +%Y`
+moV=`date +%m`
+dV=`date +%d`
+basenameV=`date +%Y-%m-%d_%H-%M-%S`
+basedayV=`date +%Y-%m-%d`
 read  tv toto < Current_V_tint.tmp
 # writing to logfile
-if [ ! -d $basepath/$y ]
-then mkdir $basepath/$y
+if [ ! -d $basepath/$yV ]
+then mkdir $basepath/$yV
 fi
-if [ ! -d $basepath/$y/$mo ]
-then /bin/mkdir $basepath/$y/$mo
+if [ ! -d $basepath/$yV/$moV ]
+then /bin/mkdir $basepath/$yV/$moV
 fi
-echo $y $mo $d $h $mi $s " V " $tv $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
+echo $yV $moV $dV $h $mi $s " V " $tv $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".dng" >> $basepath/$yV/$moV/nightmon.log
 echo "=============================="
 # rename pictures
-cp -f capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
-cp -f capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
-mv capture_1.dng $basename"_V_"$tv"_"$gain".dng"
+cp -f capture_1.dng $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".dng"
+cp -f capture_1.jpg $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".jpg"
+mv capture_1.dng $basenameV"_V_"$tv"_"$gain".dng"
 
 echo "Johnson R shot"
 take_pictureR
-y=`date +%Y`
-mo=`date +%m`
-d=`date +%d`
-h=`date +%H`
-mi=`date +%M`
-s=`date +%S`
-basename=`date +%Y-%m-%d_%H-%M-%S`
+yR=`date +%Y`
+moR=`date +%m`
+dR=`date +%d`
+basenameR=`date +%Y-%m-%d_%H-%M-%S`
 read  tr toto < Current_R_tint.tmp
 # writing to logfile
-if [ ! -d $basepath/$y ]
-then mkdir $basepath/$y
+if [ ! -d $basepath/$yR ]
+then mkdir $basepath/$yR
 fi
-if [ ! -d $basepath/$y/$mo ]
-then /bin/mkdir $basepath/$y/$mo
+if [ ! -d $basepath/$yR/$moR ]
+then /bin/mkdir $basepath/$yR/$moR
 fi
-echo $y $mo $d $h $mi $s " R " $tr $basename"_R_"$tv"_"$gain".dng" >> $basepath/$y/$m/nightmon.log
+echo $yR $moR $dR $h $mi $s " R " $tr $basenameR"_R_"$tv"_"$gain".dng" >> $basepath/$yR/$moR/nightmon.log
 echo "=============================="
 # rename pictures
-cp -f capture_2.dng $basepath/$y/$m/$basename"_R_"$tv"_"$gain".dng"
-cp -f capture_2.jpg $basepath/$y/$m/$basename"_R_"$tv"_"$gain".jpg"
+cp -f capture_2.dng $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".dng"
+cp -f capture_2.jpg $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".jpg"
 mv capture_2.dng $basename"_R_"$tv"_"$gain".dng"
 
 
@@ -169,22 +163,29 @@ echo "=============================="
 echo
 python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d /home/sand/git/data/Darks/$darkimg
 # rename pictures
-mv Vzeropoint_corr.png $basepath/$y/$m/$basename_Vzeropoint_corr.png
-mv Rzeropoint_corr.png $basepath/$y/$m/$basename_Rzeropoint_corr.png
-mv VcalSbBkg.png $basepath/$y/$m/$basename_VcalSbBkg.png
-mv RcalSbBkg.png $basepath/$y/$m/$basename_RcalSbBkg.png
-mv VStars_Match.png $basepath/$y/$m/$basename_VStars_Match.png
-mv RStars_Match.png $basepath/$y/$m/$basename_RStars_Match.png
+mv Vzeropoint_corr.png $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png
+mv Rzeropoint_corr.png $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png
+mv VcalSbBkg.png $basepath/$yV/$moV/$basenameV_VcalSbBkg.png
+mv RcalSbBkg.png $basepath/$yR/$moR/$basenameR_RcalSbBkg.png
+mv VStars_Match.png $basepath/$yV/$moV/$basenameV_VStars_Match.png
+mv RStars_Match.png $basepath/$yR/$moR/$basenameR_RStars_Match.png
 # backup important files
-if [ ! -d $backpath/$y ]
-then mkdir $backpath/$y
+if [ ! -d $backpath/$yV ]
+then mkdir $backpath/$yV
 fi
-if [ ! -d $backpath/$y/$mo ]
-then /bin/mkdir $backpath/$y/$mo
+if [ ! -d $backpath/$yV/$moV ]
+then /bin/mkdir $backpath/$yV/$moV
 fi
-cp -f $basepath/$y/$m/$basename_Vzeropoint_corr.png $backpath/
-cp -f $basepath/$y/$m/$basename_Rzeropoint_corr.png $backpath/
-cp -f $basepath/$y/$m/$basename_VStars_Match.png $backpath/
-cp -f $basepath/$y/$m/$basename_RStars_Match.png $backpath/
-cp -f $basepath/$y/$m/nightmon.log $backpath/
-cp -f $basepath/$y/$m/"calibrated_"$baseday"_sky.csv"
+if [ ! -d $backpath/$yR ]
+then mkdir $backpath/$yR
+fi
+if [ ! -d $backpath/$yR/$moR ]
+then /bin/mkdir $backpath/$yR/$moR
+fi
+cp -f $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png $backpath/
+cp -f $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png $backpath/
+cp -f $basepath/$yV/$moV/$basenameV_VStars_Match.png $backpath/
+cp -f $basepath/$yR/$moR/$basenameR_RStars_Match.png $backpath/
+cp -f $basepath/$yV/$moV/nightmon.log $backpath/
+cp -f $basepath/$yR/$moR/nightmon.log $backpath/
+cp -f $basepath/$yV/$mV/"calibrated_"$baseday"_sky.csv"

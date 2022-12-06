@@ -163,12 +163,12 @@ echo "=============================="
 echo
 python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basenameV"_V_"$tv"_"$gain".dng" -r $basenameR"_R_"$tv"_"$gain".dng" -d /home/sand/git/nightmon/data/Darks/$darkimg
 # rename pictures
-mv Vzeropoint_corr.png $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png
-mv Rzeropoint_corr.png $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png
-mv VcalSbBkg.png $basepath/$yV/$moV/$basenameV_VcalSbBkg.png
-mv RcalSbBkg.png $basepath/$yR/$moR/$basenameR_RcalSbBkg.png
-mv VStars_Match.png $basepath/$yV/$moV/$basenameV_VStars_Match.png
-mv RStars_Match.png $basepath/$yR/$moR/$basenameR_RStars_Match.png
+mv Vzeropoint_corr$basenameV.png $basepath/$yV/$moV/
+mv Rzeropoint_corr$basenameV.png $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png
+mv VcalSbBkg$basenameV.png $basepath/$yV/$moV/
+mv RcalSbBkg$basenameV.png $basepath/$yR/$moR/RcalSbBkg$basenameR.png
+mv VStars_Match$basenameV.png $basepath/$yV/$moV/
+mv RStars_Match$basenameV.png $basepath/$yR/$moR/RStars_Match$basenameR.png
 # backup important files
 if [ ! -d $backpath/$yV ]
 then mkdir $backpath/$yV
@@ -182,10 +182,10 @@ fi
 if [ ! -d $backpath/$yR/$moR ]
 then /bin/mkdir $backpath/$yR/$moR
 fi
-cp -f $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png $backpath/
-cp -f $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png $backpath/
-cp -f $basepath/$yV/$moV/$basenameV_VStars_Match.png $backpath/
-cp -f $basepath/$yR/$moR/$basenameR_RStars_Match.png $backpath/
+cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/
+cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/
+cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/
+cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/
 cp -f $basepath/$yV/$moV/nightmon.log $backpath/
 cp -f $basepath/$yR/$moR/nightmon.log $backpath/
 cp -f $basepath/$yV/$mV/"calibrated_"$baseday"_sky.csv"

@@ -43,7 +43,7 @@ take_pictureV() {
 				     read satmax bidon  < capture.tmp
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
-			       then  let tv=tv/2
+			       then  let tv=tv/10
 					 elif [ "$satmax" -lt 70 ]
 			       then let tv=90*tv/satmax
 					   fi
@@ -76,7 +76,7 @@ take_pictureR() {
 				     read satmax bidon  < capture.tmp
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
-			       then  let tr=tr/2
+			       then  let tr=tr/10
 			       elif [ "$satmax" -lt 70 ]
 			       then let tr=90*tr/satmax
 					   fi

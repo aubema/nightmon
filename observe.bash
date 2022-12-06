@@ -128,7 +128,7 @@ echo "=============================="
 # rename pictures
 cp -f capture_1.dng $basepath/$y/$m/$basename"_V_"$tv"_"$gain".dng"
 cp -f capture_1.jpg $basepath/$y/$m/$basename"_V_"$tv"_"$gain".jpg"
-mv capture_2.dng $basename"_V_"$tv"_"$gain".dng"
+mv capture_1.dng $basename"_V_"$tv"_"$gain".dng"
 
 echo "Johnson R shot"
 take_pictureR

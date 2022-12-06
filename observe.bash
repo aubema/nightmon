@@ -183,8 +183,7 @@ fi
 if [ ! -d $backpath/$yR/$moR ]
 then /bin/mkdir $backpath/$yR/$moR
 fi
-rm $basenameR"_R_"$tr"_"$gain".dng"
-rm $basenameR"_V_"$tv"_"$gain".dng"
+
 cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/$yV/$moV/
 cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/$yR/$moR/
 cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/$yV/$moV/
@@ -192,3 +191,6 @@ cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/$yR/$moR/
 cp -f $basepath/$yV/$moV/nightmon.log $backpath/$yV/$moV/
 cp -f $basepath/$yR/$moR/nightmon.log $backpath/$yR/$moR/
 cp -f $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv" $backpath/$yV/$moV/
+rm $basenameR"_R_"$tr"_"$gain".dng"
+rm $basenameV"_V_"$tv"_"$gain".dng"
+rm "calibrated_"$basedayV"_sky.csv"

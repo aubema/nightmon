@@ -146,7 +146,7 @@ echo "=============================="
 # rename pictures
 cp -f capture_2.dng $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".dng"
 cp -f capture_2.jpg $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".jpg"
-mv capture_2.dng $basename"_R_"$tv"_"$gain".dng"
+mv capture_2.dng $basenameR"_R_"$tv"_"$gain".dng"
 
 
 # check for the night by reading the latest optimal integration time
@@ -161,7 +161,7 @@ fi
 echo "=============================="
 # process sky IMAGES
 echo
-python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d /home/sand/git/data/Darks/$darkimg
+python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basenameV"_V_"$tv"_"$gain".dng" -r $basenameR"_R_"$tv"_"$gain".dng" -d /home/sand/git/data/Darks/$darkimg
 # rename pictures
 mv Vzeropoint_corr.png $basepath/$yV/$moV/$basenameV_Vzeropoint_corr.png
 mv Rzeropoint_corr.png $basepath/$yR/$moR/$basenameR_Rzeropoint_corr.png

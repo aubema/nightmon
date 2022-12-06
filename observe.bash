@@ -96,7 +96,7 @@ take_pictureR() {
 #
 gain=8
 max_lum=10000  # 1000000 = 1sec
-darkimg="dark-gain16-t100000.dng"
+darkimg="dark-gain8-t100000.dng"
 echo  "10000 us" > Current_V_tint.tmp
 echo  "10000 us" > Current_R_tint.tmp
 # get the site name
@@ -166,7 +166,8 @@ fi
 
 echo "=============================="
 # process sky IMAGES
-ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d /home/sand/$darkimg
+echo
+python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basename"_V_"$tv"_"$gain".dng" -r $basename"_R_"$tv"_"$gain".dng" -d /home/sand/git/data/Darks/$darkimg
 # rename pictures
 mv Vzeropoint_corr.png $basepath/$y/$m/$basename_Vzeropoint_corr.png
 mv Rzeropoint_corr.png $basepath/$y/$m/$basename_Rzeropoint_corr.png

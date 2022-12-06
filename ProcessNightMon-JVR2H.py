@@ -133,7 +133,7 @@ Rimg = open_raw(Rfile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters
-home = os.path.expanduser("~")
+# home = os.path.expanduser("~")
 # read NightMon config file
 with open("/home/sand/nightmon_config") as f:
     p = yaml.safe_load(f)
@@ -406,7 +406,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
     print(f"Sun azimuth: {azis:.4f}")
     # creating star map with the SIMBAD stars database
     ds = pd.read_csv(
-        home + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
+        "home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
     )
     # stars_selected=ds[ds['MagR'] < limit]
     # locating Polaris

@@ -144,9 +144,9 @@ fi
 echo $yR $moR $dR $h $mi $s " R " $tr $basenameR"_R_"$tv"_"$gain".dng" >> $basepath/$yR/$moR/nightmon.log
 echo "=============================="
 # rename pictures
-cp -f capture_2.dng $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".dng"
-cp -f capture_2.jpg $basepath/$yR/$moR/$basenameR"_R_"$tv"_"$gain".jpg"
-mv capture_2.dng $basenameR"_R_"$tv"_"$gain".dng"
+cp -f capture_2.dng $basepath/$yR/$moR/$basenameR"_R_"$tr"_"$gain".dng"
+cp -f capture_2.jpg $basepath/$yR/$moR/$basenameR"_R_"$tr"_"$gain".jpg"
+mv capture_2.dng $basenameR"_R_"$tr"_"$gain".dng"
 
 
 # check for the night by reading the latest optimal integration time
@@ -183,6 +183,8 @@ fi
 if [ ! -d $backpath/$yR/$moR ]
 then /bin/mkdir $backpath/$yR/$moR
 fi
+rm $basenameR"_R_"$tr"_"$gain".dng"
+rm $basenameR"_V_"$tv"_"$gain".dng"
 cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/$yV/$moV/
 cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/$yR/$moR/
 cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/$yV/$moV/

@@ -188,4 +188,4 @@ cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/$yV/$moV/
 cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/$yR/$moR/
 cp -f $basepath/$yV/$moV/nightmon.log $backpath/$yV/$moV/
 cp -f $basepath/$yR/$moR/nightmon.log $backpath/$yR/$moR/
-cp -f $basepath/$yV/$moV/"calibrated_"$baseday"_sky.csv" $backpath/$yV/$moV/
+cp -f $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv" $backpath/$yV/$moV/

@@ -84,7 +84,7 @@ def input(argv):
         opts, args = getopt.getopt(
             argv,
             "h:v:r:d:ev:er:",
-            ["help=", "vfile=", "dfile=", "rfile=", "extv=", "extr="],
+            ["help=", "vfile=", "rfile=", "dfile=", "extv=", "extr="],
         )
     except getopt.GetoptError:
         print("test.py -v <Vfile> -r <Rfile>")
@@ -105,6 +105,7 @@ def input(argv):
             extinc_r = arg
     print("Johnson V file is :", Vfile)
     print("Johnson R file is :", Rfile)
+    print("Dark frame file is :", Dfile)
     return Vfile, Rfile, Dfile, extinc_v, extinc_r
 
 

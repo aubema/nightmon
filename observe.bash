@@ -182,10 +182,10 @@ fi
 if [ ! -d $backpath/$yR/$moR ]
 then /bin/mkdir $backpath/$yR/$moR
 fi
-cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/
-cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/
-cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/
-cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/
-cp -f $basepath/$yV/$moV/nightmon.log $backpath/
-cp -f $basepath/$yR/$moR/nightmon.log $backpath/
-cp -f $basepath/$yV/$mV/"calibrated_"$baseday"_sky.csv"
+cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/$yV/$moV/
+cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/$yR/$moR/
+cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/$yV/$moV/
+cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/$yR/$moR/
+cp -f $basepath/$yV/$moV/nightmon.log $backpath/$yV/$moV/
+cp -f $basepath/$yR/$moR/nightmon.log $backpath/$yR/$moR/
+cp -f $basepath/$yV/$moV/"calibrated_"$baseday"_sky.csv" $backpath/$yV/$moV/

@@ -406,7 +406,7 @@ for band, xpoli, ypoli, imagi, imbkg, imstars in (
     print(f"Sun azimuth: {azis:.4f}")
     # creating star map with the SIMBAD stars database
     ds = pd.read_csv(
-        "home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
+        "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
     )
     # stars_selected=ds[ds['MagR'] < limit]
     # locating Polaris

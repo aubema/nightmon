@@ -116,14 +116,8 @@ Sfile, Cam = input(sys.argv[1:])
 print("Reading images...")
 Simg = open_raw(Sfile)
 
-# read site coordinates
 # Load Parameters
-# home = os.path.expanduser("~")
 # read NightMon config file
-
-
-# TODO restore that line
-# with open("/home/sand/cameraorientation_config") as f:
 configpath = "/home/" + user + "/cameraorientation_config"
 with open(cofigpath) as f:
     p = yaml.safe_load(f)
@@ -162,16 +156,11 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = q["Zslope"] * d + q["Zquad"] * d**2
+z = p["Zslope"] * d + p["Zquad"] * d**2 + p["Zthird"] * d**3 + p["Zfourth"] * d**4
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
-# az = az - azpol
 az = np.where(az < 0, az + 360, az)
-# solid angle in sq arc second
-sec2 = ((q["Zslope"] + q["Zquad"]) * 180 * 3600**2 * np.sin((z) * np.pi / 180)) / (
-    d * np.pi
-)
 # compute elevation angle
 el = 90 - z
 
@@ -188,8 +177,7 @@ elif Cam == "B":
     xpoli = p["XpolarisB"]
     ypoli = p["YpolarisB"]
 
-# TOTO : IL FAUT DEPLACER CECI ET LES EPHEMERIDES DANS LA BOUCLE DES FILTRES
-# files names provided by NightMon are formatted in the following way
+# file names provided by NightMon are formatted in the following way
 # YYYYY-MM-DD_hh-mm-ss_V.dng , the V letter represents the filter and can thus be
 # replaced by R. Time and date are in UTC.
 # time=ts.utc(2020, 9, 22, 4, 22, 53)
@@ -208,9 +196,6 @@ time = ts.utc(
 here_now = here.at(time)
 
 # creating star map with the SIMBAD stars database
-# TODO restore thhe following two line
-# ds = pd.read_csv(
-#    "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
 simbadpath = "/home/" + user + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv"
 ds = pd.read_csv(simbadpath, header=0, sep=";")
 
@@ -242,7 +227,6 @@ polindex = polindex.reshape(polshape, 2)
 polindex = np.delete(polindex, (0), axis=0)
 polshape = int(np.shape(polindex)[0])
 print("Polaris located at : ", polindex[0, 1], polindex[0, 0])
-
 
 stars_selected = ds[(ds["MagV"] < limiti) & (ds["MagV"] > limits)]
 coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
@@ -361,6 +345,7 @@ for i in range(3):
 print("Shift x : ", deltax)
 print("Shift y : ", deltay)
 print("Angle : ", angle)
+print("Copy that in your nightmon_config file")
 
 StarMatch = np.zeros([ishape, 9])
 n = 0
@@ -399,7 +384,6 @@ StarMatch = np.delete(
     StarMatch, np.where(StarMatch[:, 4] > avggap + 1 * stdgap), axis=0
 )
 StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 8] == 0), axis=0)
-
 
 title = "Stars correspondance"
 plt.figure()

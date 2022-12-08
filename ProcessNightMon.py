@@ -360,16 +360,24 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = p["Zslope"] * d + p["Zquad"] * d**2
+z = p["Zslope"] * d + p["Zquad"] * d**2 + p["Zthird"] * d**3 + p["Zfourth"] * d**4
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
 # az = az - azpol
 az = np.where(az < 0, az + 360, az)
 # solid angle in sq arc second
-sec2 = ((p["Zslope"] + p["Zquad"]) * 180 * 3600**2 * np.sin((z) * np.pi / 180)) / (
-    d * np.pi
-)
+sec2 = (
+    (
+        p["Zslope"]
+        + 2 * p["Zquad"] * d
+        + 3 * p["Zthird"] * d**2
+        + 4 * p["Zfourth"] * d**3
+    )
+    * 180
+    * 3600**2
+    * np.sin((z) * np.pi / 180)
+) / (d * np.pi)
 # compute elevation angle
 el = 90 - z
 ImgAirm = airmass(el)
@@ -655,6 +663,12 @@ calSbTot = calMagTot + 2.5 * np.log10(sec2)
 calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
 calSbTot[z > 90] = np.nan
 calSbBkg[z > 90] = np.nan
+
+
+plt.figure()
+plt.imshow(sec2, cmap="magma")
+plt.colorbar()
+plt.title("sq arc sec")
 
 title = Band + " calibration"
 file = Band + "_calibration_" + baseout + ".png"

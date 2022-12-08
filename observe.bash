@@ -23,19 +23,19 @@
 # =============================
 # find appropriate integration time
 #
-take_pictureV() {
+take_pictureA() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking V picture"
 		 read tv bidon < Current_V_tint.tmp
-		 if [ -z "$tv" ]
-		 then echo "tv not available, setting it to 1/10s"
-		      let tv=100000
+		 if [ -z "$ta" ]
+		 then echo "ta not available, setting it to 1/10s"
+		      let ta=100000
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
 		 while [ "$satmax" -gt 90 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f capture_1*
-		    echo "Tv=" $tv
+		    echo "Ta=" $ta
 		 		captureA.py -t $tv -g $gain
 				if [ -f "capture_1.dng" ]
 				then lisc perc capture_1.dng -p 99.9  > saturation.tmp
@@ -43,32 +43,32 @@ take_pictureV() {
 				     read satmax bidon  < capture.tmp
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
-			       then  let tv=tv/10
+			       then  let ta=ta/10
 					 elif [ "$satmax" -lt 70 ]
-			       then let tv=90*tv/satmax
+			       then let ta=90*ta/satmax
 					   fi
-			  else echo "Problem with V camera."
+			  else echo "Problem with A camera."
 				  	 exit 0
 				fi
 		 done
-		 echo  $tv > Current_V_tint.tmp
-		 echo "V integration time: " $tv >> nightmon.log
+		 echo  $ta > Current_A_tint.tmp
+		 echo "V integration time: " $ta >> nightmon.log
 }
 
-take_pictureR() {
+take_pictureB() {
 		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 		 echo "Taking pictures"
-		 		 read tr bidon < Current_R_tint.tmp
-		 		 if [ -z "$tr" ]
-		 		 then echo "tr not available, setting it to 1/10s"
-		 		      let tr=100000
+		 		 read tb bidon < Current_B_tint.tmp
+		 		 if [ -z "$tb" ]
+		 		 then echo "tb not available, setting it to 1/10s"
+		 		      let tb=100000
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
 		 while [ "$satmax" -gt 90 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f capture_2*
-		    echo "Tr=" $tr
-		 		captureB.py -t $tr -g $gain
+		    echo "Tb=" $tb
+		 		captureB.py -t $tb -g $gain
 				lisc perc capture_2.dng -p 99.9
 				if [ -f "capture_2.dng" ]
 		    then lisc perc capture_2.dng -p 99.9  > saturation.tmp
@@ -76,16 +76,16 @@ take_pictureR() {
 				     read satmax bidon  < capture.tmp
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
-			       then  let tr=tr/10
+			       then  let tb=tb/10
 			       elif [ "$satmax" -lt 70 ]
-			       then let tr=90*tr/satmax
+			       then let tb=90*tb/satmax
 					   fi
 			  else echo "Problem with V camera."
 				  	 exit 0
 				fi
 		 done
-		 echo  $tr > Current_R_tint.tmp
-		 echo "R integration time: " $tr >> nightmon.log
+		 echo  $tb > Current_B_tint.tmp
+		 echo "R integration time: " $tb >> nightmon.log
 }
 
 
@@ -97,60 +97,57 @@ take_pictureR() {
 gain=8
 max_lum=10000  # 1000000 = 1sec
 darkimg="dark-gain8-t100000.dng"
-echo  "10000 us" > Current_V_tint.tmp
-echo  "10000 us" > Current_R_tint.tmp
+# possible bands JV JR R G B (max 2 bands)
+bands=(JV JR)
+cams=(A B)
+# Standard extinctions for Observatorio Roque de los Muchachos (0.102 0.0547) (JV JR)
+extinct=(0.102 0.0547)
+echo ${bands[0]};for i in ${bands[@]};do echo $i;done
+echo  "10000 us" > Current_A_tint.tmp
+echo  "10000 us" > Current_B_tint.tmp
 # get the site name
 /bin/grep "SITE" /home/sand/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp
-
 basepath="/var/www/html/data"
 backpath="/home/sand/data"
-echo "Johnson V shot"
-take_pictureV
-yV=`date +%Y`
-moV=`date +%m`
-dV=`date +%d`
-basenameV=`date +%Y-%m-%d_%H-%M-%S`
-basedayV=`date +%Y-%m-%d`
-read  tv toto < Current_V_tint.tmp
+echo "A shot"
+take_pictureA
+y=`date +%Y`
+mo=`date +%m`
+dA=`date +%d`
+basenameA=`date +%Y-%m-%d_%H-%M-%S`
+baseday=`date +%Y-%m-%d`
+basename[0]="$basenameA"
+read  tv toto < Current_A_tint.tmp
 # writing to logfile
-if [ ! -d $basepath/$yV ]
-then mkdir $basepath/$yV
+if [ ! -d $basepath/$y ]
+then mkdir $basepath/$y
 fi
-if [ ! -d $basepath/$yV/$moV ]
-then /bin/mkdir $basepath/$yV/$moV
+if [ ! -d $basepath/$y/$mo ]
+then /bin/mkdir $basepath/$y/$mo
 fi
-echo $yV $moV $dV $h $mi $s " V " $tv $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".dng" >> $basepath/$yV/$moV/nightmon.log
+echo $y $mo $dA " A " $ta $basepath/$yV/$moV/$basenameA"_A_"$ta"_"$gain".dng" >> $basepath/$y/$mo/nightmon.log
 echo "=============================="
 # rename pictures
-cp -f capture_1.dng $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".dng"
-cp -f capture_1.jpg $basepath/$yV/$moV/$basenameV"_V_"$tv"_"$gain".jpg"
-mv capture_1.dng $basenameV"_V_"$tv"_"$gain".dng"
+cp -f capture_1.dng $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+cp -f capture_1.jpg $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
+mv capture_1.dng $basenameA"_A_"$ta"_"$gain".dng"
 
 echo "Johnson R shot"
-take_pictureR
-yR=`date +%Y`
-moR=`date +%m`
-dR=`date +%d`
-basenameR=`date +%Y-%m-%d_%H-%M-%S`
-read  tr toto < Current_R_tint.tmp
-# writing to logfile
-if [ ! -d $basepath/$yR ]
-then mkdir $basepath/$yR
-fi
-if [ ! -d $basepath/$yR/$moR ]
-then /bin/mkdir $basepath/$yR/$moR
-fi
-echo $yR $moR $dR $h $mi $s " R " $tr $basenameR"_R_"$tv"_"$gain".dng" >> $basepath/$yR/$moR/nightmon.log
+take_pictureB
+basenameB=`date +%Y-%m-%d_%H-%M-%S`
+basename[1]="$basenameB"
+read  tb toto < Current_B_tint.tmp
+echo $y $mo $d " B " $tb $basenameB"_B_"$tb"_"$gain".dng" >> $basepath/$y/$mo/nightmon.log
 echo "=============================="
 # rename pictures
-cp -f capture_2.dng $basepath/$yR/$moR/$basenameR"_R_"$tr"_"$gain".dng"
-cp -f capture_2.jpg $basepath/$yR/$moR/$basenameR"_R_"$tr"_"$gain".jpg"
-mv capture_2.dng $basenameR"_R_"$tr"_"$gain".dng"
+cp -f capture_2.dng $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+cp -f capture_2.jpg $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
+mv capture_2.dng $basenameB"_B_"$tb"_"$gain".dng"
 
 
 # check for the night by reading the latest optimal integration time
-if [ $tv -lt $max_lum ]
+if [ $ta -lt $max_lum ]
 then echo "Too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
@@ -161,37 +158,34 @@ fi
 
 echo "=============================="
 # process sky IMAGES
-echo
-python3 /usr/local/bin/ProcessNightMon-JVR2H.py -v $basenameV"_V_"$tv"_"$gain".dng" -r $basenameR"_R_"$tr"_"$gain".dng" -d /home/sand/git/nightmon/data/Darks/$darkimg
-# rename pictures
-mv Vzeropoint_corr$basenameV.png $basepath/$yV/$moV/
-mv Rzeropoint_corr$basenameV.png $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png
-mv VcalSbBkg$basenameV.png $basepath/$yV/$moV/
-mv RcalSbBkg$basenameV.png $basepath/$yR/$moR/RcalSbBkg$basenameR.png
-mv VStars_Match$basenameV.png $basepath/$yV/$moV/
-mv RStars_Match$basenameV.png $basepath/$yR/$moR/RStars_Match$basenameR.png
-cat "calibrated_"$basedayV"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv"
-# backup important files
-if [ ! -d $backpath/$yV ]
-then mkdir $backpath/$yV
-fi
-if [ ! -d $backpath/$yV/$moV ]
-then /bin/mkdir $backpath/$yV/$moV
-fi
-if [ ! -d $backpath/$yR ]
-then mkdir $backpath/$yR
-fi
-if [ ! -d $backpath/$yR/$moR ]
-then /bin/mkdir $backpath/$yR/$moR
-fi
+let n=0
+for b in ${bands[@]}
+do 	if ( n -eq 0 )
+    then let t=ta
+		else let t=tb
+		endif
+		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/sand/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]}
+		# rename pictures
+		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/
+		mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+		mv $band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+		mv $band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+		cat "calibrated_"$baseday"_"$b"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_"$b"_sky.csv"
+		# backup important files
+		if [ ! -d $backpath/$y ]
+		then mkdir $backpath/$y
+		fi
+		if [ ! -d $backpath/$y/$mo ]
+		then /bin/mkdir $backpath/$y/$mo
+		fi
 
-cp -f $basepath/$yV/$moV/Vzeropoint_corr$basenameV.png $backpath/$yV/$moV/
-cp -f $basepath/$yR/$moR/Rzeropoint_corr$basenameR.png $backpath/$yR/$moR/
-cp -f $basepath/$yV/$moV/VStars_Match$basenameV.png $backpath/$yV/$moV/
-cp -f $basepath/$yR/$moR/RStars_Match$basenameR.png $backpath/$yR/$moR/
-cp -f $basepath/$yV/$moV/nightmon.log $backpath/$yV/$moV/
-cp -f $basepath/$yR/$moR/nightmon.log $backpath/$yR/$moR/
-cp -f $basepath/$yV/$moV/"calibrated_"$basedayV"_sky.csv" $backpath/$yV/$moV/
-rm $basenameR"_R_"$tr"_"$gain".dng"
-rm $basenameV"_V_"$tv"_"$gain".dng"
-rm "calibrated_"$basedayV"_sky.csv"
+		cp -f $basepath/$y/$mo/$b"zeropoint_corr"${basename[$n]}".png" $backpath/$y/$mo/
+		cp -f $basepath/$y/$mo/$b"_calSbBkg_"${basename[$n]}".png" $backpath/$y/$mo/
+		cp -f $basepath/$y/$mo/$b"_calSbTot_"${basename[$n]}".png" $backpath/$y/$mo/
+		cp -f $basepath/$y/$mo/$band"_Stars_Match_"${basename[$n]}".png" $backpath/$y/$mo/
+		cp -f $basepath/$y/$mo/nightmon.log $backpath/$y/$mo/
+		cp -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" $backpath/$y/$mo/
+		rm ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
+		rm "calibrated_"$b"_"$baseday"_sky.csv"
+		let n=n+1
+done

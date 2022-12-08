@@ -220,7 +220,6 @@ dark = convolve(Dgray, kernel)
 dark_norm = convolve(Sgray, kernel)
 dmean = np.mean(dark[5 : ny - 5, 5:105], axis=(0, 1))
 imean = np.mean(Sgray[5 : ny - 5, 5:105], axis=(0, 1))
-print("moyennes", dmean, imean)
 dnorm = imean / dmean
 dark = dark * dnorm
 # plt.figure()
@@ -398,7 +397,7 @@ time = ts.utc(
     int(datearr[5]),
 )
 basename = time.utc_strftime("%Y-%m-%d")
-outname = "calibrated" + "_" + basename + "_sky.csv"
+outname = "calibrated_" + Band + "_" + basename + "_sky.csv"
 timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
 baseout = time.utc_strftime("%Y-%m-%d_%H-%M-%S")
 here_now = here.at(time)
@@ -520,14 +519,12 @@ for i in range(3):
     shiftx = float(deltax[i])
     shifty = float(deltay[i])
     theta = float(angle[i])
-    print(shiftx, shifty, theta)
     imag = ndimage.shift(imag, [shifty, shiftx], mode="nearest")
     padX = [imag.shape[1] - polindex[0, 1], polindex[0, 1]]
     padY = [imag.shape[0] - polindex[0, 0], polindex[0, 0]]
     imgP = np.pad(imag, [padY, padX], "constant")
     imag = ndimage.rotate(imgP, theta, reshape=False, mode="nearest")
     imag = imag[padY[0] : -padY[1], padX[0] : -padX[1]]
-
 # find background
 sigma_clip = SigmaClip(sigma=3.0)
 bkg_estimator = MedianBackground()
@@ -574,7 +571,7 @@ ypoli = float(positions[indtopol, 1])
 # positions[:, 1] = ny - positions[:, 1]
 apertures = CircularAperture(positions, r=4.0)
 
-StarMatch = np.zeros([ishape, 12])
+StarMatch = np.zeros([ishape, 10])
 n = 0
 nistars = ishape
 # searching for correspondance between stars in simbad and found stars in image
@@ -607,10 +604,7 @@ for ns in range(ishape):
         elif Band == "JR":
             StarMatch[n, 7] = magr[ns]
         StarMatch[n, 8] = AirM[ns]
-        StarMatch[n, 9] = Flux[dmin_index]
-        StarMatch[n, 10] = Peak[dmin_index]
-        StarMatch[n, 11] = np.sum(imstars[ys - 2 : ys + 2, xs - 2 : xs + 2])
-        print(xs, ys, StarMatch[n, 11])
+        StarMatch[n, 9] = np.sum(imstars[ys - 2 : ys + 2, xs - 2 : xs + 2])
         n = n + 1
 StarMatch[np.isnan(StarMatch)] = 0
 StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
@@ -633,120 +627,62 @@ print("Zenith atmospheric extinction (mag) :", k)
 uncalMag = -2.5 * np.log10(StarMatch[:, 9])
 # correct the extinction for the reference stars
 calMag = StarMatch[:, 7] + k * StarMatch[:, 8]
-deltam = calMag - uncalMag
 
-
-ax = StarMatch[:, 11]
+ax = StarMatch[:, 9]
 ay = 10 ** (-0.4 * calMag)
 params = curve_fit(fit_func, ax, ay)
 slp = params[0]
-ori = 0
-# ci = np.polyfit(ax, ay, 1)
-# slp = ci[0]
-# ori = ci[1]
-print("slope=", slp)
-
-plt.figure()
 gx = np.linspace(0, np.amax(ax), 100)
 gy = slp * gx
-plt.plot(gx, gy, "r")
-plt.plot(ax, ay, "ob")
-plt.xlabel("Image flux")
-plt.ylabel("10^(-0.4*CalMag)")
 
-# fit de la magnitude hors atm en fonction de la mag non calibrée
-ci = np.polyfit(uncalMag, calMag, 1)
-slopei = ci[0]
-origini = ci[1]
-print("slope=", slopei, "intercept=", origini)
-plt.figure()
-title = Band + " Zero point"
-plt.plot(uncalMag, calMag, "ob")
-gx = np.linspace(np.amin(uncalMag), np.amax(uncalMag), 100)
-gy = ci[1] + gx * ci[0]
-plt.plot(gx, gy, "r")
-plt.title(title)
-plt.ylabel("Calibrated Magnitude")
-plt.xlabel("Uncalibrated Magnitude")
-file = Band + "zeropoint_corr" + baseout + ".png"
-plt.savefig(file)
+# replace zeros with a small non null value
+mask = imag <= 0
+imagtmp = np.copy(imag)
+imagtmp[mask] = imbkg[mask]
+imag = imagtmp
+calMagTot = -2.5 * np.log10(imag * slp)
 
-zeropoint = origini
+calMagBkg = -2.5 * np.log10(imbkg * slp)
+zeropoint = float(-2.5 * np.log10(slp))
 print("Zero point (mag) =", zeropoint)
-
-# filter outliers zscore = (x - mean)/std
-am = StarMatch[:, 8]
-co = np.polyfit(am, deltam, 1)
-slope = co[0]
-origin = co[1]
-fx = np.linspace(0, np.amax(am), 100)
-fy = co[1] + fx * co[0]
-title = Band + " dDelta_Mag vs Air Mass"
-plt.figure()
-plt.plot(am, deltam, "or", markersize=2)
-plt.plot(fx, fy, "b")
-plt.title(title)
-plt.xlabel("Air Mass")
-plt.ylabel("Delta Magnitude")
-# atmospheric optical depth (aerosols + molecules)
-# tau = slope / (2.5 * np.log10(np.e))
-# extinction = slope
-#  molecular optical depth - Bodhaine et al. (1999)
-# tau_mol = (0.0021520*(1.0455996-341.29061*(lambm/1000.)**
-#     -2.-0.90230850*(lambm/1000.)**2.)/(1.+0.0027059889*(lambm/1000.)**
-#     -2.-85.968563*(lambm/1000.)**2.))
-# AOD = tau-tau_mol
-# print("Atmospheric optical depth =", tau)
-# print("Aerosol optical depth =",AOD," at ",lambm," nm")
-
-# calculate a calibrated magnitude
-# calMag = -2.5 * np.log10(pixel_value) - origin
-# calMagTot = -2.5 * np.log10(imag) * slopei + origini
-# calMagBkg = -2.5 * np.log10(imbkg) * slopei + origini
-
-
-calMagTot = -2.5 * np.log10(imag * slp + ori)
-calMagBkg = -2.5 * np.log10(imbkg * slp + ori)
-
+print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")
+print(" where R the signal assigned to the pixel")
 
 # calibrated surface brightness in mag /sq arc sec
 calSbTot = calMagTot + 2.5 * np.log10(sec2)
 calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
+calSbTot[z > 90] = np.nan
+calSbBkg[z > 90] = np.nan
 
-# plt.figure()
-# plt.imshow(ImgAirm, cmap="inferno", norm = norm )
-# plt.colorbar()
-# plt.title("airmass")
-
-norm1 = simple_norm(calSbBkg, "sqrt")
+title = Band + " calibration"
+file = Band + "_calibration_" + baseout + ".png"
 plt.figure()
-plt.imshow(imstars, cmap="inferno")
-plt.colorbar()
-plt.title("Stars image")
-print(ax)
-print(StarMatch[:, 10])
-print(StarMatch[:, 11])
-
+plt.plot(gx, gy, "r")
+plt.plot(ax, ay, "ob")
+plt.xlabel("Star's pixel values")
+plt.ylabel("10^(-0.4*CalMag)")
+plt.title(title)
+plt.savefig(file)
 
 norm1 = simple_norm(calSbBkg, "sqrt")
 title = Band + " background Surface Brightness"
-file = Band + "calSbBkg" + baseout + ".png"
+file = Band + "_calSbBkg_" + baseout + ".png"
 plt.figure()
-plt.imshow(-calSbBkg, cmap="inferno", vmin=-24, vmax=-9)
+plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
 plt.colorbar()
-plt.savefig(file)
 plt.title(title)
+plt.savefig(file)
 
 norm1 = simple_norm(calSbTot, "sqrt")
 title = Band + " total Surface Brightness"
-file = Band + "calSbTot" + baseout + ".png"
+file = Band + "_calSbTot_" + baseout + ".png"
 plt.figure()
-plt.imshow(-calSbTot, cmap="inferno", vmin=-24, vmax=-9)
+plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
 plt.colorbar()
-plt.savefig(file)
 plt.title(title)
+plt.savefig(file)
 
-file = Band + "Stars_Match" + baseout + ".png"
+file = Band + "_tars_Match_" + baseout + ".png"
 title = Band + " Stars correspondance"
 plt.figure()
 plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)
@@ -757,18 +693,8 @@ plt.title(title)
 plt.legend(["Detected stars", "Simbad reference stars"])
 plt.savefig(file)
 
-# file = band  + "Sky.png"
-# title = band + " Stars image"
-# plt.figure()
-# plt.imshow(imstars, cmap="inferno" )
-# plt.colorbar()
-# plt.title(title)
-# plt.savefig('Sky.png')
-
 # determine cloud cover
-
 threshold = np.amax(imstars) / cfactor
-# stars_binary = np.full((ny,nx),np.nan)
 stars_binary = np.full((ny, nx), 0)
 stars_full = np.full((ny, nx), 0)
 stars_binary[imstars >= threshold] = 1.0
@@ -789,29 +715,11 @@ cloud_cover = int(
 )
 print("Cloud cover (%) : ", cloud_cover)
 
-plt.figure()
-plt.imshow(sec2, cmap="inferno")
-plt.colorbar()
-
-
-# plt.figure()
-# plt.imshow(stars_count, cmap="inferno" )
-# plt.colorbar()
-#
-# plt.figure()
-# plt.title("stars_full")
-# plt.imshow(stars_full_count, cmap="inferno" )
-# plt.colorbar()
 #
 # plt.figure()
 # plt.title("stars")
 # plt.imshow(imstars, cmap="inferno" )
 # plt.colorbar()
-
-# if band == "V":
-#     np.save("BackgroundV" + baseout + ".npy", calSbBkg)
-# elif band == "R":
-#     np.save("BackgroundR" + baseout + ".npy", calSbBkg)
 
 # Extract points and write data
 index = find_close_indices(az, el, apt, ept)

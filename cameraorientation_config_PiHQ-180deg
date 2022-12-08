@@ -1,0 +1,11 @@
+# input parameters for NightMon finding camera orientation
+Site : Mont_Hereford   # No spaces in site name
+Longitude : -71.60168  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+Latitude : 45.08263
+Altitude : 864
+XpolarisA : 1019
+YpolarisA : 329
+XpolarisB : 1019
+YpolarisB: 329
+Zslope : 1.18620894e-01
+Zquad : 1.41321994e-05

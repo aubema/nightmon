@@ -94,6 +94,7 @@ take_pictureB() {
 #
 # main
 #
+user="sand"
 gain=8
 max_lum=10000  # 1000000 = 1sec
 darkimg="dark-gain8-t100000.dng"
@@ -106,10 +107,10 @@ echo ${bands[0]};for i in ${bands[@]};do echo $i;done
 echo  "10000 us" > Current_A_tint.tmp
 echo  "10000 us" > Current_B_tint.tmp
 # get the site name
-/bin/grep "SITE" /home/sand/nightmon_config > ligne.tmp
+/bin/grep "SITE" /home/$user/nightmon_config > ligne.tmp
 read bidon bidon sitename bidon < ligne.tmp
 basepath="/var/www/html/data"
-backpath="/home/sand/data"
+backpath="/home/$user/data"
 echo "A shot"
 take_pictureA
 y=`date +%Y`
@@ -164,7 +165,7 @@ do 	if ( n -eq 0 )
     then let t=ta
 		else let t=tb
 		endif
-		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/sand/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]}
+		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]}
 		# rename pictures
 		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/
 		mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/

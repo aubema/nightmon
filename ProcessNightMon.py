@@ -113,6 +113,7 @@ def fit_func(x, a):
 # ================================================
 # MAIN
 # default Parameters
+user = "aubema"
 sberr = 0
 mflag = "False"
 FWHM = 7
@@ -161,7 +162,8 @@ deltay = np.empty([3], dtype=float)
 angle = np.empty([3], dtype=float)
 # TODO: restore the following line
 # with open("/home/sand/nightmon_config") as f:
-with open("/home/aubema/nightmon_config") as f:
+configpath = "/home/" + user + "/nightmon_config"
+with open(configpath) as f:
 
     p = yaml.safe_load(f)
 Site = p["Site"]
@@ -177,7 +179,8 @@ elif Cam == "B":
 # load sky brightness extraction points
 # TODO: restore the following line
 # pt = open("/home/sand/points_list", "r")
-pt = open("/home/aubema/points_list", "r")
+pointspath = "/home/" + user + "/points_list"
+pt = open(pointspath, "r")
 
 
 pt.readline()  # skip one line
@@ -422,9 +425,8 @@ print(f"Sun azimuth: {azis:.4f}")
 # TODO: restore the two following lines
 # ds = pd.read_csv(
 #    "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
-ds = pd.read_csv(
-    "/home/aubema/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
-)
+csvpath = "/home/" + user + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv"
+ds = pd.read_csv(csvpath, header=0, sep=";")
 # stars_selected=ds[ds['MagR'] < limit]
 # locating Polaris
 polaris = ds.loc[ds["identifier"] == "* alf UMi"]

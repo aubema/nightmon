@@ -96,6 +96,7 @@ def input(argv):
 # ================================================
 # MAIN
 # default Parameters
+user = "aubema"
 sberr = 0
 mflag = "False"
 FWHM = 3
@@ -123,9 +124,15 @@ Simg = open_raw(Sfile)
 
 # TODO restore that line
 # with open("/home/sand/cameraorientation_config") as f:
-with open("/home/aubema/cameraorientation_config") as f:
+configpath = "/home/" + user + "/cameraorientation_config"
+with open(cofigpath) as f:
     p = yaml.safe_load(f)
 Site = p["Site"]
+nightmonconfigpath = "/home/" + user + "/nightmon_config"
+with open(nightmoncofigpath) as g:
+    q = yaml.safe_load(g)
+
+
 ts = load.timescale()
 # set observer position
 eph = load("de421.bsp")
@@ -140,13 +147,13 @@ Sgray = to_grayscale(Simg, [RC, GC, BC], normalize=False)
 ny = np.shape(Sgray)[0]
 nx = np.shape(Sgray)[1]
 # set the minimum elevation to the limit of the image if required
-if elmin < 90 - 0.98 * (ny / 2 * p["Zslope"] + (ny / 2) ** 2 * p["Zquad"]):
-    elmin = 90 - 0.98 * (ny / 2 * p["Zslope"] + (ny / 2) ** 2 * p["Zquad"])
+if elmin < 90 - 0.98 * (ny / 2 * q["Zslope"] + (ny / 2) ** 2 * q["Zquad"]):
+    elmin = 90 - 0.98 * (ny / 2 * q["Zslope"] + (ny / 2) ** 2 * q["Zquad"])
 print("Minimum elevation :", elmin)
 # calculate maximum zenith angle
 zemax = 90 - elmin
-rnmax = (-p["Zslope"] + np.sqrt(p["Zslope"] ** 2 - 4 * p["Zquad"] * -zemax)) / (
-    2 * p["Zquad"]
+rnmax = (-q["Zslope"] + np.sqrt(q["Zslope"] ** 2 - 4 * q["Zquad"] * -zemax)) / (
+    2 * q["Zquad"]
 )
 
 # creating elevation, azimith maps
@@ -155,14 +162,14 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = p["Zslope"] * d + p["Zquad"] * d**2
+z = q["Zslope"] * d + q["Zquad"] * d**2
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
 # az = az - azpol
 az = np.where(az < 0, az + 360, az)
 # solid angle in sq arc second
-sec2 = ((p["Zslope"] + p["Zquad"]) * 180 * 3600**2 * np.sin((z) * np.pi / 180)) / (
+sec2 = ((q["Zslope"] + q["Zquad"]) * 180 * 3600**2 * np.sin((z) * np.pi / 180)) / (
     d * np.pi
 )
 # compute elevation angle
@@ -204,9 +211,8 @@ here_now = here.at(time)
 # TODO restore thhe following two line
 # ds = pd.read_csv(
 #    "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
-ds = pd.read_csv(
-    "/home/aubema/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
-)
+simbadpath = "/home/" + user + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv"
+ds = pd.read_csv(simbadpath, header=0, sep=";")
 
 # locating Polaris
 polaris = ds.loc[ds["identifier"] == "* alf UMi"]

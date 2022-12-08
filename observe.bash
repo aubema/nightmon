@@ -155,6 +155,7 @@ then echo "Too much light. It is probably daytime."
      move_cams.py 2000 1
 		 move_cams.py -1500 1
 		 echo "Let's keep the camera inside for 15 min"
+		 exit 0
 else move_cams.py 2000 1
 fi
 

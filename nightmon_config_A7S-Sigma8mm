@@ -1,0 +1,13 @@
+# input parameters for NightMon
+Site : Mont_Hereford   # No spaces in site name
+Longitude : -71.60168  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+Latitude : 45.08263
+Altitude : 864
+ShiftxA : 40.         -1.69241644  0.1369516
+ShiftyA : -9.         -1.71123825  0.02257996
+AngleA : -5.97038306  0.24522047 -0.01997063
+ShiftxB : 40.         -1.69241644  0.1369516
+ShiftyB : -9.         -1.71123825  0.02257996
+AngleB : -5.97038306  0.24522047 -0.01997063
+Zslope : 1.21679222e-01
+Zquad : -2.09108975e-05

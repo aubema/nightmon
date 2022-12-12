@@ -45,7 +45,7 @@ take_pictureA() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let ta=ta/10
 					 elif [ "$satmax" -lt 70 ]
-			       then let ta=95*ta/satmax
+			       then let ta=90*ta/satmax
 					   fi
 			  else echo "Problem with A camera."
 				  	 exit 0
@@ -78,7 +78,7 @@ take_pictureB() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let tb=tb/10
 			       elif [ "$satmax" -lt 70 ]
-			       then let tb=95*tb/satmax
+			       then let tb=90*tb/satmax
 					   fi
 			  else echo "Problem with V camera."
 				  	 exit 0
@@ -167,7 +167,7 @@ do 	if ( n -eq 0 )
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model
+		python3 /usr/local/bin/ProcessNightMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model
 		# rename pictures
 		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/
 		mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/

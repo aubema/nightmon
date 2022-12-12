@@ -166,7 +166,7 @@ for b in ${bands[@]}
 do 	if ( n -eq 0 )
     then let t=ta
 		else let t=tb
-		endif
+		fi
 		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model
 		# rename pictures
 		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/

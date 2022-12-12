@@ -41,10 +41,10 @@ def main():
     gp.output(11, False)
     gp.output(12, True)
     print("Selected integration : ", itime, "Selected gain : ", gain)
-    capture(2)
+    capture(2, itime, gain)
 
 
-def capture(cam):
+def capture(cam, itime, gain):
     # cmd = "libcamera-hello -t 0"
     print(gain, itime)
     cmd = (

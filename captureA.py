@@ -40,11 +40,11 @@ def main():
     gp.output(7, False)
     gp.output(11, False)
     gp.output(12, True)
-    print("Selected integration A : ", itime)
-    capture(1)
+    print("Selected integration A : ", itime, "Selected gain : ", gain)
+    capture(1, itime, gain)
 
 
-def capture(cam):
+def capture(cam, itime, gain):
     # cmd = "libcamera-hello -t 0"
     print(gain, itime)
     cmd = (

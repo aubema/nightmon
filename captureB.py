@@ -32,23 +32,21 @@ def input(argv):
     return itime, gain
 
 
-itime, gain = input(sys.argv[1:])
-print(itime, gain)
-
-
 def main():
     print("Start testing the camera B")
+    itime, gain = input(sys.argv[1:])
     i2c = "i2cset -y 1 0x70 0x00 0x05"
     os.system(i2c)
     gp.output(7, True)
     gp.output(11, False)
     gp.output(12, True)
-    print("selected integration R : ", itime)
+    print("Selected integration : ", itime, "Selected gain : ", gain)
     capture(2)
 
 
 def capture(cam):
     # cmd = "libcamera-hello -t 0"
+    print(gain, itime)
     cmd = (
         "libcamera-still --analoggain "
         + str(gain)

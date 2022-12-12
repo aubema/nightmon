@@ -48,6 +48,7 @@ def main():
 
 def capture(cam):
     # cmd = "libcamera-hello -t 0"
+    print(gain, itime)
     cmd = (
         "libcamera-still --analoggain "
         + str(gain)

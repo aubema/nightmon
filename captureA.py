@@ -14,8 +14,6 @@ gp.setup(12, gp.OUT)
 
 
 def input(argv):
-    itime = 1000
-    gain = 8
     try:
         opts, args = getopt.getopt(argv, "h:t:g:", ["help=", "itime=", "gain="])
     except getopt.GetoptError:

@@ -25,7 +25,7 @@
 #
 take_pictureA() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
-		 echo "Taking V picture"
+		 echo "Taking A picture"
 		 read tv bidon < Current_A_tint.tmp
 		 if [ -z "$ta" ]
 		 then echo "ta not available, setting it to 1/10s"
@@ -36,7 +36,7 @@ take_pictureA() {
 		 while [ "$satmax" -gt 90 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f capture_1*
 		    echo "Ta=" $ta
-		 		captureA.py -t $tv -g $gain
+		 		captureA.py -t $ta -g $gain
 				if [ -f "capture_1.dng" ]
 				then lisc perc capture_1.dng -p 99.9  > saturation.tmp
 				     maxsatpercent.py > capture.tmp
@@ -57,7 +57,7 @@ take_pictureA() {
 
 take_pictureB() {
 		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
-		 		 echo "Taking pictures"
+		 		 echo "Taking B picture"
 		 		 read tb bidon < Current_B_tint.tmp
 		 		 if [ -z "$tb" ]
 		 		 then echo "tb not available, setting it to 1/10s"

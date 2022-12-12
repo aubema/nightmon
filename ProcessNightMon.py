@@ -147,35 +147,35 @@ if Model == "A7S":
         GC = 0.7
         BC = -1.0
     elif Band == "JB":
-        RC = ceciestbr
-        GC = ceciestbg
-        BC = ceciestbb
+        RC = 1
+        GC = 1
+        BC = 1
 elif Model == "RpiHQ":
     if Band == "JV":
-        RC = ceciestvr
-        GC = ceciestvg
-        BC = ceciestvb
+        RC = 1
+        GC = 1
+        BC = 1
     elif Band == "JR":
-        RC = ceciestrr
-        GC = ceciestrg
-        BC = ceciestrb
+        RC = 1
+        GC = 1
+        BC = 1
     elif Band == "JB":
-        RC = ceciestbr
-        GC = ceciestbg
-        BC = ceciestbb
+        RC = 1
+        GC = 1
+        BC = 1
 elif Model == "RpiHQ-JFilters":
     if Band == "JV":
-        RC = ceciestvr
-        GC = ceciestvg
-        BC = ceciestvb
+        RC = 1
+        GC = 1
+        BC = 1
     elif Band == "JR":
-        RC = ceciestrr
-        GC = ceciestrg
-        BC = ceciestrb
+        RC = 1
+        GC = 1
+        BC = 1
     elif Band == "JB":
-        RC = ceciestbr
-        GC = ceciestbg
-        BC = ceciestbb
+        RC = 1
+        GC = 1
+        BC = 1
 # open images
 
 print("Reading images...")

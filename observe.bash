@@ -163,7 +163,7 @@ echo "=============================="
 # process sky IMAGES
 let n=0
 for b in ${bands[@]}
-do 	if ( $n -eq 0 )
+do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi

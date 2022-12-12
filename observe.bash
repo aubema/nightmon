@@ -94,6 +94,7 @@ take_pictureB() {
 #
 # main
 #
+rm -f *.tmp
 user="sand"
 gain=8
 max_lum=10000  # 1000000 = 1sec

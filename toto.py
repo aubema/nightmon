@@ -148,7 +148,7 @@ if Model == "A7S":
         BC = -1.0
     elif Band == "JB":
         RC = -19
-        GC = -1
+        GC = 7
         BC = 20
 elif Model == "RpiHQ":
     if Band == "JV":
@@ -161,7 +161,7 @@ elif Model == "RpiHQ":
         BC = ceciestrb
     elif Band == "JB":
         RC = -19
-        GC = -1
+        GC = 7
         BC = 20
 elif Model == "RpiHQ-JFilters":
     if Band == "JV":
@@ -174,7 +174,7 @@ elif Model == "RpiHQ-JFilters":
         BC = ceciestrb
     elif Band == "JB":
         RC = -19
-        GC = -1
+        GC = 7
         BC = 20
 # open images
 

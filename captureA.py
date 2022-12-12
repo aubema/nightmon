@@ -56,7 +56,7 @@ def capture(cam):
         + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_1.jpg"
     )
     os.system(cmd)
-
+    print("Capture image A with itime and gain", str(itime), str(gain)
 
 if __name__ == "__main__":
     main()

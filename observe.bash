@@ -100,6 +100,7 @@ max_lum=10000  # 1000000 = 1sec
 darkimg="dark-gain8-t100000.dng"
 # possible bands JV JR R G B (max 2 bands)
 bands=(JV JR)
+model="RpiHQ-JFilters"  # other choices are "RpiHQ" and "A7S"
 cams=(A B)
 # Standard extinctions for Observatorio Roque de los Muchachos (0.102 0.0547) (JV JR)
 extinct=(0.102 0.0547)
@@ -134,7 +135,7 @@ cp -f capture_1.dng $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
 cp -f capture_1.jpg $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
 mv capture_1.dng $basenameA"_A_"$ta"_"$gain".dng"
 
-echo "Johnson R shot"
+echo "B shot"
 take_pictureB
 basenameB=`date +%Y-%m-%d_%H-%M-%S`
 basename[1]="$basenameB"
@@ -165,7 +166,7 @@ do 	if ( n -eq 0 )
     then let t=ta
 		else let t=tb
 		endif
-		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]}
+		python3 /usr/local/bin/ProcessNighMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model
 		# rename pictures
 		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/
 		mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/

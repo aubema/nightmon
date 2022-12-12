@@ -209,6 +209,8 @@ elif Cam == "B":
 # pt = open("/home/sand/points_list", "r")
 pointspath = "/home/" + user + "/points_list"
 pt = open(pointspath, "r")
+
+
 pt.readline()  # skip one line
 tpt = []
 apt = []

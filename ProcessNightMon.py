@@ -593,6 +593,8 @@ Peak = sources["peak"]
 rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
 sources = sources[rn < rnmax]
 positions = positions[rn < rnmax]
+
+
 Flux = Flux[rn < rnmax]
 Peak = Peak[rn < rnmax]
 maxflux = Flux.max()
@@ -600,6 +602,23 @@ sources = sources[Flux > maxflux / 2.5 ** (limiti - brightest)]
 positions = positions[Flux > maxflux / 2.5 ** (limiti - brightest)]
 Peak = Peak[Flux > maxflux / 2.5 ** (limiti - brightest)]
 Flux = Flux[Flux > maxflux / 2.5 ** (limiti - brightest)]
+
+
+positions = (np.rint(positions)).astype(int)
+xsa = positions[:, 0]
+ysa = positions[:, 1]
+print(np.shape(positions))
+flux2 = np.zeros(np.shape(positions)[0])
+back2 = np.zeros(np.shape(positions)[0])
+for nd in range(np.shape(positions)[0]):
+    xsa = positions[nd, 0]
+    ysa = positions[nd, 1]
+    flux2[nd] = np.sum(imstars[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+    back2[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+print(flux2 / back2)
+exit()
+
+
 # Flux = Flux[ rn < rnmax]
 # find most probable Polaris
 dtopol = np.hypot(polindex[0, 1] - positions[:, 0], polindex[0, 0] - positions[:, 1])
@@ -624,7 +643,7 @@ for ns in range(ishape):
     )
     dmin = np.amin(dstar)
     dmin_index = dstar.argmin()
-    if dmin < 2000000:
+    if dmin < 50:
         StarMatch[n, 0] = index[ns, 1]
         StarMatch[n, 1] = index[ns, 0]
         StarMatch[n, 2] = positions[dmin_index, 0]  # noeuds[0]
@@ -647,6 +666,7 @@ for ns in range(ishape):
         StarMatch[n, 8] = AirM[ns]
         StarMatch[n, 9] = np.sum(imstars[ys - 2 : ys + 2, xs - 2 : xs + 2])
         n = n + 1
+print("Number of matching stars : ", n)
 StarMatch[np.isnan(StarMatch)] = 0
 StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
 avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)

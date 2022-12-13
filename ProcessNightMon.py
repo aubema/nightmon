@@ -137,7 +137,8 @@ limiti = (
 )
 limits = 1.2
 # load command line parameters
-Sfile, Dfile, Band, Extinc, Cam, Model = input(sys.argv[1:])
+Sfile, Dfile, Band, k, Cam, Model = input(sys.argv[1:])
+print("Zenith atmospheric extinction (mag) :", k)
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":
@@ -675,14 +676,12 @@ if cloud_cover < max_cloud_cover:
     )
     StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
     print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
-    k = Extinc
     if Band == "JV":
         lambm = 545
     elif Band == "JR":
         lambm = 700
     elif Band == "JB":
         lambm = 436
-    print("Zenith atmospheric extinction (mag) :", k)
 
     # calculate uncalibrated mag, extinction, calibration factor
     uncalMag = -2.5 * np.log10(StarMatch[:, 9])

@@ -138,7 +138,7 @@ limiti = (
 limits = 1.2
 # load command line parameters
 Sfile, Dfile, Band, Extinc, Cam, Model = input(sys.argv[1:])
-# determine the R, G, B coefficients according to the band
+# determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":
         RC = 0.65
@@ -179,19 +179,14 @@ elif Model == "RpiHQ-JFilters":
         GC = 1
         BC = 1
 # open images
-
 print("Reading images...")
 Simg = open_raw(Sfile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters
-# home = os.path.expanduser("~")
-# read NightMon config file
 deltax = np.empty([3], dtype=float)
 deltay = np.empty([3], dtype=float)
 angle = np.empty([3], dtype=float)
-# TODO: restore the following line
-# with open("/home/sand/nightmon_config") as f:
 configpath = "/home/" + user + "/nightmon_config"
 with open(configpath) as f:
 
@@ -207,8 +202,6 @@ elif Cam == "B":
     angle = p["AngleB"].split()
 
 # load sky brightness extraction points
-# TODO: restore the following line
-# pt = open("/home/sand/points_list", "r")
 pointspath = "/home/" + user + "/points_list"
 pt = open(pointspath, "r")
 pt.readline()  # skip one line
@@ -245,7 +238,7 @@ rnmax = (-p["Zslope"] + np.sqrt(p["Zslope"] ** 2 - 4 * p["Zquad"] * -zemax)) / (
 )
 
 # remove darks
-window = 7  #  1 deg clouds ~= 10
+window = 7  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 dark = convolve(Dgray, kernel)
 dark_norm = convolve(Sgray, kernel)
@@ -253,16 +246,8 @@ dmean = np.mean(dark[5 : ny - 5, 5:105], axis=(0, 1))
 imean = np.mean(Sgray[5 : ny - 5, 5:105], axis=(0, 1))
 dnorm = imean / dmean
 dark = dark * dnorm
-# plt.figure()
-# plt.imshow(Vgray, cmap="inferno", norm=norm)
-# plt.colorbar()
-# plt.title("img")
 Sgray = Sgray - dark
-# plt.figure()
-# plt.imshow(Vgray, cmap="inferno", norm=norm)
-# plt.colorbar()
-# plt.title("img-dark")
-# plt.show()
+
 
 # **************************** supprimer
 rm = 0.635
@@ -380,6 +365,8 @@ rrr[rrr > 1.0] = 0.0
 r = np.linspace(0, 1, 100)
 flat = np.interp(rrr, r, vv)
 # ****************************
+
+
 # correct flat field
 Sgray = Sgray / flat
 # creating elevation, azimith maps
@@ -411,12 +398,10 @@ el = 90 - z
 ImgAirm = airmass(el)
 ImgAirm[z >= 90] = np.nan
 
-
 # initialize np arrays for backgrounds and stars fields
 Vbkg = np.zeros([ny, nx])
 Rbkg = np.zeros([ny, nx])
 Sstars = np.zeros([ny, nx])
-
 
 print(f"Processing Johnson {Band} camera...")
 # TOTO : IL FAUT DEPLACER CECI ET LES EPHEMERIDES DANS LA BOUCLE DES FILTRES
@@ -580,8 +565,6 @@ bkg = Background2D(
 imbkg = bkg.background
 # image without background
 imstars = imag - imbkg
-# imstars[imstars < 0] = 0
-
 
 # determine cloud cover only for z < 70 deg because of extinction
 imstars_tmp = np.copy(imstars)
@@ -594,14 +577,12 @@ stars_full = np.full((ny, nx), 1.0)
 stars_binary[imstars >= threshold] = 1.0
 stars_binary[z > 70] = 0
 stars_full[z > 70] = 0
-window = 51  #  1 deg clouds ~= 10
+# set cloud detection window to about 5 deg (51)
+window = 51  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 stars_count = convolve(stars_binary, kernel)
 stars_count[z > 70] = 0.0
-# stars_full_count = convolve(stars_full, kernel)
-# stars_full_count[z > 90] = 0.0
 stars_count[stars_count > 0] = 1
-# stars_full_count[stars_full_count > 0] = 1
 # weighted with solid angle
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)
 print("Cloud cover (%) : ", cloud_cover)
@@ -609,7 +590,7 @@ print("Cloud cover (%) : ", cloud_cover)
 # TODO : poursuivre seulement si cloud_cover est inférieur à max_cloud_cover
 if cloud_cover < max_cloud_cover:
     mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
-    daofind = DAOStarFinder(fwhm=2, threshold=60.0 * std)
+    daofind = DAOStarFinder(fwhm=2, threshold=50.0 * std)
     sources = daofind(imstars)
     print(sources)
     # keep stars with elevation > elmin degrees
@@ -620,32 +601,26 @@ if cloud_cover < max_cloud_cover:
     positions = (np.rint(positions)).astype(int)
     xsa = positions[:, 0]
     ysa = positions[:, 1]
-    print(np.shape(positions))
     Flux = np.zeros(np.shape(positions)[0])
-    back2 = np.zeros(np.shape(positions)[0])
+    Back = np.zeros(np.shape(positions)[0])
     for nd in range(np.shape(positions)[0]):
         xsa = positions[nd, 0]
         ysa = positions[nd, 1]
         Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
-        back2[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+        Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
 
-    # Flux = sources["flux"]
-    # Peak = sources["peak"]
     rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
     sources = sources[rn < rnmax]
     positions = positions[rn < rnmax]
 
     Flux = Flux[rn < rnmax]
-    # Peak = Peak[rn < rnmax]
+    Back = Back[rn < rnmax]
     maxflux = Flux.max()
     brightest = 0
     sources = sources[Flux > maxflux / 2.5 ** (limiti - brightest)]
     positions = positions[Flux > maxflux / 2.5 ** (limiti - brightest)]
-    print(np.shape(positions))
-    # Peak = Peak[Flux > maxflux / 2.5 ** (limiti - brightest)]
     Flux = Flux[Flux > maxflux / 2.5 ** (limiti - brightest)]
 
-    # Flux = Flux[ rn < rnmax]
     # find most probable Polaris
     dtopol = np.hypot(
         polindex[0, 1] - positions[:, 0], polindex[0, 0] - positions[:, 1]
@@ -654,7 +629,6 @@ if cloud_cover < max_cloud_cover:
     indtopol = np.where(dtopol == mintopol)
     xpoli = float(positions[indtopol, 0])
     ypoli = float(positions[indtopol, 1])
-    # positions[:, 1] = ny - positions[:, 1]
     apertures = CircularAperture(positions, r=4.0)
 
     StarMatch = np.zeros([ishape, 10])
@@ -663,8 +637,6 @@ if cloud_cover < max_cloud_cover:
     # searching for correspondance between stars in simbad and found stars in image
     dstar = np.zeros(np.shape(positions)[0])
     for ns in range(ishape):
-        # for npos in range(np.shape(positions)[0]-1):
-        #     dstar[npos] = np.hypot(positions[npos,0]-index[ns,1],positions[npos,1]-index[ns,0])
         dstar = (
             np.hypot(positions[:, 0] - index[ns, 1], positions[:, 1] - index[ns, 0])
             ** 2
@@ -750,12 +722,6 @@ if cloud_cover < max_cloud_cover:
     calSbBkg[z > 90] = np.nan
     calSbStr[z > 90] = np.nan
 
-    # title = Band + " Stars Surface Brightness"
-    # plt.figure()
-    # plt.imshow(-calSbStr, cmap="magma", vmin=-22, vmax=-16)
-    # plt.colorbar()
-    # plt.title(title)
-
     title = Band + " calibration"
     file = Band + "_calibration_" + baseout + ".png"
     plt.figure()
@@ -799,7 +765,6 @@ plt.figure()
 plt.title("stars bin")
 plt.imshow(stars_binary, cmap="inferno")
 plt.colorbar()
-
 
 plt.figure()
 plt.title("starcount")
@@ -875,5 +840,4 @@ for no in range(num_pts - 1):
     print(outputline)
     o.write(outputline)
     o.close()
-print("Correlation coefficient : ", corcoef, RC, GC, BC)
 plt.show()

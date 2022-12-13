@@ -137,7 +137,8 @@ limiti = (
 )
 limits = 1.2
 # load command line parameters
-Sfile, Dfile, Band, k, Cam, Model = input(sys.argv[1:])
+Sfile, Dfile, Band, Extinc, Cam, Model = input(sys.argv[1:])
+k = float(Extinc)
 print("Zenith atmospheric extinction (mag) :", k)
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
@@ -798,6 +799,8 @@ for no in range(num_pts - 1):
     else:
         mago = np.nan
     o = open(outname, "a")
+    print(type(k))
+    print("{:5.3f}".format(k), k)
     outputline = (
         Site
         + " , "

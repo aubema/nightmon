@@ -191,7 +191,7 @@ do 	if [ $n -eq 0 ]
 
 		# backup output files
 		cp -f $basepath/$y/$mo/nightmon.log $backpath/$y/$mo/
-		cat "calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_"$b"_sky.csv"
+		cat "calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$b"_"$baseday"_sky.csv"
 		cp -f $basepath/$y/$mo/"calibrated_"$b"_"$baseday"_sky.csv" $backpath/$y/$mo/
 
 		# clean directory

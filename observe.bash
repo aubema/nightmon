@@ -193,7 +193,7 @@ do 	if [ $n -eq 0 ]
 		cp -f $basepath/$y/$mo/nightmon.log $backpath/$y/$mo/
 		if [ -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" ]
 		then cat "calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
-		else cat "calibrated_"$b"_"$baseday"_sky.csv" | grep "Loc_Name" | grep "(pixel)"  > $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
+		else cat "calibrated_"$b"_"$baseday"_sky.csv" | grep -E "Loc_Name|(pixel)"  > $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
 		fi
 		cp -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" $backpath/$y/$mo/
 

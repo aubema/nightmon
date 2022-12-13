@@ -129,6 +129,12 @@ fi
 if [ ! -d $basepath/$y/$mo ]
 then /bin/mkdir $basepath/$y/$mo
 fi
+if [ ! -d $backpath/$y ]
+then mkdir $backpath/$y
+fi
+if [ ! -d $backpath/$y/$mo ]
+then /bin/mkdir $backpath/$y/$mo
+fi
 echo $y $mo $dA " A " $ta $basepath/$yV/$moV/$basenameA"_A_"$ta"_"$gain".dng" >> $basepath/$y/$mo/nightmon.log
 echo "=============================="
 # rename pictures
@@ -168,26 +174,27 @@ do 	if [ $n -eq 0 ]
 		else let t=tb
 		fi
 		python3 /usr/local/bin/ProcessNightMon.py -s ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model
-		# rename pictures
-		mv $band"zeropoint_corr"${basename[$n]}".png" $basepath/$y/$mo/
-		mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
-		mv $band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-		mv $band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
-		cat "calibrated_"$baseday"_"$b"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_"$b"_sky.csv"
-		# backup important files
-		if [ ! -d $backpath/$y ]
-		then mkdir $backpath/$y
-		fi
-		if [ ! -d $backpath/$y/$mo ]
-		then /bin/mkdir $backpath/$y/$mo
+		if [ -f $band"calibration"${basename[$n]}".png" ]
+		then
+			# rename plots
+			mv $band"calibration"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+
+			# backup plots
+			cp -f $basepath/$y/$mo/$b"calibration"${basename[$n]}".png" $backpath/$y/$mo/
+			cp -f $basepath/$y/$mo/$b"_calSbBkg_"${basename[$n]}".png" $backpath/$y/$mo/
+			cp -f $basepath/$y/$mo/$b"_calSbTot_"${basename[$n]}".png" $backpath/$y/$mo/
+			cp -f $basepath/$y/$mo/$band"_Stars_Match_"${basename[$n]}".png" $backpath/$y/$mo/
 		fi
 
-		cp -f $basepath/$y/$mo/$b"zeropoint_corr"${basename[$n]}".png" $backpath/$y/$mo/
-		cp -f $basepath/$y/$mo/$b"_calSbBkg_"${basename[$n]}".png" $backpath/$y/$mo/
-		cp -f $basepath/$y/$mo/$b"_calSbTot_"${basename[$n]}".png" $backpath/$y/$mo/
-		cp -f $basepath/$y/$mo/$band"_Stars_Match_"${basename[$n]}".png" $backpath/$y/$mo/
+		# backup output files
 		cp -f $basepath/$y/$mo/nightmon.log $backpath/$y/$mo/
+		cat "calibrated_"$baseday"_"$b"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_"$b"_sky.csv"
 		cp -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" $backpath/$y/$mo/
+
+		# clean directory
 		rm ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
 		rm "calibrated_"$b"_"$baseday"_sky.csv"
 		let n=n+1

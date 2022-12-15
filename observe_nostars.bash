@@ -18,7 +18,9 @@
 #
 #    Contact: martin.aube@cegepsherbrooke.qc.ca
 #
-
+# script appropriate when no star field can be used to calibrate on the fly
+# in such situation, we calibrate once with a starry sky a limited set of gains and itime
+# to find the relevant slope to convert DN to mag
 #
 # =============================
 # find appropriate integration time
@@ -96,7 +98,7 @@ take_pictureB() {
 #
 rm -f *.tmp
 user="sand"
-slope=1.0
+slope=1.
 gain=8
 max_lum=10000  # 1000000 = 1sec
 darkimg="dark-gain8-t100000.dng"
@@ -174,7 +176,7 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model -k fixed -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots

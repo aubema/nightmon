@@ -65,7 +65,7 @@ def airmass(elevat):
 
 # reading command line parameters
 def input(argv):
-    Sfile = "undefined"
+    Ifile = "undefined"
     # reading V and R images names from the input parameters
     # default extinction values will be replaces if provided to the command line arguments
     # RGO, D. K. (1985). Atmospheric Extinction at the Roque de los Muchachos Observatory, La Palma.
@@ -75,25 +75,37 @@ def input(argv):
     Model = "RpiHQ"
     Cam = "A"
     Band = "JV"
+    Calmet = "stars"  # other option is fixed
+    Slope = 1  # this value is only useful when selecting fixed calibration method otherwise ignored
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:s:d:b:e:c:m:",
-            ["help=", "sfile=", "dfile=", "extinc=", "band=", "cam=", "model="],
+            "h:i:d:b:e:c:m:k:s:",
+            [
+                "help=",
+                "ifile=",
+                "dfile=",
+                "extinc=",
+                "band=",
+                "cam=",
+                "model=",
+                "calib=",
+                "slope=",
+            ],
         )
     except getopt.GetoptError:
         print(
-            "ProcessNighMon.py -s <Sfile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model>"
+            "ProcessNighMon.py -i <SIfile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
         )
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print(
-                "ProcessNighMon.py -s <Sfile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model>"
+                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
             )
             sys.exit()
-        elif opt in ("-s", "--sfile"):
-            Sfile = arg
+        elif opt in ("-i", "--ifile"):
+            Ifile = arg
         elif opt in ("-d", "--dfile"):
             Dfile = arg
         elif opt in ("-b", "--band"):
@@ -104,13 +116,18 @@ def input(argv):
             Cam = arg
         elif opt in ("-m", "--model"):
             Model = arg
-    print("Sky image file is :", Sfile)
+        elif opt in ("-k", "--calib"):
+            Calmet = arg
+        elif opt in ("-s", "--slope"):
+            Slope = arg
+    print("Sky image file is :", Ifile)
     print("Dark frame file is :", Dfile)
     print("Band is :", Band)
     print("Extinction is :", Extinc)
     print("Camera is :", Cam)
     print("Camera model is :", Model)
-    return Sfile, Dfile, Band, Extinc, Cam, Model
+    print("Calibration method :", Calmet)
+    return Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Slope
 
 
 def fit_func(x, a):
@@ -137,7 +154,7 @@ limiti = (
 )
 limits = 1.2
 # load command line parameters
-Sfile, Dfile, Band, Extinc, Cam, Model = input(sys.argv[1:])
+Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Slope = input(sys.argv[1:])
 k = float(Extinc)
 print("Zenith atmospheric extinction (mag) :", k)
 # determine the R, G, B coefficients according to the band and the camera model
@@ -151,9 +168,9 @@ if Model == "A7S":
         GC = 0.7
         BC = -1.0
     elif Band == "JB":
-        RC = 1
-        GC = 1
-        BC = 1
+        RC = -0.65
+        GC = 0.4
+        BC = 1.0
 elif Model == "RpiHQ":
     if Band == "JV":
         RC = 1
@@ -182,7 +199,7 @@ elif Model == "RpiHQ-JFilters":
         BC = 1
 # open images
 print("Reading images...")
-Simg = open_raw(Sfile)
+Simg = open_raw(Ifile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters
@@ -413,7 +430,7 @@ print(f"Processing Johnson {Band} camera...")
 # time=ts.utc(2020, 9, 22, 4, 22, 53)
 # time = ts.now()
 # yesterday = time - timedelta(days = 1)
-datearr = Sfile.replace("_", "-").split("-")
+datearr = Ifile.replace("_", "-").split("-")
 time = ts.utc(
     int(datearr[0]),
     int(datearr[1]),
@@ -589,116 +606,131 @@ stars_count[stars_count > 0] = 1
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)
 print("Cloud cover (%) : ", cloud_cover)
 
-# TODO : poursuivre seulement si cloud_cover est inférieur à max_cloud_cover
-if cloud_cover < max_cloud_cover:
-    mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
-    daofind = DAOStarFinder(fwhm=2, threshold=50.0 * std)
-    sources = daofind(imstars)
-    print(sources)
-    # keep stars with elevation > elmin degrees
-    for col in sources.colnames:
-        sources[col].info.format = "%.8g"  # for consistent table output
-    positions = np.transpose((sources["xcentroid"], sources["ycentroid"]))
 
-    positions = (np.rint(positions)).astype(int)
-    xsa = positions[:, 0]
-    ysa = positions[:, 1]
-    Flux = np.zeros(np.shape(positions)[0])
-    Back = np.zeros(np.shape(positions)[0])
-    for nd in range(np.shape(positions)[0]):
-        xsa = positions[nd, 0]
-        ysa = positions[nd, 1]
-        Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
-        Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+if Calmet == "stars" and cloud_cover > max_cloud_cover:
+    print("Can't process the data for stars calibration methods under cloudy skies")
+else:
+    if Calmet == "stars" and cloud_cover < max_cloud_cover:
+        # Search for stars only if cloud_cover is lower than max_cloud_cover
+        mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
+        daofind = DAOStarFinder(fwhm=2, threshold=50.0 * std)
+        sources = daofind(imstars)
+        print(sources)
+        # keep stars with elevation > elmin degrees
+        for col in sources.colnames:
+            sources[col].info.format = "%.8g"  # for consistent table output
+        positions = np.transpose((sources["xcentroid"], sources["ycentroid"]))
 
-    rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
-    sources = sources[rn < rnmax]
-    positions = positions[rn < rnmax]
+        positions = (np.rint(positions)).astype(int)
+        xsa = positions[:, 0]
+        ysa = positions[:, 1]
+        Flux = np.zeros(np.shape(positions)[0])
+        Back = np.zeros(np.shape(positions)[0])
+        for nd in range(np.shape(positions)[0]):
+            xsa = positions[nd, 0]
+            ysa = positions[nd, 1]
+            Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+            Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
 
-    Flux = Flux[rn < rnmax]
-    Back = Back[rn < rnmax]
-    maxflux = Flux.max()
-    brightest = 0
-    sources = sources[Flux > maxflux / 2.5 ** (limiti - brightest)]
-    positions = positions[Flux > maxflux / 2.5 ** (limiti - brightest)]
-    Flux = Flux[Flux > maxflux / 2.5 ** (limiti - brightest)]
+        rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
+        sources = sources[rn < rnmax]
+        positions = positions[rn < rnmax]
 
-    # find most probable Polaris
-    dtopol = np.hypot(
-        polindex[0, 1] - positions[:, 0], polindex[0, 0] - positions[:, 1]
-    )
-    mintopol = np.nanmin(dtopol)
-    indtopol = np.where(dtopol == mintopol)
-    xpoli = float(positions[indtopol, 0])
-    ypoli = float(positions[indtopol, 1])
-    apertures = CircularAperture(positions, r=4.0)
+        Flux = Flux[rn < rnmax]
+        Back = Back[rn < rnmax]
+        maxflux = Flux.max()
+        brightest = 0
+        sources = sources[Flux > maxflux / 2.5 ** (limiti - brightest)]
+        positions = positions[Flux > maxflux / 2.5 ** (limiti - brightest)]
+        Flux = Flux[Flux > maxflux / 2.5 ** (limiti - brightest)]
 
-    StarMatch = np.zeros([ishape, 10])
-    n = 0
-    nistars = ishape
-    # searching for correspondance between stars in simbad and found stars in image
-    dstar = np.zeros(np.shape(positions)[0])
-    for ns in range(ishape):
-        dstar = (
-            np.hypot(positions[:, 0] - index[ns, 1], positions[:, 1] - index[ns, 0])
-            ** 2
-            / Flux
+        # find most probable Polaris
+        dtopol = np.hypot(
+            polindex[0, 1] - positions[:, 0], polindex[0, 0] - positions[:, 1]
         )
-        dmin = np.amin(dstar)
-        dmin_index = dstar.argmin()
-        if dmin < 100000:
-            StarMatch[n, 0] = index[ns, 1]
-            StarMatch[n, 1] = index[ns, 0]
-            StarMatch[n, 2] = positions[dmin_index, 0]  # noeuds[0]
-            StarMatch[n, 3] = positions[dmin_index, 1]  # noeuds[1]
-            StarMatch[n, 4] = dmin
-            StarMatch[n, 5] = (
-                positions[dmin_index, 0] - index[ns, 1]
-            )  # noeuds[0] - index[ns,1]
-            StarMatch[n, 6] = (
-                positions[dmin_index, 1] - index[ns, 0]
-            )  # noeuds[1] - index[ns,0]
-            if Band == "JV":
-                StarMatch[n, 7] = magv[ns]
-            elif Band == "JR":
-                StarMatch[n, 7] = magr[ns]
-            elif Band == "JB":
-                StarMatch[n, 7] = magb[ns]
-            StarMatch[n, 8] = AirM[ns]
-            StarMatch[n, 9] = Flux[dmin_index]
-            n = n + 1
-    print("Number of matching stars : ", n, "/", ishape)
-    StarMatch[np.isnan(StarMatch)] = 0
-    StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
-    avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
-    print("Average gap between nearest star (d^2/flux):", avggap, "+/-", stdgap)
-    StarMatch = np.delete(
-        StarMatch, np.where(StarMatch[:, 4] > avggap + 3 * stdgap), axis=0
-    )
-    StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
-    print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
-    if Band == "JV":
-        lambm = 545
-    elif Band == "JR":
-        lambm = 700
-    elif Band == "JB":
-        lambm = 436
+        mintopol = np.nanmin(dtopol)
+        indtopol = np.where(dtopol == mintopol)
+        xpoli = float(positions[indtopol, 0])
+        ypoli = float(positions[indtopol, 1])
+        apertures = CircularAperture(positions, r=4.0)
 
-    # calculate uncalibrated mag, extinction, calibration factor
-    uncalMag = -2.5 * np.log10(StarMatch[:, 9])
-    # correct the extinction for the reference stars
-    calMag = StarMatch[:, 7] + k * StarMatch[:, 8]
+        StarMatch = np.zeros([ishape, 10])
+        n = 0
+        nistars = ishape
+        # searching for correspondance between stars in simbad and found stars in image
+        dstar = np.zeros(np.shape(positions)[0])
+        for ns in range(ishape):
+            dstar = (
+                np.hypot(positions[:, 0] - index[ns, 1], positions[:, 1] - index[ns, 0])
+                ** 2
+                / Flux
+            )
+            dmin = np.amin(dstar)
+            dmin_index = dstar.argmin()
+            if dmin < 100000:
+                StarMatch[n, 0] = index[ns, 1]
+                StarMatch[n, 1] = index[ns, 0]
+                StarMatch[n, 2] = positions[dmin_index, 0]  # noeuds[0]
+                StarMatch[n, 3] = positions[dmin_index, 1]  # noeuds[1]
+                StarMatch[n, 4] = dmin
+                StarMatch[n, 5] = (
+                    positions[dmin_index, 0] - index[ns, 1]
+                )  # noeuds[0] - index[ns,1]
+                StarMatch[n, 6] = (
+                    positions[dmin_index, 1] - index[ns, 0]
+                )  # noeuds[1] - index[ns,0]
+                if Band == "JV":
+                    StarMatch[n, 7] = magv[ns]
+                elif Band == "JR":
+                    StarMatch[n, 7] = magr[ns]
+                elif Band == "JB":
+                    StarMatch[n, 7] = magb[ns]
+                StarMatch[n, 8] = AirM[ns]
+                StarMatch[n, 9] = Flux[dmin_index]
+                n = n + 1
+        print("Number of matching stars : ", n, "/", ishape)
+        StarMatch[np.isnan(StarMatch)] = 0
+        StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
+        avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
+        print("Average gap between nearest star (d^2/flux):", avggap, "+/-", stdgap)
+        StarMatch = np.delete(
+            StarMatch, np.where(StarMatch[:, 4] > avggap + 3 * stdgap), axis=0
+        )
+        StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
+        print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
+        if Band == "JV":
+            lambm = 545
+        elif Band == "JR":
+            lambm = 700
+        elif Band == "JB":
+            lambm = 436
 
-    ax = StarMatch[:, 9]
-    ay = 10 ** (-0.4 * calMag)
-    cr = np.corrcoef(ax, ay)
-    corcoef = cr[0, 1]
-    print("Correlation coefficient : ", corcoef)
-    params = curve_fit(fit_func, ax, ay)
-    slp = params[0]
-    gx = np.linspace(0, np.amax(ax), 100)
-    gy = slp * gx
+        # calculate uncalibrated mag, extinction, calibration factor
+        uncalMag = -2.5 * np.log10(StarMatch[:, 9])
+        # correct the extinction for the reference stars
+        calMag = StarMatch[:, 7] + k * StarMatch[:, 8]
 
+        ax = StarMatch[:, 9]
+        ay = 10 ** (-0.4 * calMag)
+        cr = np.corrcoef(ax, ay)
+        corcoef = cr[0, 1]
+        print("Correlation coefficient : ", corcoef)
+        params = curve_fit(fit_func, ax, ay)
+        slp = float(params[0])
+        gx = np.linspace(0, np.amax(ax), 100)
+        gy = slp * gx
+
+        title = Band + " calibration"
+        file = Band + "_calibration_" + baseout + ".png"
+        plt.figure()
+        plt.plot(gx, gy, "r")
+        plt.plot(ax, ay, "ob")
+        plt.xlabel("Star's pixel values")
+        plt.ylabel("10^(-0.4*CalMag)")
+        plt.title(title)
+        plt.savefig(file)
+    # print calibration slope slp
+    print("Calibration slope (slp) :", slp)
     # replace zeros with a small non null value
     mask = imag <= 0
     imagtmp = np.copy(imag)
@@ -721,16 +753,6 @@ if cloud_cover < max_cloud_cover:
     calSbTot[z > 90] = np.nan
     calSbBkg[z > 90] = np.nan
     calSbStr[z > 90] = np.nan
-
-    title = Band + " calibration"
-    file = Band + "_calibration_" + baseout + ".png"
-    plt.figure()
-    plt.plot(gx, gy, "r")
-    plt.plot(ax, ay, "ob")
-    plt.xlabel("Star's pixel values")
-    plt.ylabel("10^(-0.4*CalMag)")
-    plt.title(title)
-    plt.savefig(file)
 
     norm1 = simple_norm(calSbBkg, "sqrt")
     title = Band + " background Surface Brightness"

@@ -138,7 +138,7 @@ def fit_func(x, a):
 # ================================================
 # MAIN
 # default Parameters
-user = "aubema"
+user = "sand"
 path = "/home/" + user
 sberr = 0
 mflag = "False"

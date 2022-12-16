@@ -53,6 +53,7 @@ def capture(cam, itime, gain):
         + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_2.jpg"
     )
     os.system(cmd)
+    os.system("cp capture_1* /home/sand/")
 
 
 if __name__ == "__main__":

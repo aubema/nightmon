@@ -120,6 +120,7 @@ y=`date +%Y`
 mo=`date +%m`
 dA=`date +%d`
 basenameA=`date +%Y-%m-%d_%H-%M-%S`
+echo $basenameA
 baseday=`date +%Y-%m-%d`
 basename[0]="$basenameA"
 read  tv toto < $path/Current_A_tint.tmp

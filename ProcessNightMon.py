@@ -95,7 +95,7 @@ def input(argv):
         )
     except getopt.GetoptError:
         print(
-            "ProcessNighMon.py -i <SIfile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
+            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
         )
         sys.exit(2)
     for opt, arg in opts:
@@ -199,7 +199,7 @@ elif Model == "RpiHQ-JFilters":
         BC = 1
 # open images
 print("Reading images...")
-Simg = open_raw(Ifile)
+Simg = open_raw(path + Ifile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters

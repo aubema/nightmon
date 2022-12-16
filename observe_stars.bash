@@ -172,7 +172,7 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i $path/${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots

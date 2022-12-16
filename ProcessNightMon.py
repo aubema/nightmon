@@ -438,12 +438,19 @@ if Model == "A7S":
         + 1.00525
     )
 else:
-    flat = 1 - 0.00001 * d
-
+    flat = (
+        0.9999999999992863
+        + 0.0003775455182209281 * d
+        - 5.775598992847673e-07 * d**2
+        - 4.419838608862352e-09 * d**3
+        + 2.3664435720648865e-11 * d**4
+        - 4.1361998468625023e-14 * d**5
+        + 2.2896450343971182e-17 * d**6
+    )
 flat[z > 90] = 1
-plt.figure()
-plt.imshow(flat, cmap="magma")
-plt.colorbar()
+# plt.figure()
+# plt.imshow(flat, cmap="magma")
+# plt.colorbar()
 
 # correct flat field
 Sgray = Sgray / flat
@@ -892,4 +899,4 @@ for no in range(num_pts - 1):
     print(outputline)
     o.write(outputline)
     o.close()
-plt.show()
+# plt.show()

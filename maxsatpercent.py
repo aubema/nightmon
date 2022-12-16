@@ -3,8 +3,10 @@ import os
 import sys
 import numpy as np
 
-
-with open("saturation.tmp", "r") as f:
+user = "sand"
+path = "/home/" + user + "/"
+file = path + "saturation.tmp"
+with open(file, "r") as f:
     words = [word for line in f for word in line.split()]
 R = float(words[2])
 G = float(words[5])

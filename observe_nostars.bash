@@ -82,7 +82,7 @@ take_pictureB() {
 			       elif [ "$satmax" -lt 70 ]
 			       then let tb=90*tb/satmax
 					   fi
-			  else echo "Problem with V camera."
+			  else echo "Problem with B camera."
 				  	 exit 0
 				fi
 		 done

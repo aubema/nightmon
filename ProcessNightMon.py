@@ -139,6 +139,7 @@ def fit_func(x, a):
 # MAIN
 # default Parameters
 user = "aubema"
+path = "/home/" + user
 sberr = 0
 mflag = "False"
 FWHM = 7
@@ -477,7 +478,7 @@ time = ts.utc(
     int(datearr[5]),
 )
 basename = time.utc_strftime("%Y-%m-%d")
-outname = "calibrated_" + Band + "_" + basename + "_sky.csv"
+outname = path + "calibrated_" + Band + "_" + basename + "_sky.csv"
 timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
 baseout = time.utc_strftime("%Y-%m-%d_%H-%M-%S")
 here_now = here.at(time)
@@ -793,7 +794,7 @@ else:
 
     norm1 = simple_norm(calSbBkg, "sqrt")
     title = Band + " background Surface Brightness"
-    file = Band + "_calSbBkg_" + baseout + ".png"
+    file = path + Band + "_calSbBkg_" + baseout + ".png"
     plt.figure()
     plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
     plt.colorbar()
@@ -802,14 +803,14 @@ else:
 
     norm1 = simple_norm(calSbTot, "sqrt")
     title = Band + " total Surface Brightness"
-    file = Band + "_calSbTot_" + baseout + ".png"
+    file = path + Band + "_calSbTot_" + baseout + ".png"
     plt.figure()
     plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
     plt.colorbar()
     plt.title(title)
     plt.savefig(file)
 
-    file = Band + "Stars_Match_" + baseout + ".png"
+    file = path + Band + "Stars_Match_" + baseout + ".png"
     title = Band + " Stars correspondance"
     plt.figure()
     plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)

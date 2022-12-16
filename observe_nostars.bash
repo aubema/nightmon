@@ -122,8 +122,7 @@ dA=`date +%d`
 basenameA=`date +%Y-%m-%d_%H-%M-%S`
 baseday=`date +%Y-%m-%d`
 basename[0]="$basenameA"
-read  tv toto < Current_A_tint.tmp
-# writing to logfile
+read  tv toto < $path/Current_A_tint.tmp
 if [ ! -d $basepath/$y ]
 then mkdir $basepath/$y
 fi
@@ -189,7 +188,6 @@ do 	if [ $n -eq 0 ]
 		fi
 
 		# backup output files
-		cp -f $basepath/$y/$mo/nightmon.log $backpath/$y/$mo/
 		if [ -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" ]
 		then cat /home/$user/"calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
 	else cat /home/$user/"calibrated_"$b"_"$baseday"_sky.csv"  > $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"

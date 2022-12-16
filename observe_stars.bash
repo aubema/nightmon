@@ -37,7 +37,7 @@ take_pictureA() {
 		 do	rm -f $path/capture_1*
 		    echo "Ta=" $ta
 		 		captureA.py -t $ta -g $gain
-				if [ -f $path/"capture_1.dng" ]
+				if [ -f $path"/capture_1.dng" ]
 				then lisc perc $path/capture_1.dng -p 99.9  > $path/saturation.tmp
 				     maxsatpercent.py > capture.tmp
 				     read satmax bidon  < capture.tmp
@@ -172,7 +172,7 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		python3 /usr/local/bin/ProcessNightMon.py -i $path/${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots

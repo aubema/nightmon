@@ -40,7 +40,7 @@ take_pictureA() {
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 				echo "image capturee"
 				if [ -f $path"/capture_1.dng" ]
-				then lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
 				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
@@ -70,9 +70,9 @@ take_pictureB() {
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
-				lisc perc $path"/capture_2.dng" -p 99.9
+				/usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9
 				if [ -f $path"/capture_2.dng" ]
-		    then lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
+		    then /usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
 				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax

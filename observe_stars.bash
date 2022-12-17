@@ -159,11 +159,11 @@ mv $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
 # check for the night by reading the latest optimal integration time
 if [ $ta -lt $max_lum ]
 then echo "Too much light. It is probably daytime."
-     move_cams.py 2000 1
-		 move_cams.py -1500 1
+     python3 /usr/local/bin/move_cams.py 2000 1
+		 python3 /usr/local/bin/move_cams.py -1500 1
 		 echo "Let's keep the camera inside for 15 min"
 		 exit 0
-else move_cams.py 2000 1
+else python3 /usr/local/bin/move_cams.py 2000 1
 fi
 
 echo "=============================="

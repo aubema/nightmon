@@ -50,7 +50,9 @@ def capture(cam, itime, gain):
         + str(gain)
         + " --shutter "
         + str(itime)
-        + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_2.jpg"
+        + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o "
+        + path
+        + "/capture_2.jpg"
     )
     os.system(cmd)
     os.system("cp capture_2* /home/sand/")

@@ -26,7 +26,7 @@
 take_pictureA() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking A picture"
-		 read tv bidon < $path/Current_A_tint.tmp
+		 read tv bidon < $path"/Current_A_tint.tmp"
 		 if [ -z "$ta" ]
 		 then echo "ta not available, setting it to 1/10s"
 		      let ta=100000
@@ -34,13 +34,13 @@ take_pictureA() {
 		 let satmax=1000
 		 # capture an image with V camera
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
-		 do	rm -f $path/capture_1*
+		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		captureA.py -t $ta -g $gain
 				if [ -f $path"/capture_1.dng" ]
-				then lisc perc $path/capture_1.dng -p 99.9  > $path/saturation.tmp
-				     maxsatpercent.py > $path/capture.tmp
-				     read satmax bidon  < $path/capture.tmp
+				then lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				     maxsatpercent.py > $path"/capture.tmp"
+				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let ta=ta/4
@@ -51,7 +51,7 @@ take_pictureA() {
 				  	 exit 0
 				fi
 		 done
-		 echo  $ta > $path/Current_A_tint.tmp
+		 echo  $ta > $path"/Current_A_tint.tmp"
 }
 
 take_pictureB() {

@@ -44,13 +44,16 @@ def main():
 
 def capture(cam, itime, gain):
     # cmd = "libcamera-hello -t 0"
+    path = "/home/sand"
     print(gain, itime)
     cmd = (
         "libcamera-still --analoggain "
         + str(gain)
         + " --shutter "
         + str(itime)
-        + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_1.jpg"
+        + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o "
+        + path
+        + "/capture_1.jpg"
     )
     os.system(cmd)
     os.system("cp capture_1* /home/sand/")

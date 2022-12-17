@@ -57,7 +57,7 @@ take_pictureA() {
 take_pictureB() {
 		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 		 echo "Taking B picture"
-		 		 read tb bidon < $path/Current_B_tint.tmp
+		 		 read tb bidon < $path"/Current_B_tint.tmp"
 		 		 if [ -z "$tb" ]
 		 		 then echo "tb not available, setting it to 1/10s"
 		 		      let tb=100000
@@ -65,14 +65,14 @@ take_pictureB() {
 		 		 let satmax=1000
 		 let satmax=1000
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
-		 do	rm -f $path/capture_2*
+		 do	rm -f $path"/capture_2*""
 		    echo "Tb=" $tb
 		 		captureB.py -t $tb -g $gain
-				lisc perc $path/capture_2.dng -p 99.9
-				if [ -f "$path/capture_2.dng" ]
-		    then lisc perc $path/capture_2.dng -p 99.9  > $path/saturation.tmp
-				     maxsatpercent.py > $path/capture.tmp
-				     read satmax bidon  < $path/capture.tmp
+				lisc perc $path"/capture_2.dng" -p 99.9
+				if [ -f $path"/capture_2.dng" ]
+		    then lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
+				     maxsatpercent.py > $path"/capture.tmp"
+				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let tb=tb/4
@@ -83,7 +83,7 @@ take_pictureB() {
 				  	 exit 0
 				fi
 		 done
-		 echo  $tb > 		$path/Current_B_tint.tmp
+		 echo  $tb > 		$path"/Current_B_tint.tmp"
 }
 
 

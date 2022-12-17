@@ -65,7 +65,7 @@ take_pictureB() {
 		 		 let satmax=1000
 		 let satmax=1000
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
-		 do	rm -f $path"/capture_2*""
+		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		captureB.py -t $tb -g $gain
 				lisc perc $path"/capture_2.dng" -p 99.9
@@ -105,14 +105,14 @@ cams=(A B)
 # Standard extinctions for Observatorio Roque de los Muchachos (0.102 0.0547) (JV JR)
 extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
-backpath="/home/$user/data"
+backpath="/home/"$user"/data"
 path="/home/"$user
 echo ${bands[0]};for i in ${bands[@]};do echo $i;done
-echo  "10000 us" > $path/Current_A_tint.tmp
-echo  "10000 us" > $path/Current_B_tint.tmp
+echo  "10000 us" > $path"/Current_A_tint.tmp"
+echo  "10000 us" > $path"/Current_B_tint.tmp"
 # get the site name
-/bin/grep "SITE" $path/nightmon_config > $path/ligne.tmp
-read bidon bidon sitename bidon < $path/ligne.tmp
+/bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
+read bidon bidon sitename bidon < $path"/ligne.tmp"
 
 echo "A shot"
 take_pictureA
@@ -123,7 +123,7 @@ basenameA=`date +%Y-%m-%d_%H-%M-%S`
 echo $basenameA
 baseday=`date +%Y-%m-%d`
 basename[0]="$basenameA"
-read  tv toto < $path/Current_A_tint.tmp
+read  tv toto < $path"/Current_A_tint.tmp"
 if [ ! -d $basepath/$y ]
 then mkdir $basepath/$y
 fi
@@ -138,20 +138,20 @@ then /bin/mkdir $backpath/$y/$mo
 fi
 echo "=============================="
 # rename pictures
-cp -f $path/capture_1.dng $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
-cp -f $path/capture_1.jpg $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
-mv $path/capture_1.dng $path/$basenameA"_A_"$ta"_"$gain".dng"
+cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
+mv $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
 
 echo "B shot"
 take_pictureB
 basenameB=`date +%Y-%m-%d_%H-%M-%S`
 basename[1]="$basenameB"
-read  tb toto < $path/Current_B_tint.tmp
+read  tb toto < $path"/Current_B_tint.tmp"
 echo "=============================="
 # rename pictures
-cp -f $path/capture_2.dng $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
-cp -f $path/capture_2.jpg $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
-mv $path/capture_2.dng $path/$basenameB"_B_"$tb"_"$gain".dng"
+cp -f $path"/capture_2.dng" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+cp -f $path"/capture_2.jpg" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
+mv $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
 
 
 # check for the night by reading the latest optimal integration time
@@ -172,31 +172,31 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d /home/$user/git/nightmon/data/Darks/$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/""$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots
-			mv $path/$band"calibration"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path/$band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path/$band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path/$band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/""$band"calibration"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/""$band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/""$band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/""$band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
 
 			# backup plots
-			cp -f $basepath/$y/$mo/$b"calibration"${basename[$n]}".png" $backpath/$y/$mo/
-			cp -f $basepath/$y/$mo/$b"_calSbBkg_"${basename[$n]}".png" $backpath/$y/$mo/
-			cp -f $basepath/$y/$mo/$b"_calSbTot_"${basename[$n]}".png" $backpath/$y/$mo/
-			cp -f $basepath/$y/$mo/$band"_Stars_Match_"${basename[$n]}".png" $backpath/$y/$mo/
+			cp -f $basepath"/"$y"/"$mo"/"$b"calibration"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			cp -f $basepath"/"$y"/"$mo"/"$band"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
 		fi
 
 		# backup output files
-		if [ -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" ]
-		then cat $path/"calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
-	else cat $path/"calibrated_"$b"_"$baseday"_sky.csv"  > $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv"
+		if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ]
+		then cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/""calibrated_"$baseday"_sky.csv"
+	else cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/""calibrated_"$baseday"_sky.csv"
 		fi
-		cp -f $basepath/$y/$mo/"calibrated_"$baseday"_sky.csv" $backpath/$y/$mo/
+		cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
 
 		# clean directory
-		rm $path/${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
-		rm $path/"calibrated_"$b"_"$baseday"_sky.csv"
+		rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
+		rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
 		let n=n+1
 done

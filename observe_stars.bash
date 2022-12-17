@@ -37,11 +37,11 @@ take_pictureA() {
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
-		 		python3 /usr/local/bin/captureA.py -t $ta -g $gain
+		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 				echo "image capturee"
 				if [ -f $path"/capture_1.dng" ]
 				then lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				     python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
@@ -69,11 +69,11 @@ take_pictureB() {
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
-		 		python3 /usr/local/bin/captureB.py -t $tb -g $gain
+		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
 				lisc perc $path"/capture_2.dng" -p 99.9
 				if [ -f $path"/capture_2.dng" ]
 		    then lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
-				     python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
@@ -159,11 +159,11 @@ mv $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
 # check for the night by reading the latest optimal integration time
 if [ $ta -lt $max_lum ]
 then echo "Too much light. It is probably daytime."
-     python3 /usr/local/bin/move_cams.py 2000 1
-		 python3 /usr/local/bin/move_cams.py -1500 1
+     /usr/bin/python3 /usr/local/bin/move_cams.py 2000 1
+		 /usr/bin/python3 /usr/local/bin/move_cams.py -1500 1
 		 echo "Let's keep the camera inside for 15 min"
 		 exit 0
-else python3 /usr/local/bin/move_cams.py 2000 1
+else /usr/bin/python3 /usr/local/bin/move_cams.py 2000 1
 fi
 
 echo "=============================="
@@ -174,7 +174,7 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots

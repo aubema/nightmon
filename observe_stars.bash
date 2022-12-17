@@ -172,14 +172,14 @@ do 	if [ $n -eq 0 ]
     then let t=ta
 		else let t=tb
 		fi
-		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/""$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+		python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
 		if [ -f $band"calibration"${basename[$n]}".png" ]
 		then
 			# rename plots
-			mv $path"/""$band"calibration"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path"/""$band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path"/""$band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-			mv $path"/""$band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/"$band"calibration"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/"$band"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/"$band"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+			mv $path"/"$band"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
 
 			# backup plots
 			cp -f $basepath"/"$y"/"$mo"/"$b"calibration"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
@@ -190,8 +190,8 @@ do 	if [ $n -eq 0 ]
 
 		# backup output files
 		if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ]
-		then cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/""calibrated_"$baseday"_sky.csv"
-	else cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/""calibrated_"$baseday"_sky.csv"
+		then cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
+	else cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
 		fi
 		cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
 

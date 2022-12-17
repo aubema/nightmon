@@ -37,10 +37,11 @@ take_pictureA() {
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
-		 		captureA.py -t $ta -g $gain
+		 		python3 /usr/local/bin/captureA.py -t $ta -g $gain
+				echo "image capturee"
 				if [ -f $path"/capture_1.dng" ]
 				then lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				     maxsatpercent.py > $path"/capture.tmp"
+				     python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
@@ -68,11 +69,11 @@ take_pictureB() {
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
-		 		captureB.py -t $tb -g $gain
+		 		python3 /usr/local/bin/captureB.py -t $tb -g $gain
 				lisc perc $path"/capture_2.dng" -p 99.9
 				if [ -f $path"/capture_2.dng" ]
 		    then lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
-				     maxsatpercent.py > $path"/capture.tmp"
+				     python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]

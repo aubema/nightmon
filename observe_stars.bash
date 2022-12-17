@@ -26,6 +26,7 @@
 take_pictureA() {
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking A picture"
+		 echo $path
 		 read tv bidon < $path"/Current_A_tint.tmp"
 		 if [ -z "$ta" ]
 		 then echo "ta not available, setting it to 1/10s"

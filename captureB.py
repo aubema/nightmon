@@ -55,7 +55,6 @@ def capture(cam, itime, gain):
         + "/capture_2.jpg"
     )
     os.system(cmd)
-    os.system("cp capture_2* /home/sand/")
 
 
 if __name__ == "__main__":

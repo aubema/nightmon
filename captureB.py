@@ -47,7 +47,7 @@ def capture(cam, itime, gain):
     print(gain, itime)
     path = "/home/sand"
     cmd = (
-        "libcamera-still --analoggain "
+        "/usr/bin/libcamera-still --analoggain "
         + str(gain)
         + " --shutter "
         + str(itime)

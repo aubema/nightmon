@@ -134,8 +134,7 @@ fi
 
 
 while :
-do rm -f *.tmp
-   time1=`date +%s`
+do time1=`date +%s`
    echo "A shot"
    take_pictureA
    y=`date +%Y`

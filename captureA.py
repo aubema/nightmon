@@ -54,7 +54,6 @@ def capture(cam, itime, gain):
         + " --denoise off --rawfull --raw --awbgains 1,1 --nopreview -o capture_1.jpg"
     )
     os.system(cmd)
-    os.system("mv capture_1.* " + path)
 
 
 if __name__ == "__main__":

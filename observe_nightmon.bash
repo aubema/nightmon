@@ -223,4 +223,5 @@ do time1=`date +%s`
    if [ $idle -lt 0 ] ; then let idle=0; fi
    echo "Wait " $idle "s before next reading."
    /bin/sleep $idle
+	 time1=`date +%s`
 done

@@ -9,5 +9,8 @@ RestartSec=1
 User=root
 ExecStart=/bin/bash /usr/local/bin/observe_nightmon.bash
 
+StandardOutput=append:/home/sand/nightmon.log
+StandardError=append:/home/sand/nightmon.log
+
 [Install]
 WantedBy=multi-user.target

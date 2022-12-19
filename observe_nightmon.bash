@@ -97,9 +97,9 @@ take_pictureB() {
 # setting constants
 user="sand"
 slope=1.0
-gain=8
-max_lum=10000  # 1000000 = 1sec
-darkimg="dark-gain8-t100000.dng"
+gain=16
+max_lum=100000  # 1000000 = 1sec
+darkimg="dark-gain16-t100000.dng"
 # possible bands JV JR R G B (max 2 bands)
 bands=(JV JR)
 model="RpiHQ-JFilters"  # other choices are "RpiHQ" and "A7S"
@@ -121,7 +121,7 @@ gopt=0
 while getopts 'k:' OPTION
 do
    case $OPTION in
-      k) kopt=1 
+      k) kopt=1
          Kalmode=$OPTARG
       ;;
    esac

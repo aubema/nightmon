@@ -46,9 +46,13 @@ take_pictureA() {
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let ta=ta/4
-					 elif [ "$satmax" -lt 70 ]
+					   elif [ "$satmax" -lt 70 ]
 			       then let ta=90*ta/satmax
 					   fi
+						 if [ "$ta" -gt 239000000 ]
+						 then let ta=239000000
+									let satmax=80
+						 fi
 			  else echo "Problem with A camera."
 				  	 exit 0
 				fi
@@ -81,6 +85,10 @@ take_pictureB() {
 			       elif [ "$satmax" -lt 70 ]
 			       then let tb=90*tb/satmax
 					   fi
+						 if [ "$tb" -gt 239000000 ]
+						 then let tb=239000000
+						      let satmax=80
+						 fi
 			  else echo "Problem with B camera."
 				  	 exit 0
 				fi
@@ -163,8 +171,10 @@ do time1=`date +%s`
    # rename pictures
    cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
    cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
-	 mv -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
-	 mv -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
+   cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+   cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
+	 cp -f $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
+	 cp -f $path"/capture_1.jpg" $path/$basenameA"_A_"$ta"_"$gain".jpg"
    echo "B shot"
    take_pictureB
    basenameB=`date +%Y-%m-%d_%H-%M-%S`
@@ -174,8 +184,10 @@ do time1=`date +%s`
    # rename pictures
    cp -f $path"/capture_2.dng" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
    cp -f $path"/capture_2.jpg" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
-	 mv -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
-	 mv -f $path"/capture_2.jpg" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
+   cp -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+   cp -f $path"/capture_2.jpg" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
+	 cp -f $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
+	 cp -f $path"/capture_2.jpg" $path/$basenameB"_B_"$tb"_"$gain".jpg"
    # check for the night by reading the latest optimal integration time
    if [ $ta -lt $max_lum ]
    then echo "Too much light. It is probably daytime."
@@ -228,4 +240,6 @@ do time1=`date +%s`
    echo "Wait " $idle "s before next reading."
    /bin/sleep $idle
 	 time1=`date +%s`
+	 rm -f $path/*.dng
+	 rm -f $path/*.jpg
 done

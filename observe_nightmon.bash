@@ -115,7 +115,8 @@ echo  "10000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
-
+# wait 5 min to start (enough time for ntp sync)
+/bin/sleep 300
 #OPTIONS
 gopt=0
 while getopts 'k:' OPTION
@@ -161,7 +162,8 @@ do time1=`date +%s`
    # rename pictures
    cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
    cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
-   mv $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
+	 mv -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+	 mv -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
    echo "B shot"
    take_pictureB
    basenameB=`date +%Y-%m-%d_%H-%M-%S`
@@ -171,6 +173,8 @@ do time1=`date +%s`
    # rename pictures
    cp -f $path"/capture_2.dng" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
    cp -f $path"/capture_2.jpg" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
+	 mv -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+	 mv -f $path"/capture_2.jpg" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
    mv $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
    # check for the night by reading the latest optimal integration time
    if [ $ta -lt $max_lum ]

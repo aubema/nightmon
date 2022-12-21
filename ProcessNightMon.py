@@ -688,7 +688,7 @@ else:
     plt.title(title)
     plt.savefig(file)
 
-    file = path + Band + "Stars_Match_" + baseout + ".png"
+    file = path + Band + "_Stars_Match_" + baseout + ".png"
     title = Band + " Stars correspondance"
     plt.figure()
     plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)

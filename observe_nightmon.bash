@@ -176,7 +176,6 @@ do time1=`date +%s`
    cp -f $path"/capture_2.jpg" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
 	 mv -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
 	 mv -f $path"/capture_2.jpg" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
-   mv $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
    # check for the night by reading the latest optimal integration time
    if [ $ta -lt $max_lum ]
    then echo "Too much light. It is probably daytime."

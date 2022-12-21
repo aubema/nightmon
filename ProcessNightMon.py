@@ -501,22 +501,22 @@ imbkg = bkg.background
 # image without background
 imstars = imag - imbkg
 
-# determine cloud cover only for z < 70 deg because of extinction
+# determine cloud cover only for z < 30 deg for determining if starfield is usable for calibration
 imstars_tmp = np.copy(imstars)
-imstars_tmp[z > 70] = np.nan
+imstars_tmp[z > 30] = np.nan
 starsstd = np.nanstd(imstars_tmp)
 starsmean = np.nanmean(imstars_tmp)
 threshold = starsmean + starsstd
 stars_binary = np.full((ny, nx), 0.0)
 stars_full = np.full((ny, nx), 1.0)
 stars_binary[imstars >= threshold] = 1.0
-stars_binary[z > 70] = 0
-stars_full[z > 70] = 0
+stars_binary[z > 30] = 0
+stars_full[z > 30] = 0
 # set cloud detection window to about 5 deg (51)
 window = 51  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 stars_count = convolve(stars_binary, kernel)
-stars_count[z > 70] = 0.0
+stars_count[z > 30] = 0.0
 stars_count[stars_count > 0] = 1
 # weighted with solid angle
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)

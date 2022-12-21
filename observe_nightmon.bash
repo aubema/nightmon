@@ -209,7 +209,7 @@ do time1=`date +%s`
          else let t=tb
          fi
          /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
-         if [ -f $band"calibration"${basename[$n]}".png" ]
+         if [ -f $path"/"$band"calibration"${basename[$n]}".png" ]
          then
             # rename plots
             mv $path"/"$band"calibration"${basename[$n]}".png" $basepath/$y/$mo/

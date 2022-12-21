@@ -261,8 +261,8 @@ window = 7  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 dark = convolve(Dgray, kernel)
 dark_norm = convolve(Sgray, kernel)
-dmean = np.mean(dark[5 : ny - 5, 5:105], axis=(0, 1))
-imean = np.mean(Sgray[5 : ny - 5, 5:105], axis=(0, 1))
+dmean = np.mean(dark[5:105, 5:105], axis=(0, 1))
+imean = np.mean(Sgray[5:105, 5:105], axis=(0, 1))
 dnorm = imean / dmean
 dark = dark * dnorm
 Sgray = Sgray - dark

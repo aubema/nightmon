@@ -116,6 +116,7 @@ echo  "10000 us" > $path"/Current_B_tint.tmp"
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 5 min to start (enough time for ntp sync)
+echo "Waiting 5 min before starting measurements..."
 /bin/sleep 300
 #OPTIONS
 gopt=0

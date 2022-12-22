@@ -109,7 +109,7 @@ take_pictureB() {
 #
 # setting constants
 user="sand"
-slope=1.0
+zpoint=1.0
 gain=16
 max_lum=100000  # 1000000 = 1sec
 darkimg="dark-gain16-t100000.dng"
@@ -224,7 +224,12 @@ do time1=`date +%s`
          then let t=ta
          else let t=tb
          fi
-         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
+				 # determine the zeropoint according to the integration time and camera
+				 #
+				 #
+				 #
+
+         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -z $zpoint
          if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ]
          then
 				    mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/

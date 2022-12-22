@@ -80,7 +80,7 @@ def input(argv):
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:i:d:b:e:c:m:k:s:",
+            "h:i:d:b:e:c:m:k:z:",
             [
                 "help=",
                 "ifile=",
@@ -90,18 +90,18 @@ def input(argv):
                 "cam=",
                 "model=",
                 "calib=",
-                "slope=",
+                "zerop=",
             ],
         )
     except getopt.GetoptError:
         print(
-            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
+            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -z <Zeropoint>"
         )
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print(
-                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -s <Calibration slope>"
+                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -z <Zeropoint>"
             )
             sys.exit()
         elif opt in ("-i", "--ifile"):
@@ -118,7 +118,7 @@ def input(argv):
             Model = arg
         elif opt in ("-k", "--calib"):
             Calmet = arg
-        elif opt in ("-s", "--slope"):
+        elif opt in ("-z", "--zerop"):
             Slope = arg
     print("Sky image file is :", Ifile)
     print("Dark frame file is :", Dfile)
@@ -127,7 +127,7 @@ def input(argv):
     print("Camera is :", Cam)
     print("Camera model is :", Model)
     print("Calibration method :", Calmet)
-    return Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Slope
+    return Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint
 
 
 def fit_func(x, a):
@@ -157,9 +157,9 @@ limiti = (
 )
 limits = 1.2
 # load command line parameters
-Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Slope = input(sys.argv[1:])
+Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint = input(sys.argv[1:])
 k = float(Extinc)
-slp = Slope
+slp = 10 ** (-0.4 * Zpoint)
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":

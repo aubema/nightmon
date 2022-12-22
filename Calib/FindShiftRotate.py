@@ -96,7 +96,7 @@ def input(argv):
 # ================================================
 # MAIN
 # default Parameters
-user = "aubema"
+user = "sand"
 sberr = 0
 mflag = "False"
 FWHM = 3
@@ -119,14 +119,14 @@ Simg = open_raw(Sfile)
 # Load Parameters
 # read NightMon config file
 configpath = "/home/" + user + "/cameraorientation_config"
-with open(cofigpath) as f:
+with open(configpath) as f:
     p = yaml.safe_load(f)
-Site = p["Site"]
+
 nightmonconfigpath = "/home/" + user + "/nightmon_config"
-with open(nightmoncofigpath) as g:
+with open(nightmonconfigpath) as g:
     q = yaml.safe_load(g)
 
-
+Site = p["Site"]
 ts = load.timescale()
 # set observer position
 eph = load("de421.bsp")
@@ -156,7 +156,7 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = p["Zslope"] * d + p["Zquad"] * d**2 + p["Zthird"] * d**3 + p["Zfourth"] * d**4
+z = q["Zslope"] * d + q["Zquad"] * d**2 + q["Zthird"] * d**3 + q["Zfourth"] * d**4
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi

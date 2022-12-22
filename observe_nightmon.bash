@@ -120,8 +120,8 @@ basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
 echo ${bands[0]};for i in ${bands[@]};do echo $i;done
-echo  "5000000 us" > $path"/Current_A_tint.tmp"
-echo  "5000000 us" > $path"/Current_B_tint.tmp"
+echo  "12000000 us" > $path"/Current_A_tint.tmp"
+echo  "12000000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"

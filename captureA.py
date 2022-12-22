@@ -45,7 +45,6 @@ def main():
 def capture(cam, itime, gain):
     # cmd = "libcamera-hello -t 0"
     path = "/home/sand"
-    print(gain, itime)
     cmd = (
         "/usr/bin/libcamera-still --analoggain "
         + str(gain)

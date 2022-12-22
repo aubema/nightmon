@@ -38,7 +38,6 @@ take_pictureA() {
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-				echo "image capturee"
 				if [ -f $path"/capture_1.dng" ]
 				then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
 				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"

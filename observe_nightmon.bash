@@ -38,6 +38,9 @@ take_pictureA() {
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+				if [ "$ta" -eq 120000000 ]
+				then break
+				fi
 				if [ -f $path"/capture_1.dng" ]
 				then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
 				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
@@ -77,6 +80,9 @@ take_pictureB() {
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
+				if [ "$tb" -eq 120000000 ]
+	 		  then break
+			  fi
 				/usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9
 				if [ -f $path"/capture_2.dng" ]
 		    then /usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"

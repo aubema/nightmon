@@ -159,7 +159,7 @@ limits = 1.2
 # load command line parameters
 Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint = input(sys.argv[1:])
 k = float(Extinc)
-slp = 10 ** (-0.4 * Zpoint)
+slp = 10 ** (-0.4 * float(Zpoint))
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":

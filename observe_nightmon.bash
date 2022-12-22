@@ -34,7 +34,7 @@ take_pictureA() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
@@ -45,12 +45,13 @@ take_pictureA() {
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let ta=ta/4
-					   elif [ "$satmax" -lt 70 ]
+					 elif [ "$satmax" -lt 50 ]
 			       then let ta=ta*2
 					   fi
-						 if [ "$ta" -ge 120000000 ]
+						 if [ "$ta" -gt 120000000 ]
 						 then let ta=120000000
-									let satmax=80
+						      echo "Ta=" $ta
+                  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 						 fi
 						 if [ "$ta" -le 1000 ]
 						 then break
@@ -72,7 +73,7 @@ take_pictureB() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
@@ -84,12 +85,13 @@ take_pictureB() {
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
 			       then  let tb=tb/4
-			       elif [ "$satmax" -lt 70 ]
+					 elif [ "$satmax" -lt 50 ]
 			       then let tb=tb*2
 					   fi
-						 if [ "$tb" -ge 120000000 ]
+						 if [ "$tb" -gt 120000000 ]
 						 then let tb=120000000
-						      let satmax=80
+						      echo "Tb=" $tb
+                  /usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
 						 fi
 						 if [ "$tb" -le 1000 ]
 						 then break

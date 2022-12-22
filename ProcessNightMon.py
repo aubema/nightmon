@@ -157,6 +157,7 @@ limits = 1.2
 # load command line parameters
 Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Slope = input(sys.argv[1:])
 k = float(Extinc)
+slp = Slope
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":
@@ -501,22 +502,22 @@ imbkg = bkg.background
 # image without background
 imstars = imag - imbkg
 
-# determine cloud cover only for z < 30 deg for determining if starfield is usable for calibration
+# determine cloud cover only for z < 80 deg for determining if starfield is usable for calibration
 imstars_tmp = np.copy(imstars)
-imstars_tmp[z > 30] = np.nan
+imstars_tmp[z > 80] = np.nan
 starsstd = np.nanstd(imstars_tmp)
 starsmean = np.nanmean(imstars_tmp)
 threshold = starsmean + starsstd
 stars_binary = np.full((ny, nx), 0.0)
 stars_full = np.full((ny, nx), 1.0)
 stars_binary[imstars >= threshold] = 1.0
-stars_binary[z > 30] = 0
-stars_full[z > 30] = 0
+stars_binary[z > 80] = 0
+stars_full[z > 80] = 0
 # set cloud detection window to about 5 deg (51)
 window = 51  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 stars_count = convolve(stars_binary, kernel)
-stars_count[z > 30] = 0.0
+stars_count[z > 80] = 0.0
 stars_count[stars_count > 0] = 1
 # weighted with solid angle
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)
@@ -636,8 +637,9 @@ else:
         gx = np.linspace(0, np.amax(ax), 100)
         gy = slp * gx
 
+    if corcoef > 0.75:
         title = Band + " calibration"
-        file = Band + "_calibration_" + baseout + ".png"
+        file = path + Band + "_calibration_" + baseout + ".png"
         plt.figure()
         plt.plot(gx, gy, "r")
         plt.plot(ax, ay, "ob")
@@ -645,48 +647,48 @@ else:
         plt.ylabel("10^(-0.4*CalMag)")
         plt.title(title)
         plt.savefig(file)
-    # print calibration slope slp
-    print("Calibration slope (slp) :", slp)
-    # replace zeros with a small non null value
-    mask = imag <= 0
-    imagtmp = np.copy(imag)
-    imagtmp[mask] = imbkg[mask]
-    imag = imagtmp
-    imstars[imstars <= 0] = 0.0001
-    clouds = imstars[imstars > 0.001]
-    calMagTot = -2.5 * np.log10(imag * slp)
-    calMagBkg = -2.5 * np.log10(imbkg * slp)
-    calMagStr = -2.5 * np.log10(imstars * slp)
-    zeropoint = float(-2.5 * np.log10(slp))
-    print("Zero point (mag) =", zeropoint)
-    print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")
-    print(" where R the signal assigned to the pixel")
+        # print calibration slope slp
+        print("Calibration slope (slp) :", slp)
+        # replace zeros with a small non null value
+        mask = imag <= 0
+        imagtmp = np.copy(imag)
+        imagtmp[mask] = imbkg[mask]
+        imag = imagtmp
+        imstars[imstars <= 0] = 0.0001
+        clouds = imstars[imstars > 0.001]
+        calMagTot = -2.5 * np.log10(imag * slp)
+        calMagBkg = -2.5 * np.log10(imbkg * slp)
+        calMagStr = -2.5 * np.log10(imstars * slp)
+        zeropoint = float(-2.5 * np.log10(slp))
+        print("Zero point (mag) =", zeropoint)
+        print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")
+        print(" where R the signal assigned to the pixel")
 
-    # calibrated surface brightness in mag /sq arc sec
-    calSbTot = calMagTot + 2.5 * np.log10(sec2)
-    calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
-    calSbStr = calMagStr + 2.5 * np.log10(sec2)
-    calSbTot[z > 90] = np.nan
-    calSbBkg[z > 90] = np.nan
-    calSbStr[z > 90] = np.nan
+        # calibrated surface brightness in mag /sq arc sec
+        calSbTot = calMagTot + 2.5 * np.log10(sec2)
+        calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
+        calSbStr = calMagStr + 2.5 * np.log10(sec2)
+        calSbTot[z > 90] = np.nan
+        calSbBkg[z > 90] = np.nan
+        calSbStr[z > 90] = np.nan
 
-    norm1 = simple_norm(calSbBkg, "sqrt")
-    title = Band + " background Surface Brightness"
-    file = path + Band + "_calSbBkg_" + baseout + ".png"
-    plt.figure()
-    plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
-    plt.colorbar()
-    plt.title(title)
-    plt.savefig(file)
+        norm1 = simple_norm(calSbBkg, "sqrt")
+        title = Band + " background Surface Brightness"
+        file = path + Band + "_calSbBkg_" + baseout + ".png"
+        plt.figure()
+        plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
+        plt.colorbar()
+        plt.title(title)
+        plt.savefig(file)
 
-    norm1 = simple_norm(calSbTot, "sqrt")
-    title = Band + " total Surface Brightness"
-    file = path + Band + "_calSbTot_" + baseout + ".png"
-    plt.figure()
-    plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
-    plt.colorbar()
-    plt.title(title)
-    plt.savefig(file)
+        norm1 = simple_norm(calSbTot, "sqrt")
+        title = Band + " total Surface Brightness"
+        file = path + Band + "_calSbTot_" + baseout + ".png"
+        plt.figure()
+        plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
+        plt.colorbar()
+        plt.title(title)
+        plt.savefig(file)
 
     file = path + Band + "_Stars_Match_" + baseout + ".png"
     title = Band + " Stars correspondance"
@@ -699,19 +701,19 @@ else:
     plt.legend(["Detected stars", "Simbad reference stars"])
     plt.savefig(file)
 
-plt.figure()
-plt.title("stars bin")
-plt.imshow(stars_binary, cmap="inferno")
-plt.colorbar()
-
-plt.figure()
-plt.title("starcount")
-plt.imshow(stars_count, cmap="inferno")
-plt.colorbar()
-plt.figure()
-plt.title("full")
-plt.imshow(stars_full, cmap="inferno")
-plt.colorbar()
+# plt.figure()
+# plt.title("stars bin")
+# plt.imshow(stars_binary, cmap="inferno")
+# plt.colorbar()
+#
+# plt.figure()
+# plt.title("starcount")
+# plt.imshow(stars_count, cmap="inferno")
+# plt.colorbar()
+# plt.figure()
+# plt.title("full")
+# plt.imshow(stars_full, cmap="inferno")
+# plt.colorbar()
 
 # Extract points and write data
 index = find_close_indices(az, el, apt, ept)
@@ -732,7 +734,7 @@ for no in range(num_pts - 1):
     # calculate Airmass
     airmo = airmass(ept[no])
     # read V sky Brightness
-    if cloud_cover < max_cloud_cover:
+    if cloud_cover < max_cloud_cover and corcoef > 0.75:
         mago = calSbBkg[index[no, 0], index[no, 1]]
     else:
         mago = np.nan

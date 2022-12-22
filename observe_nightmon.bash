@@ -34,7 +34,7 @@ take_pictureA() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ] || [ "$ta" -lt 1000 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
@@ -53,6 +53,9 @@ take_pictureA() {
 						 then let ta=120000000
 									let satmax=80
 						 fi
+						 if [ "$ta" -le 1000 ]
+						 then break
+						 fi
 			  else echo "Problem with A camera."
 				  	 exit 0
 				fi
@@ -70,7 +73,7 @@ take_pictureB() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ] || [ "$tb" -lt 1000 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
@@ -89,6 +92,9 @@ take_pictureB() {
 						 then let tb=120000000
 						      let satmax=80
 						 fi
+						 if [ "$tb" -le 1000 ]
+						 then break
+					   fi
 			  else echo "Problem with B camera."
 				  	 exit 0
 				fi

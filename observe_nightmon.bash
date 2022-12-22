@@ -34,7 +34,7 @@ take_pictureA() {
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ] || [ "$ta" -lt 1000 ]
 		 do	rm -f $path"/capture_1*"
 		    echo "Ta=" $ta
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
@@ -70,7 +70,7 @@ take_pictureB() {
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ]
+		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 70 ] || [ "$tb" -lt 1000 ]
 		 do	rm -f $path"/capture_2*"
 		    echo "Tb=" $tb
 		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
@@ -120,8 +120,8 @@ basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
 echo ${bands[0]};for i in ${bands[@]};do echo $i;done
-echo  "12000000 us" > $path"/Current_A_tint.tmp"
-echo  "12000000 us" > $path"/Current_B_tint.tmp"
+echo  "6000000 us" > $path"/Current_A_tint.tmp"
+echo  "6000000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"

@@ -48,7 +48,7 @@ take_pictureA() {
 					   elif [ "$satmax" -lt 70 ]
 			       then let ta=ta*2
 					   fi
-						 if [ "$ta" -gt 120000000 ]
+						 if [ "$ta" -ge 120000000 ]
 						 then let ta=120000000
 									let satmax=80
 						 fi
@@ -87,7 +87,7 @@ take_pictureB() {
 			       elif [ "$satmax" -lt 70 ]
 			       then let tb=tb*2
 					   fi
-						 if [ "$tb" -gt 120000000 ]
+						 if [ "$tb" -ge 120000000 ]
 						 then let tb=120000000
 						      let satmax=80
 						 fi

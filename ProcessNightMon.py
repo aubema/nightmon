@@ -119,7 +119,7 @@ def input(argv):
         elif opt in ("-k", "--calib"):
             Calmet = arg
         elif opt in ("-z", "--zerop"):
-            Slope = arg
+            Zpoint = arg
     print("Sky image file is :", Ifile)
     print("Dark frame file is :", Dfile)
     print("Band is :", Band)

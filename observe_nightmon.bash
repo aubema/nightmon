@@ -199,8 +199,9 @@ do time1=`date +%s`
 	 limit=`cat /sys/class/gpio/gpio5/value`
    if [ $ta -lt $max_lum ]
    then echo "Too much light. It is probably daytime."
-	    if [ "$limit" == "0"]
+	    if [ "$limit" == "0" ]
 			then
+				 echo "Moving cameras..."
          /usr/bin/python3 /usr/local/bin/move_cams.py -1400 1
 			fi
       echo "Let's keep the camera inside for 15 min"

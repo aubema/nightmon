@@ -30,7 +30,7 @@ take_pictureA() {
 		 read ta bidon < $path"/Current_A_tint.tmp"
 		 if [ -z "$ta" ]
 		 then echo "ta not available, setting it to 1/10s"
-		      let ta=100000
+		      let ta=3750000
 		 fi
 		 let satmax=1000
 		 # capture an image with V camera
@@ -46,7 +46,7 @@ take_pictureA() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let ta=ta/4
 					   elif [ "$satmax" -lt 70 ]
-			       then let ta=90*ta/satmax
+			       then let ta=ta*2
 					   fi
 						 if [ "$ta" -gt 120000000 ]
 						 then let ta=120000000
@@ -68,7 +68,7 @@ take_pictureB() {
 		 		 read tb bidon < $path"/Current_B_tint.tmp"
 		 		 if [ -z "$tb" ]
 		 		 then echo "tb not available, setting it to 1/10s"
-		 		      let tb=100000
+		 		      let tb=3750000
 		 		 fi
 		 		 let satmax=1000
 		 let satmax=1000
@@ -85,7 +85,7 @@ take_pictureB() {
 			       if [ "$satmax" -ge 100 ]
 			       then  let tb=tb/4
 			       elif [ "$satmax" -lt 70 ]
-			       then let tb=90*tb/satmax
+			       then let tb=tb*2
 					   fi
 						 if [ "$tb" -gt 120000000 ]
 						 then let tb=120000000
@@ -124,8 +124,8 @@ extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
-echo  "6000000 us" > $path"/Current_A_tint.tmp"
-echo  "6000000 us" > $path"/Current_B_tint.tmp"
+echo  "3750000 us" > $path"/Current_A_tint.tmp"
+echo  "3750000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"

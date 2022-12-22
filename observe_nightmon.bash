@@ -119,7 +119,6 @@ extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
-echo ${bands[0]};for i in ${bands[@]};do echo $i;done
 echo  "6000000 us" > $path"/Current_A_tint.tmp"
 echo  "6000000 us" > $path"/Current_B_tint.tmp"
 # get the site name

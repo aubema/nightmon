@@ -49,8 +49,8 @@ take_pictureA() {
 					   elif [ "$satmax" -lt 70 ]
 			       then let ta=90*ta/satmax
 					   fi
-						 if [ "$ta" -gt 239000000 ]
-						 then let ta=239000000
+						 if [ "$ta" -gt 120000000 ]
+						 then let ta=120000000
 									let satmax=80
 						 fi
 			  else echo "Problem with A camera."
@@ -85,8 +85,8 @@ take_pictureB() {
 			       elif [ "$satmax" -lt 70 ]
 			       then let tb=90*tb/satmax
 					   fi
-						 if [ "$tb" -gt 239000000 ]
-						 then let tb=239000000
+						 if [ "$tb" -gt 120000000 ]
+						 then let tb=120000000
 						      let satmax=80
 						 fi
 			  else echo "Problem with B camera."

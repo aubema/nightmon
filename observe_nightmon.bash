@@ -129,9 +129,9 @@ echo  "6000000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
-# wait 5 min to start (enough time for ntp sync)
-echo "Waiting 5 min before starting measurements..."
-/bin/sleep 300
+# wait 2 min to start (enough time for ntp sync)
+echo "Waiting 2 min before starting measurements..."
+/bin/sleep 120
 #OPTIONS
 gopt=0
 while getopts 'k:' OPTION
@@ -175,11 +175,14 @@ do time1=`date +%s`
    fi
    echo "=============================="
    # rename pictures
-   cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+	 if [ $ta -ge $max_lum ]
+	 then
+      cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+	    cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
+	    cp -f $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
+   fi
    cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
-   cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
    cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
-	 cp -f $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
 	 cp -f $path"/capture_1.jpg" $path/$basenameA"_A_"$ta"_"$gain".jpg"
    echo "B shot"
    take_pictureB
@@ -188,11 +191,14 @@ do time1=`date +%s`
    read  tb toto < $path"/Current_B_tint.tmp"
    echo "=============================="
    # rename pictures
-   cp -f $path"/capture_2.dng" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+	 if [ $ta -ge $max_lum ]
+	 then
+      cp -f $path"/capture_2.dng" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+	    cp -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
+	    cp -f $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
+   fi
    cp -f $path"/capture_2.jpg" $basepath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
-   cp -f $path"/capture_2.dng" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".dng"
    cp -f $path"/capture_2.jpg" $backpath/$y/$mo/$basenameB"_B_"$tb"_"$gain".jpg"
-	 cp -f $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
 	 cp -f $path"/capture_2.jpg" $path/$basenameB"_B_"$tb"_"$gain".jpg"
    # check for the night by reading the latest optimal integration time
 	 limit=`cat /sys/class/gpio/gpio5/value`

@@ -209,19 +209,27 @@ do time1=`date +%s`
          else let t=tb
          fi
          /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -s $slope
-         if [ -f $path"/"$b"calibration"${basename[$n]}".png" ]
+         if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ]
          then
-            # rename plots
-            mv $path"/"$b"calibration"${basename[$n]}".png" $basepath/$y/$mo/
-            mv $path"/"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
-            mv $path"/"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-            mv $path"/"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
-            # backup plots
-            cp -f $basepath"/"$y"/"$mo"/"$b"calibration"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-            cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-            cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-            cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-         fi
+				    mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
+					  cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+				 fi
+				 if [ -f $path"/"$b"_calSbBkg_"${basename[$n]}".png" ]
+				 then
+					 mv $path"/"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+					 cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			   fi
+				 if [ -f $path"/"$b"_calSbTot_"${basename[$n]}".png" ]
+				 then
+					 mv $path"/"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+					 cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			   fi
+				 if [ -f $path"/"$b"_Stars_Match_"${basename[$n]}".png" ]
+				 then
+					 mv $path"/"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+					 cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			   fi
+
          # backup output files
          if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ]
          then cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"

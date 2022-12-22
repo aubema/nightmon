@@ -141,6 +141,8 @@ def fit_func(x, a):
 user = "sand"
 path = "/home/" + user + "/"
 sberr = 0
+calsb = 0
+corcoef = 0
 mflag = "False"
 FWHM = 7
 zeropoint = np.nan
@@ -468,9 +470,9 @@ AirM = airmass(altstar)
 if os.path.exists(outname) == False:
     o = open(outname, "w")
     first_line = "# Loc_Name , Band , CCD_XY_position , ,  AzAlt_position , , Airmass , Ext_coef ,    \
-    Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , Sun_Alt, Moon_Alt , Galactic_Lat , Moon_Phase \n"
-    second_line = "# ,  , (pixel) , (pixel) , (deg) , (deg) ,  ,  ,  \
-    , (%) , (mag/arcsec^2) ,  , mag , deg , deg ,  deg , deg , \n"
+    Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , CorCoef , Sun_Alt, Moon_Alt , Galactic_Lat , Moon_Phase \n"
+    second_line = "# ,  , (pixel) , (pixel) , (deg) , (deg) ,  ,  ,  , \
+    , (%) , (mag/arcsec^2) ,  , mag , , deg , deg ,  deg , deg , \n"
     o.write(first_line)
     o.write(second_line)
     o.close()
@@ -523,11 +525,10 @@ stars_count[stars_count > 0] = 1
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)
 print("Cloud cover (%) : ", cloud_cover)
 
-
-if Calmet == "stars" and cloud_cover > max_cloud_cover:
-    print("Can't process the data for stars calibration methods under cloudy skies")
-else:
-    if Calmet == "stars" and cloud_cover < max_cloud_cover:
+if Calmet == "stars":
+    if cloud_cover > max_cloud_cover:
+        print("Can't process the data for stars calibration methods under cloudy skies")
+    else:
         # Search for stars only if cloud_cover is lower than max_cloud_cover
         mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
         daofind = DAOStarFinder(fwhm=2, threshold=50.0 * std)
@@ -637,69 +638,75 @@ else:
         gx = np.linspace(0, np.amax(ax), 100)
         gy = slp * gx
 
-    if corcoef > 0.75:
-        title = Band + " calibration"
-        file = path + Band + "_calibration_" + baseout + ".png"
+        if corcoef > 0.75:
+            calsb = 1
+
+        file = path + Band + "_Stars_Match_" + baseout + ".png"
+        title = Band + " Stars correspondance"
         plt.figure()
-        plt.plot(gx, gy, "r")
-        plt.plot(ax, ay, "ob")
-        plt.xlabel("Star's pixel values")
-        plt.ylabel("10^(-0.4*CalMag)")
+        plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)
+        plt.plot(StarMatch[:, 0], StarMatch[:, 1], "ok", markersize=2)
+        plt.ylim(ny, 0)
+        plt.xlim(0, nx)
         plt.title(title)
+        plt.legend(["Detected stars", "Simbad reference stars"])
         plt.savefig(file)
-        # print calibration slope slp
-        print("Calibration slope (slp) :", slp)
-        # replace zeros with a small non null value
-        mask = imag <= 0
-        imagtmp = np.copy(imag)
-        imagtmp[mask] = imbkg[mask]
-        imag = imagtmp
-        imstars[imstars <= 0] = 0.0001
-        clouds = imstars[imstars > 0.001]
-        calMagTot = -2.5 * np.log10(imag * slp)
-        calMagBkg = -2.5 * np.log10(imbkg * slp)
-        calMagStr = -2.5 * np.log10(imstars * slp)
-        zeropoint = float(-2.5 * np.log10(slp))
-        print("Zero point (mag) =", zeropoint)
-        print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")
-        print(" where R the signal assigned to the pixel")
-
-        # calibrated surface brightness in mag /sq arc sec
-        calSbTot = calMagTot + 2.5 * np.log10(sec2)
-        calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
-        calSbStr = calMagStr + 2.5 * np.log10(sec2)
-        calSbTot[z > 90] = np.nan
-        calSbBkg[z > 90] = np.nan
-        calSbStr[z > 90] = np.nan
-
-        norm1 = simple_norm(calSbBkg, "sqrt")
-        title = Band + " background Surface Brightness"
-        file = path + Band + "_calSbBkg_" + baseout + ".png"
-        plt.figure()
-        plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
-        plt.colorbar()
-        plt.title(title)
-        plt.savefig(file)
-
-        norm1 = simple_norm(calSbTot, "sqrt")
-        title = Band + " total Surface Brightness"
-        file = path + Band + "_calSbTot_" + baseout + ".png"
-        plt.figure()
-        plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
-        plt.colorbar()
-        plt.title(title)
-        plt.savefig(file)
-
-    file = path + Band + "_Stars_Match_" + baseout + ".png"
-    title = Band + " Stars correspondance"
+elif Calmet == "fixed":
+    slp = Slope
+    calsb = 1
+if calsb == 1:
+    title = Band + " calibration"
+    file = path + Band + "_calibration_" + baseout + ".png"
     plt.figure()
-    plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)
-    plt.plot(StarMatch[:, 0], StarMatch[:, 1], "ok", markersize=2)
-    plt.ylim(ny, 0)
-    plt.xlim(0, nx)
+    plt.plot(gx, gy, "r")
+    plt.plot(ax, ay, "ob")
+    plt.xlabel("Star's pixel values")
+    plt.ylabel("10^(-0.4*CalMag)")
     plt.title(title)
-    plt.legend(["Detected stars", "Simbad reference stars"])
     plt.savefig(file)
+    # print calibration slope slp
+    print("Calibration slope (slp) :", slp)
+    # replace zeros with a small non null value
+    mask = imag <= 0
+    imagtmp = np.copy(imag)
+    imagtmp[mask] = imbkg[mask]
+    imag = imagtmp
+    imstars[imstars <= 0] = 0.0001
+    clouds = imstars[imstars > 0.001]
+    calMagTot = -2.5 * np.log10(imag * slp)
+    calMagBkg = -2.5 * np.log10(imbkg * slp)
+    calMagStr = -2.5 * np.log10(imstars * slp)
+    zeropoint = float(-2.5 * np.log10(slp))
+    print("Zero point (mag) =", zeropoint)
+    print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")
+    print(" where R the signal assigned to the pixel")
+
+    # calibrated surface brightness in mag /sq arc sec
+    calSbTot = calMagTot + 2.5 * np.log10(sec2)
+    calSbBkg = calMagBkg + 2.5 * np.log10(sec2)
+    calSbStr = calMagStr + 2.5 * np.log10(sec2)
+    calSbTot[z > 90] = np.nan
+    calSbBkg[z > 90] = np.nan
+    calSbStr[z > 90] = np.nan
+
+    norm1 = simple_norm(calSbBkg, "sqrt")
+    title = Band + " background Surface Brightness"
+    file = path + Band + "_calSbBkg_" + baseout + ".png"
+    plt.figure()
+    plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
+    plt.colorbar()
+    plt.title(title)
+    plt.savefig(file)
+
+    norm1 = simple_norm(calSbTot, "sqrt")
+    title = Band + " total Surface Brightness"
+    file = path + Band + "_calSbTot_" + baseout + ".png"
+    plt.figure()
+    plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
+    plt.colorbar()
+    plt.title(title)
+    plt.savefig(file)
+
 
 # plt.figure()
 # plt.title("stars bin")
@@ -734,7 +741,7 @@ for no in range(num_pts - 1):
     # calculate Airmass
     airmo = airmass(ept[no])
     # read V sky Brightness
-    if cloud_cover < max_cloud_cover and corcoef > 0.75:
+    if calsb == 1:
         mago = calSbBkg[index[no, 0], index[no, 1]]
     else:
         mago = np.nan
@@ -767,6 +774,8 @@ for no in range(num_pts - 1):
         + str("{:6.3f}".format(sberr))
         + " , "
         + str("{:6.3f}".format(zeropoint))
+        + " , "
+        + str("{:6.3f}".format(corcoef))
         + " , "
         + str("{:6.2f}".format(theta_sun))
         + " , "

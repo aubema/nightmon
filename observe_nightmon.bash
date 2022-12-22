@@ -51,11 +51,11 @@ take_pictureA() {
 					 elif [ "$satmax" -lt 50 ]
 			       then let ta=ta*2
 					   fi
-						 if [ "$ta" -gt 120000000 ]
-						 then let ta=120000000
-						      echo "Ta=" $ta
-                  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-						 fi
+						 #if [ "$ta" -gt 120000000 ]
+						 #then let ta=120000000
+						 #     echo "Ta=" $ta
+             #     /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+						 #fi
 						 if [ "$ta" -le 1000 ]
 						 then break
 						 fi
@@ -94,11 +94,11 @@ take_pictureB() {
 					 elif [ "$satmax" -lt 50 ]
 			       then let tb=tb*2
 					   fi
-						 if [ "$tb" -gt 120000000 ]
-						 then let tb=120000000
-						      echo "Tb=" $tb
-                  /usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
-						 fi
+						 #if [ "$tb" -gt 120000000 ]
+						 #then let tb=120000000
+						 #     echo "Tb=" $tb
+             #     /usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
+						 #fi
 						 if [ "$tb" -le 1000 ]
 						 then break
 					   fi

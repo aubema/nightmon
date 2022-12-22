@@ -112,6 +112,8 @@ darkimg="dark-gain16-t100000.dng"
 bands=(JV JR)
 model="RpiHQ-JFilters"  # other choices are "RpiHQ" and "A7S"
 cams=(A B)
+# listen to gpio 5 (limit switch)  state=1 means cams inside, state=0 means cams out
+echo "5" > /sys/class/gpio/export
 # Standard extinctions for Observatorio Roque de los Muchachos (0.102 0.0547) (JV JR)
 extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
@@ -189,10 +191,13 @@ do time1=`date +%s`
 	 cp -f $path"/capture_2.dng" $path/$basenameB"_B_"$tb"_"$gain".dng"
 	 cp -f $path"/capture_2.jpg" $path/$basenameB"_B_"$tb"_"$gain".jpg"
    # check for the night by reading the latest optimal integration time
+	 limit=`cat /sys/class/gpio/gpio5/value`
    if [ $ta -lt $max_lum ]
    then echo "Too much light. It is probably daytime."
-      /usr/bin/python3 /usr/local/bin/move_cams.py 2000 1
-      /usr/bin/python3 /usr/local/bin/move_cams.py -1500 1
+	    if [ "$limit" == "0"]
+			then
+         /usr/bin/python3 /usr/local/bin/move_cams.py -1400 1
+			fi
       echo "Let's keep the camera inside for 15 min"
 			processflag=0
    else /usr/bin/python3 /usr/local/bin/move_cams.py 2000 1

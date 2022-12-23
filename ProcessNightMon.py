@@ -174,6 +174,10 @@ if Model == "A7S":
         RC = -0.65
         GC = 0.4
         BC = 1.0
+    Zslope = 1.13163209e-01
+    Zquad = 4.01469526e-06
+    Zthird = -1.94853987e-08
+    Zfourth = 4.63754847e-13
 elif Model == "RpiHQ":
     if Band == "JV":
         RC = 1
@@ -187,6 +191,10 @@ elif Model == "RpiHQ":
         RC = 1
         GC = 1
         BC = 1
+    Zslope = 1.18620894e-01
+    Zquad = 1.41321994e-05
+    Zthird = -3.80934963e-08
+    Zfourth = 4.52138304e-11
 elif Model == "RpiHQ-JFilters":
     if Band == "JV":
         RC = 1
@@ -200,6 +208,10 @@ elif Model == "RpiHQ-JFilters":
         RC = 1
         GC = 1
         BC = 1
+    Zslope = 1.18620894e-01
+    Zquad = 1.41321994e-05
+    Zthird = -3.80934963e-08
+    Zfourth = 4.52138304e-11
 # open images
 print("Reading images...")
 Simg = open_raw(path + Ifile)
@@ -250,14 +262,12 @@ Dgray = to_grayscale(Dimg, [RC, GC, BC], normalize=False)
 ny = np.shape(Sgray)[0]
 nx = np.shape(Sgray)[1]
 # set the minimum elevation to the limit of the image if required
-if elmin < 90 - 0.98 * (ny / 2 * p["Zslope"] + (ny / 2) ** 2 * p["Zquad"]):
-    elmin = 90 - 0.98 * (ny / 2 * p["Zslope"] + (ny / 2) ** 2 * p["Zquad"])
+if elmin < 90 - 0.98 * (ny / 2 * Zslope + (ny / 2) ** 2 * Zquad):
+    elmin = 90 - 0.98 * (ny / 2 * Zslope + (ny / 2) ** 2 * Zquad)
 print("Minimum elevation :", elmin)
 # calculate maximum zenith angle
 zemax = 90 - elmin
-rnmax = (-p["Zslope"] + np.sqrt(p["Zslope"] ** 2 - 4 * p["Zquad"] * -zemax)) / (
-    2 * p["Zquad"]
-)
+rnmax = (-Zslope + np.sqrt(Zslope**2 - 4 * Zquad * -zemax)) / (2 * Zquad)
 
 # remove darks
 window = 7  #  1 deg ~= 10
@@ -276,7 +286,7 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = p["Zslope"] * d + p["Zquad"] * d**2 + p["Zthird"] * d**3 + p["Zfourth"] * d**4
+z = Zslope * d + Zquad * d**2 + Zthird * d**3 + Zfourth * d**4
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
@@ -284,12 +294,7 @@ az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
 az = np.where(az < 0, az + 360, az)
 # solid angle in sq arc second
 sec2 = (
-    (
-        p["Zslope"]
-        + 2 * p["Zquad"] * d
-        + 3 * p["Zthird"] * d**2
-        + 4 * p["Zfourth"] * d**3
-    )
+    (Zslope + 2 * Zquad * d + 3 * Zthird * d**2 + 4 * Zfourth * d**3)
     * 180
     * 3600**2
     * np.sin((z) * np.pi / 180)
@@ -446,7 +451,7 @@ for i in range(np.shape(coords)[0]):
     azi_star = azi_star.degrees
     azistar[i] = azi_star
     altstar[i] = alt_star
-# keep stars above horizon limitz = 0.95 * ny/2 * p["Zslope"]
+# keep stars above horizon limitz = 0.95 * ny/2 * Zslope
 azistar = np.delete(azistar, np.where(altstar < elmin))
 magv = np.delete(magv, np.where(altstar < elmin))
 magr = np.delete(magr, np.where(altstar < elmin))

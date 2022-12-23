@@ -74,23 +74,25 @@ def input(argv):
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:s:c:",
-            ["help=", "sfile=", "cam="],
+            "h:s:c:m:",
+            ["help=", "sfile=", "cam=", "model="],
         )
     except getopt.GetoptError:
-        print("FindShiftRotate.py -s <Sfile> -c <Cam>")
+        print("FindShiftRotate.py -s <Sfile> -c <Cam> -m <Model>")
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print("FindShiftRotate.py -s <Sfile> -c <Cam>")
+            print("FindShiftRotate.py -s <Sfile> -c <Cam> -m <Model>")
             sys.exit()
         elif opt in ("-s", "--sfile"):
             Sfile = arg
         elif opt in ("-c", "--cam"):
             Cam = arg
+        elif opt in ("-m", "--model"):
+            Model = arg
     print("Sky image file is :", Sfile)
     print("Camera is :", Cam)
-    return Sfile, Cam
+    return Sfile, Cam, Model
 
 
 # ================================================
@@ -110,7 +112,22 @@ limiti = (
 )
 limits = 1.2
 # load command line parameters
-Sfile, Cam = input(sys.argv[1:])
+Sfile, Cam, Model = input(sys.argv[1:])
+if Model == "A7S":
+    Zslope = 1.13163209e-01
+    Zquad = 4.01469526e-06
+    Zthird = -1.94853987e-08
+    Zfourth = 4.63754847e-13
+elif Model == "RpiHQ":
+    Zslope = 1.18620894e-01
+    Zquad = 1.41321994e-05
+    Zthird = -3.80934963e-08
+    Zfourth = 4.52138304e-11
+elif Model == "RpiHQ-JFilters":
+    Zslope = 1.18620894e-01
+    Zquad = 1.41321994e-05
+    Zthird = -3.80934963e-08
+    Zfourth = 4.52138304e-11
 
 # open image
 print("Reading images...")
@@ -121,10 +138,6 @@ Simg = open_raw(Sfile)
 configpath = "/home/" + user + "/cameraorientation_config"
 with open(configpath) as f:
     p = yaml.safe_load(f)
-
-nightmonconfigpath = "/home/" + user + "/nightmon_config"
-with open(nightmonconfigpath) as g:
-    q = yaml.safe_load(g)
 
 Site = p["Site"]
 ts = load.timescale()
@@ -141,14 +154,12 @@ Sgray = to_grayscale(Simg, [RC, GC, BC], normalize=False)
 ny = np.shape(Sgray)[0]
 nx = np.shape(Sgray)[1]
 # set the minimum elevation to the limit of the image if required
-if elmin < 90 - 0.98 * (ny / 2 * q["Zslope"] + (ny / 2) ** 2 * q["Zquad"]):
-    elmin = 90 - 0.98 * (ny / 2 * q["Zslope"] + (ny / 2) ** 2 * q["Zquad"])
+if elmin < 90 - 0.98 * (ny / 2 * Zslope + (ny / 2) ** 2 * Zquad):
+    elmin = 90 - 0.98 * (ny / 2 * Zslope + (ny / 2) ** 2 * Zquad)
 print("Minimum elevation :", elmin)
 # calculate maximum zenith angle
 zemax = 90 - elmin
-rnmax = (-q["Zslope"] + np.sqrt(q["Zslope"] ** 2 - 4 * q["Zquad"] * -zemax)) / (
-    2 * q["Zquad"]
-)
+rnmax = (-Zslope + np.sqrt(Zslope**2 - 4 * Zquad * -zemax)) / (2 * Zquad)
 
 # creating elevation, azimith maps
 print("Creating Azimuth and elevation maps...")
@@ -156,7 +167,7 @@ y, x = np.indices((ny, nx))
 # computing the distance to zenith in pixels
 d = np.hypot(x - nx / 2, y - ny / 2)
 d[d < 0.5] = 0.5
-z = q["Zslope"] * d + q["Zquad"] * d**2 + q["Zthird"] * d**3 + q["Zfourth"] * d**4
+z = Zslope * d + Zquad * d**2 + Zthird * d**3 + Zfourth * d**4
 z[z < 0] = 0
 # computing azimuth
 az = np.arctan2(-x + nx / 2, -y + ny / 2) * 180 / np.pi
@@ -257,7 +268,7 @@ for i in range(np.shape(coords)[0]):
     azi_star = azi_star.degrees
     azistar[i] = azi_star
     altstar[i] = alt_star
-# keep stars above horizon limitz = 0.95 * ny/2 * p["Zslope"]
+# keep stars above horizon limitz = 0.95 * ny/2 * Zslope
 azistar = np.delete(azistar, np.where(altstar < elmin))
 magv = np.delete(magv, np.where(altstar < elmin))
 magr = np.delete(magr, np.where(altstar < elmin))

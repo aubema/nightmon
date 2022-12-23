@@ -642,21 +642,26 @@ if Calmet == "stars":
         print("Correlation coefficient : ", corcoef)
         params = curve_fit(fit_func, ax, ay)
         slp = float(params[0])
-
+        print(np.shape(ax))
         # filtering outliers (may be stars behing semi-transparent cloud or bad matching)
-        residuals = ay - slp * ax
-        res_mean, res_median, res_std = sigma_clipped_stats(residuals, sigma=3.0)
-        residuals[residuals > res_mean + res_std] = -1000
-        residuals[residuals < res_mean - res_std] = -1000
-        axp = np.delete(ax, np.where(residuals == -1000))
-        ayp = np.delete(ay, np.where(residuals == -1000))
-        cr = np.corrcoef(axp, ayp)
-        corcoef = cr[0, 1]
-        print("Correlation coefficient : ", corcoef)
-        params = curve_fit(fit_func, axp, ayp)
-        slp = float(params[0])
-        gx = np.linspace(0, np.amax(ax), 100)
-        gy = slp * gx
+        deltacor = 1000
+        while deltacor > 0.001:
+            residuals = ay - slp * ax
+            res_mean, res_median, res_std = sigma_clipped_stats(residuals, sigma=3.0)
+            residuals[residuals > res_mean + res_std] = -1000
+            residuals[residuals < res_mean - res_std] = -1000
+            axp = np.delete(ax, np.where(residuals == -1000))
+            ayp = np.delete(ay, np.where(residuals == -1000))
+            cr = np.corrcoef(axp, ayp)
+            deltacor = corcoef
+            corcoef = cr[0, 1]
+            deltacor = abs(deltacor - corcoef)
+            print("Correlation coefficient : ", corcoef)
+            params = curve_fit(fit_func, axp, ayp)
+            slp = float(params[0])
+            gx = np.linspace(0, np.amax(ax), 100)
+            gy = slp * gx
+            print(np.shape(axp))
 
         if corcoef > 0.7:
             calsb = 1

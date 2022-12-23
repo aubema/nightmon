@@ -334,6 +334,7 @@ else:
         - 4.1361998468625023e-14 * d**5
         + 2.2896450343971182e-17 * d**6
     )
+# flat = flat * sec2[ny / 2, nx / 2] / sec2
 flat[z > 90] = 1
 # plt.figure()
 # plt.imshow(flat, cmap="magma")

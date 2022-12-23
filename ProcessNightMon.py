@@ -138,7 +138,7 @@ def fit_func(x, a):
 # ================================================
 # MAIN
 # default Parameters
-user = "sand"
+user = "aubema"
 path = "/home/" + user + "/"
 sberr = 0
 calsb = 0
@@ -155,7 +155,7 @@ elmin = 10  # set the minimum elevation
 limiti = (
     3.7  # limitting stars magnitude NEED TO BE LOWER THAN 6 but 3.7 is a magic number
 )
-limits = 1.2
+limits = -1
 # load command line parameters
 Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint = input(sys.argv[1:])
 k = float(Extinc)
@@ -208,10 +208,10 @@ elif Model == "RpiHQ-JFilters":
         RC = 1
         GC = 1
         BC = 1
-    Zslope = 1.18620894e-01
-    Zquad = 1.41321994e-05
-    Zthird = -3.80934963e-08
-    Zfourth = 4.52138304e-11
+    Zslope = 1.167e-01
+    Zquad = 1.0e-09
+    Zthird = 0
+    Zfourth = 0
 # open images
 print("Reading images...")
 Simg = open_raw(path + Ifile)
@@ -537,7 +537,7 @@ if Calmet == "stars":
     else:
         # Search for stars only if cloud_cover is lower than max_cloud_cover
         mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
-        daofind = DAOStarFinder(fwhm=2, threshold=50.0 * std)
+        daofind = DAOStarFinder(fwhm=2, threshold=5.0 * std)
         sources = daofind(imstars)
         print(sources)
         # keep stars with elevation > elmin degrees
@@ -563,7 +563,7 @@ if Calmet == "stars":
         Flux = Flux[rn < rnmax]
         Back = Back[rn < rnmax]
         maxflux = Flux.max()
-        brightest = 0
+        brightest = -1
         sources = sources[Flux > maxflux / 2.5 ** (limiti - brightest)]
         positions = positions[Flux > maxflux / 2.5 ** (limiti - brightest)]
         Flux = Flux[Flux > maxflux / 2.5 ** (limiti - brightest)]
@@ -584,24 +584,25 @@ if Calmet == "stars":
         # searching for correspondance between stars in simbad and found stars in image
         dstar = np.zeros(np.shape(positions)[0])
         for ns in range(ishape):
-            dstar = (
-                np.hypot(positions[:, 0] - index[ns, 1], positions[:, 1] - index[ns, 0])
-                ** 2
-                / Flux
+            dstar = np.hypot(
+                positions[:, 0] - index[ns, 1], positions[:, 1] - index[ns, 0]
             )
+            dweight = dstar**2 / Flux
+            dweight_min = np.amin(dweight)
+            dweight_min_index = dweight.argmin()
             dmin = np.amin(dstar)
-            dmin_index = dstar.argmin()
-            if dmin < 100000:
+            # try to match if distance is lower that 3 deg
+            if dmin < 30:
                 StarMatch[n, 0] = index[ns, 1]
                 StarMatch[n, 1] = index[ns, 0]
-                StarMatch[n, 2] = positions[dmin_index, 0]  # noeuds[0]
-                StarMatch[n, 3] = positions[dmin_index, 1]  # noeuds[1]
+                StarMatch[n, 2] = positions[dweight_min_index, 0]  # noeuds[0]
+                StarMatch[n, 3] = positions[dweight_min_index, 1]  # noeuds[1]
                 StarMatch[n, 4] = dmin
                 StarMatch[n, 5] = (
-                    positions[dmin_index, 0] - index[ns, 1]
+                    positions[dweight_min_index, 0] - index[ns, 1]
                 )  # noeuds[0] - index[ns,1]
                 StarMatch[n, 6] = (
-                    positions[dmin_index, 1] - index[ns, 0]
+                    positions[dweight_min_index, 1] - index[ns, 0]
                 )  # noeuds[1] - index[ns,0]
                 if Band == "JV":
                     StarMatch[n, 7] = magv[ns]
@@ -610,15 +611,15 @@ if Calmet == "stars":
                 elif Band == "JB":
                     StarMatch[n, 7] = magb[ns]
                 StarMatch[n, 8] = AirM[ns]
-                StarMatch[n, 9] = Flux[dmin_index]
+                StarMatch[n, 9] = Flux[dweight_min_index]
                 n = n + 1
         print("Number of matching stars : ", n, "/", ishape)
         StarMatch[np.isnan(StarMatch)] = 0
         StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
         avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
-        print("Average gap between nearest star (d^2/flux):", avggap, "+/-", stdgap)
+        print("Average gap between nearest star :", avggap, "+/-", stdgap)
         StarMatch = np.delete(
-            StarMatch, np.where(StarMatch[:, 4] > avggap + 3 * stdgap), axis=0
+            StarMatch, np.where(StarMatch[:, 4] > avggap + 1 * stdgap), axis=0
         )
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
         print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
@@ -641,10 +642,23 @@ if Calmet == "stars":
         print("Correlation coefficient : ", corcoef)
         params = curve_fit(fit_func, ax, ay)
         slp = float(params[0])
+
+        # filtering outliers (may be stars behing semi-transparent cloud or bad matching)
+        residuals = ay - slp * ax
+        res_mean, res_median, res_std = sigma_clipped_stats(residuals, sigma=3.0)
+        residuals[residuals > res_mean + res_std] = -1000
+        residuals[residuals < res_mean - res_std] = -1000
+        axp = np.delete(ax, np.where(residuals == -1000))
+        ayp = np.delete(ay, np.where(residuals == -1000))
+        cr = np.corrcoef(axp, ayp)
+        corcoef = cr[0, 1]
+        print("Correlation coefficient : ", corcoef)
+        params = curve_fit(fit_func, axp, ayp)
+        slp = float(params[0])
         gx = np.linspace(0, np.amax(ax), 100)
         gy = slp * gx
 
-        if corcoef > 0.75:
+        if corcoef > 0.7:
             calsb = 1
 
         file = path + Band + "_Stars_Match_" + baseout + ".png"
@@ -657,19 +671,22 @@ if Calmet == "stars":
         plt.title(title)
         plt.legend(["Detected stars", "Simbad reference stars"])
         plt.savefig(file)
+
+        title = Band + " calibration"
+        file = path + Band + "_calibration_" + baseout + ".png"
+        plt.figure()
+        plt.plot(gx, gy, "r")
+        plt.plot(ax, ay, "ob")
+        plt.plot(axp, ayp, "or")
+        plt.xlabel("Star's pixel values")
+        plt.ylabel("10^(-0.4*CalMag)")
+        plt.title(title)
+        plt.savefig(file)
 elif Calmet == "fixed":
     slp = Slope
     calsb = 1
 if calsb == 1:
-    title = Band + " calibration"
-    file = path + Band + "_calibration_" + baseout + ".png"
-    plt.figure()
-    plt.plot(gx, gy, "r")
-    plt.plot(ax, ay, "ob")
-    plt.xlabel("Star's pixel values")
-    plt.ylabel("10^(-0.4*CalMag)")
-    plt.title(title)
-    plt.savefig(file)
+
     # print calibration slope slp
     print("Calibration slope (slp) :", slp)
     # replace zeros with a small non null value
@@ -795,4 +812,4 @@ for no in range(num_pts - 1):
     print(outputline)
     o.write(outputline)
     o.close()
-# plt.show()
+plt.show()

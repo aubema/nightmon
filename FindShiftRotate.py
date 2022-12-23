@@ -98,7 +98,7 @@ def input(argv):
 # ================================================
 # MAIN
 # default Parameters
-user = "sand"
+user = "aubema"
 sberr = 0
 mflag = "False"
 FWHM = 3
@@ -110,7 +110,7 @@ elmin = 5  # set the minimum elevation
 limiti = (
     3.7  # limitting stars magnitude NEED TO BE LOWER THAN 6 but 3.7 is a magic number
 )
-limits = 1.2
+limits = -1
 # load command line parameters
 Sfile, Cam, Model = input(sys.argv[1:])
 if Model == "A7S":
@@ -124,10 +124,10 @@ elif Model == "RpiHQ":
     Zthird = -3.80934963e-08
     Zfourth = 4.52138304e-11
 elif Model == "RpiHQ-JFilters":
-    Zslope = 1.18620894e-01
-    Zquad = 1.41321994e-05
-    Zthird = -3.80934963e-08
-    Zfourth = 4.52138304e-11
+    Zslope = 1.167e-01
+    Zquad = 1.0e-09
+    Zthird = 0
+    Zfourth = 0
 
 # open image
 print("Reading images...")
@@ -353,9 +353,9 @@ for i in range(3):
     apertures = CircularAperture(positions, r=4.0)
 
 
-print("Shift x : ", deltax)
-print("Shift y : ", deltay)
-print("Angle : ", angle)
+print("Shiftx" + Cam + " : ", deltax)
+print("Shifty" + Cam + " : ", deltay)
+print("Angle" + Cam + " : ", angle)
 print("Copy that in your nightmon_config file")
 
 StarMatch = np.zeros([ishape, 9])

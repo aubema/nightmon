@@ -28,7 +28,7 @@ take_pictureA() {
 		 echo "Taking A picture"
 		 echo $path
 		 read ta bidon < $path"/Current_A_tint.tmp"
-		 if [ -z "$ta" || "$ta" -lt 800 ]
+		 if [ -z "$ta" ] || [ "$ta" -lt 800 ]
 		 then echo "ta not available, setting it to 1/10s"
 		      let ta=3750000
 		 fi
@@ -70,7 +70,7 @@ take_pictureB() {
 		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 		 echo "Taking B picture"
 		 		 read tb bidon < $path"/Current_B_tint.tmp"
-		 		 if [ -z "$tb"  || "$tb" -lt 800 ]
+		 		 if [ -z "$tb" ]  || [ "$tb" -lt 800 ]
 		 		 then echo "tb not available, setting it to 1/10s"
 		 		      let tb=3750000
 		 		 fi

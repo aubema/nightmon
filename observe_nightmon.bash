@@ -23,98 +23,36 @@
 # =============================
 # find appropriate integration time
 #
-take_pictureA() {
+take_pictures() {
+	   dayt=800
+		 nightt=120000000
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking A picture"
 		 echo $path
-		 read ta bidon < $path"/Current_A_tint.tmp"
-		 if [ -z "$ta" ] || [ "$ta" -lt 800 ]
-		 then echo "ta not available, setting it to 1/10s"
-		      let ta=3750000
-		 fi
-		 # at max integration reduce by half to allow automatic integration adjustment
-		 if [ "$ta" -eq 120000000 ]
-		 then let ta=ta/2
-		 fi
+     let ta=nightt
 		 let satmax=1000
-		 # capture an image with V camera
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
-		 do	rm -f $path"/capture_1*"
-		    echo "Ta=" $ta
+     rm -f $path"/capture_1*"
+		 rm -f $path"/capture_2*"
 		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-				if [ "$ta" -eq 120000000 ]
-				then break
-				fi
 				if [ -f $path"/capture_1.dng" ]
 				then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
 				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 				     read satmax bidon  < $path"/capture.tmp"
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
-			       then  let ta=ta/4
-					 elif [ "$satmax" -lt 50 ]
-			       then let ta=ta*2
+             then let ta=dayt
+						      rm -f $path"/capture_1*"
+									rm -f $path"/capture_2*"
+						      /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+									/usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
+						 else
+							    /usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
 					   fi
-						 #if [ "$ta" -gt 120000000 ]
-						 #then let ta=120000000
-						 #     echo "Ta=" $ta
-             #     /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-						 #fi
-						 if [ "$ta" -le 1000 ]
-						 then break
-						 fi
 			  else echo "Problem with A camera."
 				  	 exit 0
 				fi
 		 done
-		 echo  $ta > $path"/Current_A_tint.tmp"
-}
-
-take_pictureB() {
-		      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
-		 		 echo "Taking B picture"
-		 		 read tb bidon < $path"/Current_B_tint.tmp"
-		 		 if [ -z "$tb" ]  || [ "$tb" -lt 800 ]
-		 		 then echo "tb not available, setting it to 1/10s"
-		 		      let tb=3750000
-		 		 fi
-				 # at max integration reduce by half to allow automatic integration adjustment
-				 if [ "$tb" -eq 120000000 ]
-				 then let tb=tb/2
-				 fi
-		 		 let satmax=1000
-		 let satmax=1000
-		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
-		 do	rm -f $path"/capture_2*"
-		    echo "Tb=" $tb
-		 		/usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
-				if [ "$tb" -eq 120000000 ]
-	 		  then break
-			  fi
-				/usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9
-				if [ -f $path"/capture_2.dng" ]
-		    then /usr/local/bin/lisc perc $path"/capture_2.dng" -p 99.9  > $path"/saturation.tmp"
-				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-				     read satmax bidon  < $path"/capture.tmp"
-						 echo "satmax=" $satmax
-			       if [ "$satmax" -ge 100 ]
-			       then  let tb=tb/4
-					 elif [ "$satmax" -lt 50 ]
-			       then let tb=tb*2
-					   fi
-						 #if [ "$tb" -gt 120000000 ]
-						 #then let tb=120000000
-						 #     echo "Tb=" $tb
-             #     /usr/bin/python3 /usr/local/bin/captureB.py -t $tb -g $gain
-						 #fi
-						 if [ "$tb" -le 1000 ]
-						 then break
-					   fi
-			  else echo "Problem with B camera."
-				  	 exit 0
-				fi
-		 done
-		 echo  $tb > 		$path"/Current_B_tint.tmp"
+		 echo  $ta > $path"/Current_tint.tmp"
 }
 
 
@@ -140,8 +78,6 @@ extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
-echo  "3750000 us" > $path"/Current_A_tint.tmp"
-echo  "3750000 us" > $path"/Current_B_tint.tmp"
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
@@ -167,16 +103,17 @@ fi
 
 while :
 do time1=`date +%s`
-   echo "A shot"
-   take_pictureA
-   y=`date +%Y`
-   mo=`date +%m`
-   dA=`date +%d`
-   basenameA=`date +%Y-%m-%d_%H-%M-%S`
+   echo "Shooting..."
+   take_pictures
+   y=`date --date="2 minutes ago" +%Y`
+   mo=`date --date="2 minutes ago" +%m`
+   dA=`date --date="2 minutes ago" +%d`
+   basenameA=`date --date="2 minutes ago" +%Y-%m-%d_%H-%M-%S`
+	 basenameB=`date +%Y-%m-%d_%H-%M-%S`
    echo $basenameA
-   baseday=`date +%Y-%m-%d`
+   baseday=`date --date="2 minutes ago" +%Y-%m-%d`
    basename[0]="$basenameA"
-   read  tv toto < $path"/Current_A_tint.tmp"
+   read  tv toto < $path"/Current_tint.tmp"
    if [ ! -d $basepath/$y ]
    then mkdir $basepath/$y
    fi
@@ -200,11 +137,8 @@ do time1=`date +%s`
    cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
    cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
 	 cp -f $path"/capture_1.jpg" $path/$basenameA"_A_"$ta"_"$gain".jpg"
-   echo "B shot"
-   take_pictureB
-   basenameB=`date +%Y-%m-%d_%H-%M-%S`
    basename[1]="$basenameB"
-   read  tb toto < $path"/Current_B_tint.tmp"
+   read  tb toto < $path"/Current_tint.tmp"
    echo "=============================="
    # rename pictures
 	 if [ $ta -ge $max_lum ]

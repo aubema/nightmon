@@ -32,7 +32,7 @@ take_pictures() {
 		 echo "Taking A picture"
 		 echo $path
      let ta=nightt
-		 let g=nightg
+		 let gain=nightg
 		 let satmax=1000
      rm -f $path"/capture_1*"
 		 rm -f $path"/capture_2*"
@@ -44,7 +44,7 @@ take_pictures() {
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
              then let ta=dayt
-						      let g=dayg
+						      let gain=dayg
 						      rm -f $path"/capture_1*"
 									rm -f $path"/capture_2*"
 						      /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain

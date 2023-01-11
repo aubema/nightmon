@@ -25,7 +25,7 @@
 #
 take_pictures() {
 	   dayt=800
-		 dayg=1
+		 dayg=2
 		 nightt=120000000
 		 nightg=16
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)

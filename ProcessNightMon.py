@@ -146,7 +146,7 @@ corcoef = 0
 mflag = "False"
 FWHM = 7
 zeropoint = np.nan
-max_cloud_cover = 20
+max_cloud_cover = 30
 norm = ImageNormalize(stretch=SqrtStretch())
 
 elmin = 10  # set the minimum elevation
@@ -477,7 +477,7 @@ AirM = airmass(altstar)
 if os.path.exists(outname) == False:
     o = open(outname, "w")
     first_line = "# Loc_Name , Band , CCD_XY_position , ,  AzAlt_position , , Airmass , Ext_coef ,    \
-    Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , CorCoef , Sun_Alt, Moon_Alt , Galactic_Lat , Moon_Phase \n"
+    Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , CorCoef , Sun_Ang, Moon_Ang , Galactic_Lat , Moon_Phase \n"
     second_line = "# ,  , (pixel) , (pixel) , (deg) , (deg) ,  ,  ,  , \
     , (%) , (mag/arcsec^2) ,  , mag , , deg , deg ,  deg , deg , \n"
     o.write(first_line)
@@ -511,22 +511,22 @@ imbkg = bkg.background
 # image without background
 imstars = imag - imbkg
 
-# determine cloud cover only for z < 80 deg for determining if starfield is usable for calibration
+# determine cloud cover only for z < 70 deg for determining if starfield is usable for calibration
 imstars_tmp = np.copy(imstars)
-imstars_tmp[z > 80] = np.nan
+imstars_tmp[z > 70] = np.nan
 starsstd = np.nanstd(imstars_tmp)
 starsmean = np.nanmean(imstars_tmp)
 threshold = starsmean + starsstd
 stars_binary = np.full((ny, nx), 0.0)
 stars_full = np.full((ny, nx), 1.0)
 stars_binary[imstars >= threshold] = 1.0
-stars_binary[z > 80] = 0
-stars_full[z > 80] = 0
+stars_binary[z > 70] = 0
+stars_full[z > 70] = 0
 # set cloud detection window to about 5 deg (51)
 window = 51  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
 stars_count = convolve(stars_binary, kernel)
-stars_count[z > 80] = 0.0
+stars_count[z > 70] = 0.0
 stars_count[stars_count > 0] = 1
 # weighted with solid angle
 cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)

@@ -32,6 +32,10 @@ take_pictureA() {
 		 then echo "ta not available, setting it to 1/10s"
 		      let ta=3750000
 		 fi
+		 # at max integration reduce by half to allow automatic integration adjustment
+		 if [ "$ta" -eq 120000000 ]
+		 then let ta=ta/2
+		 fi
 		 let satmax=1000
 		 # capture an image with V camera
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
@@ -74,6 +78,10 @@ take_pictureB() {
 		 		 then echo "tb not available, setting it to 1/10s"
 		 		      let tb=3750000
 		 		 fi
+				 # at max integration reduce by half to allow automatic integration adjustment
+				 if [ "$tb" -eq 120000000 ]
+				 then let tb=tb/2
+				 fi
 		 		 let satmax=1000
 		 let satmax=1000
 		 while [ "$satmax" -gt 99 ] || [ "$satmax" -lt 50 ]
@@ -210,6 +218,8 @@ do time1=`date +%s`
 	 cp -f $path"/capture_2.jpg" $path/$basenameB"_B_"$tb"_"$gain".jpg"
    # check for the night by reading the latest optimal integration time
 	 limit=`cat /sys/class/gpio/gpio5/value`
+	 # limit = 1 => cameras inside
+	 # limit = 0 => cameras outside
    if [ $ta -lt $max_lum ]
    then echo "Too much light. It is probably daytime."
 	    if [ "$limit" == "0" ]

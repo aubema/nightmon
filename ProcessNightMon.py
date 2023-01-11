@@ -215,6 +215,7 @@ elif Model == "RpiHQ-JFilters":
 # open images
 print("Reading images...")
 Simg = open_raw(path + Ifile)
+print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters

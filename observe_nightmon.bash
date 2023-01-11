@@ -51,7 +51,6 @@ take_pictures() {
 			  else echo "Problem with A camera."
 				  	 exit 0
 				fi
-		 done
 		 echo  $ta > $path"/Current_tint.tmp"
 }
 

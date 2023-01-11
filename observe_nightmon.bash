@@ -56,6 +56,7 @@ take_pictures() {
 				  	 exit 0
 				fi
 		 echo  $ta > $path"/Current_tint.tmp"
+		 echo  $g > $path"/Current_gain.tmp"
 }
 
 
@@ -117,6 +118,7 @@ do time1=`date +%s`
    baseday=`date --date="2 minutes ago" +%Y-%m-%d`
    basename[0]="$basenameA"
    read  tv toto < $path"/Current_tint.tmp"
+	 read  gain toto < $path"/Current_gain.tmp"
    if [ ! -d $basepath/$y ]
    then mkdir $basepath/$y
    fi

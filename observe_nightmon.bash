@@ -25,11 +25,14 @@
 #
 take_pictures() {
 	   dayt=800
+		 dayg=1
 		 nightt=120000000
+		 nightg=16
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking A picture"
 		 echo $path
      let ta=nightt
+		 let g=nightg
 		 let satmax=1000
      rm -f $path"/capture_1*"
 		 rm -f $path"/capture_2*"
@@ -41,6 +44,7 @@ take_pictures() {
 						 echo "satmax=" $satmax
 			       if [ "$satmax" -ge 100 ]
              then let ta=dayt
+						      let g=dayg
 						      rm -f $path"/capture_1*"
 									rm -f $path"/capture_2*"
 						      /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain

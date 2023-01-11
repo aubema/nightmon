@@ -56,7 +56,7 @@ take_pictures() {
 				  	 exit 0
 				fi
 		 echo  $ta > $path"/Current_tint.tmp"
-		 echo  $g > $path"/Current_gain.tmp"
+		 echo  $gain > $path"/Current_gain.tmp"
 }
 
 

@@ -643,7 +643,7 @@ if Calmet == "stars":
         print("Correlation coefficient : ", corcoef)
         params = curve_fit(fit_func, ax, ay)
         slp = float(params[0])
-        print(np.shape(ax))
+        print("n ax=", np.shape(ax)[0])
         # filtering outliers (may be stars behing semi-transparent cloud or bad matching)
         deltacor = 1000
         ndelta = 0
@@ -666,7 +666,7 @@ if Calmet == "stars":
             if ndelta == 10:
                 break
             ndelta += 1
-
+        print("n axp=", np.shape(axp)[0])
         if corcoef > 0.7:
             calsb = 1
 

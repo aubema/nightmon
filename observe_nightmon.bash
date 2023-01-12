@@ -26,8 +26,8 @@
 take_pictures() {
 	   dayt=800
 		 dayg=2
-		 moont=12000000
-		 nightt=120000000
+		 moont=12000000     # 12 sec
+		 nightt=120000000   # 2 minutes
 		 nightg=16
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
 		 echo "Taking A picture"

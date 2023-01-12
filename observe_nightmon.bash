@@ -26,6 +26,7 @@
 take_pictures() {
 	   dayt=800
 		 dayg=2
+		 moont=12000000
 		 nightt=120000000
 		 nightg=16
      #  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
@@ -36,25 +37,44 @@ take_pictures() {
 		 let satmax=1000
      rm -f $path"/capture_1*"
 		 rm -f $path"/capture_2*"
-		 		/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-				if [ -f $path"/capture_1.dng" ]
-				then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				     /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-				     read satmax bidon  < $path"/capture.tmp"
-						 echo "satmax=" $satmax
-			       if [ "$satmax" -ge 100 ]
-             then let ta=dayt
-						      let gain=dayg
-						      rm -f $path"/capture_1*"
-									rm -f $path"/capture_2*"
-						      /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-									/usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
-						 else
-							    /usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
-					   fi
-			  else echo "Problem with A camera."
-				  	 exit 0
-				fi
+		 /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+		 if [ -f $path"/capture_1.dng" ]
+		 then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				   /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				   read satmax bidon  < $path"/capture.tmp"
+					 echo "satmax=" $satmax
+			     if [ "$satmax" -ge 100 ]
+           then let ta=moont
+						    let gain=nightg
+						    rm -f $path"/capture_1*"
+						    /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+							  if [ -f $path"/capture_1.dng" ]
+								then /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+									   /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+									   read satmax bidon  < $path"/capture.tmp"
+										 echo "satmax=" $satmax
+								     if [ "$satmax" -ge 100 ]
+					           then let ta=dayt
+						              let gain=dayg
+													rm -f $path"/capture_1*"
+										      /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+													/usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
+								     else
+												  /usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
+										 fi
+								else echo "Problem with A camera."
+										 exit 0
+								fi
+						    rm -f $path"/capture_1*"
+							  rm -f $path"/capture_2*"
+						    /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+								/usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
+					else
+							 /usr/bin/python3 /usr/local/bin/captureB.py -t $ta -g $gain
+					fi
+		 else echo "Problem with A camera."
+				  exit 0
+		 fi
 		 echo  $ta > $path"/Current_tint.tmp"
 		 echo  $gain > $path"/Current_gain.tmp"
 }

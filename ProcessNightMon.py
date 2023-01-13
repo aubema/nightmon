@@ -146,7 +146,7 @@ corcoef = 0
 mflag = "False"
 FWHM = 7
 zeropoint = np.nan
-max_cloud_cover = 30
+max_cloud_cover = 2
 norm = ImageNormalize(stretch=SqrtStretch())
 
 elmin = 10  # set the minimum elevation
@@ -479,7 +479,7 @@ if os.path.exists(outname) == False:
     first_line = "# Loc_Name , Band , CCD_XY_position , ,  AzAlt_position , , Airmass , Ext_coef ,    \
     Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , CorCoef , Sun_Ang, Moon_Ang , Galactic_Lat , Moon_Phase \n"
     second_line = "# ,  , (pixel) , (pixel) , (deg) , (deg) ,  ,  ,  , \
-    , (%) , (mag/arcsec^2) ,  , mag , , deg , deg ,  deg , deg , \n"
+    , (oktas) , (mag/arcsec^2) ,  , mag , , deg , deg ,  deg , deg , \n"
     o.write(first_line)
     o.write(second_line)
     o.close()
@@ -511,29 +511,77 @@ imbkg = bkg.background
 # image without background
 imstars = imag - imbkg
 
-# determine cloud cover only for z < 70 deg for determining if starfield is usable for calibration
+# determine cloud cover only for z < 40 deg to exclude near horizon obstacles
+cld_deg = 30
+cld_pix = cld_deg / Zslope
 imstars_tmp = np.copy(imstars)
-imstars_tmp[z > 70] = np.nan
+
+#plt.figure()
+#plt.title("imstars_tmp")
+#plt.imshow(imstars_tmp, cmap="magma")
+#plt.colorbar()
+#plt.figure()
+#plt.title("imstars")
+#plt.imshow(imstars, cmap="magma")
+#plt.colorbar()
+#plt.show()
+
+
+#imstars_tmp = imstars #/ imbkg
+imstars_tmp[z > cld_deg] = np.nan
 starsstd = np.nanstd(imstars_tmp)
 starsmean = np.nanmean(imstars_tmp)
-threshold = starsmean + starsstd
+threshold = starsmean + 7 * starsstd
 stars_binary = np.full((ny, nx), 0.0)
 stars_full = np.full((ny, nx), 1.0)
-stars_binary[imstars >= threshold] = 1.0
-stars_binary[z > 70] = 0
-stars_full[z > 70] = 0
+stars_full[z > cld_deg] = 0
+stars_full_small = stars_full[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+stars_binary[imstars_tmp >= threshold] = 1.0
+stars_binary[z > cld_deg] = 0
+stars_binary_small = stars_binary[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+
+
+
+plt.figure()
+plt.title("stars_binary_small")
+plt.imshow(stars_binary_small, cmap="magma")
+plt.colorbar()
+
+
+stars_full[z > cld_deg] = 0
 # set cloud detection window to about 5 deg (51)
-window = 51  #  1 deg ~= 10
+window = 161  #  1 deg ~= 10
 kernel = Box2DKernel(width=window, mode="integrate")
-stars_count = convolve(stars_binary, kernel)
-stars_count[z > 70] = 0.0
-stars_count[stars_count > 0] = 1
+stars_count = convolve(stars_binary_small, kernel)
+stars_count = stars_count * window * window
+plt.figure()
+plt.title("stars_count1")
+plt.imshow(stars_count, cmap="magma")
+plt.colorbar()
+
+
+
+stars_count[stars_count <= 13 ] = 0
+stars_count[stars_count > 13 ] = 1
+stars_full_small = stars_full[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+sec2_small = sec2[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+
+plt.figure()
+plt.title("stars_count")
+plt.imshow(stars_count, cmap="magma")
+plt.colorbar()
+plt.figure()
+plt.title("stars_full_small")
+plt.imshow(stars_full_small, cmap="magma")
+plt.colorbar()
+
 # weighted with solid angle
-cloud_cover = round((1 - np.sum(stars_count * sec2) / np.sum(stars_full * sec2)) * 100)
-print("Cloud cover (%) : ", cloud_cover)
+cloud_cover = round((1 - np.sum(stars_count * sec2_small) / np.sum(stars_full_small * sec2_small)) * 100)
+cloud_cover_okta = round(cloud_cover/12.5)
+print("Cloud cover (%, oktas) : ", cloud_cover,cloud_cover_okta)
 
 if Calmet == "stars":
-    if cloud_cover > max_cloud_cover:
+    if cloud_cover_okta > max_cloud_cover:
         print("Can't process the data for stars calibration methods under cloudy skies")
     else:
         # Search for stars only if cloud_cover is lower than max_cloud_cover
@@ -620,7 +668,7 @@ if Calmet == "stars":
         avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
         print("Average gap between nearest star :", avggap, "+/-", stdgap)
         StarMatch = np.delete(
-            StarMatch, np.where(StarMatch[:, 4] > avggap + 1 * stdgap), axis=0
+            StarMatch, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
         )
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
         print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
@@ -650,8 +698,8 @@ if Calmet == "stars":
         while deltacor > 0.001:
             residuals = ay - slp * ax
             res_mean, res_median, res_std = sigma_clipped_stats(residuals, sigma=3.0)
-            residuals[residuals > res_mean + res_std] = -1000
-            residuals[residuals < res_mean - res_std] = -1000
+            residuals[residuals > res_mean + 2 * res_std] = -1000
+            residuals[residuals < res_mean - 2 * res_std] = -1000
             axp = np.delete(ax, np.where(residuals == -1000))
             ayp = np.delete(ay, np.where(residuals == -1000))
             cr = np.corrcoef(axp, ayp)
@@ -663,7 +711,7 @@ if Calmet == "stars":
             slp = float(params[0])
             gx = np.linspace(0, np.amax(ax), 100)
             gy = slp * gx
-            if ndelta == 10:
+            if ndelta == 5:
                 break
             ndelta += 1
         print("n axp=", np.shape(axp)[0])
@@ -799,7 +847,7 @@ for no in range(num_pts - 1):
         + " , "
         + mflag
         + " , "
-        + str("{:5.1f}".format(cloud_cover))
+        + str("{:d}".format(cloud_cover_okta))
         + " , "
         + str("{:6.3f}".format(mago))
         + " , "
@@ -821,4 +869,4 @@ for no in range(num_pts - 1):
     print(outputline)
     o.write(outputline)
     o.close()
-plt.show()
+#plt.show()

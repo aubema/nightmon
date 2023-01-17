@@ -236,11 +236,12 @@ if Cam == "A":
     deltax = p["ShiftxA"].split()
     deltay = p["ShiftyA"].split()
     angle = p["AngleA"].split()
+    ZpointConfig = p["ZpointB"]
 elif Cam == "B":
     deltax = p["ShiftxB"].split()
     deltay = p["ShiftyB"].split()
     angle = p["AngleB"].split()
-    ZpointConfig = p["ZpointB"].split()
+    ZpointConfig = p["ZpointB"]
 if (
     Zpoint == 0 and ZpointConfig != 0
 ):  # if no zero point is provided in argument then use the value of the config file

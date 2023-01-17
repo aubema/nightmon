@@ -206,7 +206,7 @@ do time1=`date +%s`
 				 #
 				 #
 
-         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model  -k stars -z $zpoint
+         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -c ${cams[$n]} -m $model 
          if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ]
          then
 				    mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/

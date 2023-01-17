@@ -75,8 +75,8 @@ def input(argv):
     Model = "RpiHQ"
     Cam = "A"
     Band = "JV"
-    Calmet = "stars"  # other option is fixed
-    Slope = 1  # this value is only useful when selecting fixed calibration method otherwise ignored
+    Calmet = "0"  # other option is fixed
+    Zpoint = 0  # this value is only useful when selecting fixed calibration method otherwise ignored
     try:
         opts, args = getopt.getopt(
             argv,
@@ -146,7 +146,11 @@ corcoef = 0
 mflag = "False"
 FWHM = 7
 zeropoint = np.nan
+Zpoint = 0
+Zpointconfig = 0
 max_cloud_cover = 2
+Calmet = "0"
+Calmetconfig = "0"
 norm = ImageNormalize(stretch=SqrtStretch())
 
 elmin = 10  # set the minimum elevation
@@ -227,6 +231,7 @@ with open(configpath) as f:
 
     p = yaml.safe_load(f)
 Site = p["Site"]
+Calmetconfig = p["Calmet"]
 if Cam == "A":
     deltax = p["ShiftxA"].split()
     deltay = p["ShiftyA"].split()
@@ -235,7 +240,17 @@ elif Cam == "B":
     deltax = p["ShiftxB"].split()
     deltay = p["ShiftyB"].split()
     angle = p["AngleB"].split()
-
+    ZpointConfig = p["ZpointB"].split()
+if (
+    Zpoint == 0 and ZpointConfig != 0
+):  # if no zero point is provided in argument then use the value of the config file
+    Zpoint = ZpointConfig
+if (
+    Calmet == "0" and Calmetconfig != "0"
+):  # if no calib method is provided in argument then use the value of the config file
+    Calmet = Calmetconfig
+if Calmet == "0":
+    Calmet = "stars"  # if no calib method is provided either in argument or in the configfile then use stars
 # load sky brightness extraction points
 pointspath = "/home/" + user + "/points_list"
 pt = open(pointspath, "r")
@@ -516,18 +531,18 @@ cld_deg = 30
 cld_pix = cld_deg / Zslope
 imstars_tmp = np.copy(imstars)
 
-#plt.figure()
-#plt.title("imstars_tmp")
-#plt.imshow(imstars_tmp, cmap="magma")
-#plt.colorbar()
-#plt.figure()
-#plt.title("imstars")
-#plt.imshow(imstars, cmap="magma")
-#plt.colorbar()
-#plt.show()
+# plt.figure()
+# plt.title("imstars_tmp")
+# plt.imshow(imstars_tmp, cmap="magma")
+# plt.colorbar()
+# plt.figure()
+# plt.title("imstars")
+# plt.imshow(imstars, cmap="magma")
+# plt.colorbar()
+# plt.show()
 
 
-#imstars_tmp = imstars #/ imbkg
+# imstars_tmp = imstars #/ imbkg
 imstars_tmp[z > cld_deg] = np.nan
 starsstd = np.nanstd(imstars_tmp)
 starsmean = np.nanmean(imstars_tmp)
@@ -535,11 +550,16 @@ threshold = starsmean + 7 * starsstd
 stars_binary = np.full((ny, nx), 0.0)
 stars_full = np.full((ny, nx), 1.0)
 stars_full[z > cld_deg] = 0
-stars_full_small = stars_full[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+stars_full_small = stars_full[
+    int(ny / 2 - cld_pix) : int(ny / 2 + cld_pix),
+    int(nx / 2 - cld_pix) : int(nx / 2 + cld_pix),
+]
 stars_binary[imstars_tmp >= threshold] = 1.0
 stars_binary[z > cld_deg] = 0
-stars_binary_small = stars_binary[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
-
+stars_binary_small = stars_binary[
+    int(ny / 2 - cld_pix) : int(ny / 2 + cld_pix),
+    int(nx / 2 - cld_pix) : int(nx / 2 + cld_pix),
+]
 
 
 plt.figure()
@@ -560,11 +580,16 @@ plt.imshow(stars_count, cmap="magma")
 plt.colorbar()
 
 
-
-stars_count[stars_count <= 13 ] = 0
-stars_count[stars_count > 13 ] = 1
-stars_full_small = stars_full[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
-sec2_small = sec2[int(ny/2-cld_pix):int(ny/2+cld_pix), int(nx/2-cld_pix):int(nx/2+cld_pix)]
+stars_count[stars_count <= 13] = 0
+stars_count[stars_count > 13] = 1
+stars_full_small = stars_full[
+    int(ny / 2 - cld_pix) : int(ny / 2 + cld_pix),
+    int(nx / 2 - cld_pix) : int(nx / 2 + cld_pix),
+]
+sec2_small = sec2[
+    int(ny / 2 - cld_pix) : int(ny / 2 + cld_pix),
+    int(nx / 2 - cld_pix) : int(nx / 2 + cld_pix),
+]
 
 plt.figure()
 plt.title("stars_count")
@@ -576,9 +601,11 @@ plt.imshow(stars_full_small, cmap="magma")
 plt.colorbar()
 
 # weighted with solid angle
-cloud_cover = round((1 - np.sum(stars_count * sec2_small) / np.sum(stars_full_small * sec2_small)) * 100)
-cloud_cover_okta = round(cloud_cover/12.5)
-print("Cloud cover (%, oktas) : ", cloud_cover,cloud_cover_okta)
+cloud_cover = round(
+    (1 - np.sum(stars_count * sec2_small) / np.sum(stars_full_small * sec2_small)) * 100
+)
+cloud_cover_okta = round(cloud_cover / 12.5)
+print("Cloud cover (%, oktas) : ", cloud_cover, cloud_cover_okta)
 
 if Calmet == "stars":
     if cloud_cover_okta > max_cloud_cover:
@@ -714,8 +741,8 @@ if Calmet == "stars":
             if ndelta == 5:
                 break
             ndelta += 1
-        print("n axp=", np.shape(axp)[0])
-        if corcoef > 0.7:
+            npts = np.shape(axp)[0]
+        if corcoef > 0.7 and npts > 9:
             calsb = 1
 
         file = path + Band + "_Stars_Match_" + baseout + ".png"
@@ -740,10 +767,8 @@ if Calmet == "stars":
         plt.title(title)
         plt.savefig(file)
 elif Calmet == "fixed":
-    slp = Slope
     calsb = 1
 if calsb == 1:
-
     # print calibration slope slp
     print("Calibration slope (slp) :", slp)
     # replace zeros with a small non null value
@@ -869,4 +894,4 @@ for no in range(num_pts - 1):
     print(outputline)
     o.write(outputline)
     o.close()
-#plt.show()
+# plt.show()

@@ -12,3 +12,4 @@ AngleB :   0.88461794 -0.07771373  0.00590247
 ZpointA : 4.3
 ZpointB : 2.6
 Calmet : stars    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
+Default_itime : 120000000  # 2 minutes

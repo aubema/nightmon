@@ -388,7 +388,7 @@ basename = time.utc_strftime("%Y-%m-%d")
 outname = path + "calibrated_" + Band + "_" + basename + "_sky.csv"
 timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
 baseout = time.utc_strftime("%Y-%m-%d_%H-%M-%S")
-calname = path + "calibration_stars_" + Band + "_" + baseout + ".csv"
+calname = path + Band + "_calibration_stars_" + baseout + ".csv"
 here_now = here.at(time)
 # calculation sun and moon positions
 moon_position = here_now.observe(eph["moon"]).apparent()
@@ -662,7 +662,7 @@ if Calmet == "stars":
         # save stars match information for future Calibration
         if os.path.exists(calname) == False:
             c = open(calname, "w")
-            first_line = "# Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux , \n"
+            first_line = "# Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux , Rcoef, Gcoef, Bcoef , \n"
             c.write(first_line)
             c.close()
 
@@ -729,6 +729,11 @@ if Calmet == "stars":
                 + str("{:5.3f}".format(StarMatch[nc, 7]))
                 + " , "
                 + str("{:5.3f}".format(StarMatch[nc, 9]))
+                + str(RC)
+                + " , "
+                + str(GC)
+                + " , "
+                + str(BC)
                 + ", \n"
             )
             c.write(cal_line)

@@ -206,7 +206,7 @@ do time1=`date +%s`
 				 #
 				 #
 
-         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -m $model 
+         /usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -m $model
          if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ]
          then
 				    mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
@@ -227,6 +227,14 @@ do time1=`date +%s`
 					 mv $path"/"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
 					 cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
 			   fi
+				 # backup calibration file
+         if [ -f $path"/"$b"_calibration_stars_"${basename[$n]}".csv" ]
+         then mv $path"/"$b"_calibration_stars_"${basename[$n]}".csv" $basepath/$y/$mo/
+              cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
+         fi
+
+
+
 
          # backup output files
          if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ]
@@ -234,6 +242,10 @@ do time1=`date +%s`
          else cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
          fi
          cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
+
+
+
+
          # clean directory
          rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
          rm $path"/calibrated_"$b"_"$baseday"_sky.csv"

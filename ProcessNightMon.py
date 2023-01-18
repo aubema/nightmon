@@ -388,6 +388,7 @@ basename = time.utc_strftime("%Y-%m-%d")
 outname = path + "calibrated_" + Band + "_" + basename + "_sky.csv"
 timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
 baseout = time.utc_strftime("%Y-%m-%d_%H-%M-%S")
+calname = path + "calibration_stars_" + Band + "_" + baseout + ".csv"
 here_now = here.at(time)
 # calculation sun and moon positions
 moon_position = here_now.observe(eph["moon"]).apparent()
@@ -658,8 +659,14 @@ if Calmet == "stars":
         xpoli = float(positions[indtopol, 0])
         ypoli = float(positions[indtopol, 1])
         apertures = CircularAperture(positions, r=4.0)
+        # save stars match information for future Calibration
+        if os.path.exists(calname) == False:
+            c = open(calname, "w")
+            first_line = "# Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux , \n"
+            c.write(first_line)
+            c.close()
 
-        StarMatch = np.zeros([ishape, 10])
+        StarMatch = np.zeros([ishape, 11])
         n = 0
         nistars = ishape
         # searching for correspondance between stars in simbad and found stars in image
@@ -693,6 +700,7 @@ if Calmet == "stars":
                     StarMatch[n, 7] = magb[ns]
                 StarMatch[n, 8] = AirM[ns]
                 StarMatch[n, 9] = Flux[dweight_min_index]
+                StarMatch[n, 10] = iden[ns]
                 n = n + 1
         print("Number of matching stars : ", n, "/", ishape)
         StarMatch[np.isnan(StarMatch)] = 0
@@ -703,7 +711,29 @@ if Calmet == "stars":
             StarMatch, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
         )
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
+
         print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
+        c = open(calname, "w")
+        for nc in range(np.shape(StarMatch)[0]):
+            # Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux"
+
+            cal_line = (
+                StarMatch[nc, 10]
+                + " , "
+                + Band
+                + " , "
+                + str("{:4.2f}".format(airmo))
+                + " , "
+                + str("{:5.3f}".format(k))
+                + " , "
+                + str("{:5.3f}".format(StarMatch[nc, 7]))
+                + " , "
+                + str("{:5.3f}".format(StarMatch[nc, 9]))
+                + ", \n"
+            )
+            c.write(cal_line)
+        c.close()
+
         if Band == "JV":
             lambm = 545
         elif Band == "JR":

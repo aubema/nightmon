@@ -80,14 +80,13 @@ def input(argv):
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:i:d:b:e:c:m:k:z:",
+            "h:i:d:b:e:m:k:z:",
             [
                 "help=",
                 "ifile=",
                 "dfile=",
                 "extinc=",
                 "band=",
-                "cam=",
                 "model=",
                 "calib=",
                 "zerop=",
@@ -95,13 +94,13 @@ def input(argv):
         )
     except getopt.GetoptError:
         print(
-            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -z <Zeropoint>"
+            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint>"
         )
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print(
-                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -c <Cam> -m <Model> -k <Calibration method> -z <Zeropoint>"
+                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint>"
             )
             sys.exit()
         elif opt in ("-i", "--ifile"):
@@ -112,8 +111,6 @@ def input(argv):
             Band = arg
         elif opt in ("-e", "--extinc"):
             Extinc = arg
-        elif opt in ("-c", "--cam"):
-            Cam = arg
         elif opt in ("-m", "--model"):
             Model = arg
         elif opt in ("-k", "--calib"):
@@ -124,7 +121,6 @@ def input(argv):
     print("Dark frame file is :", Dfile)
     print("Band is :", Band)
     print("Extinction is :", Extinc)
-    print("Camera is :", Cam)
     print("Camera model is :", Model)
     print("Calibration method :", Calmet)
     return Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint
@@ -161,9 +157,28 @@ limiti = (
 )
 limits = -1
 # load command line parameters
-Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint = input(sys.argv[1:])
+Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint = input(sys.argv[1:])
 k = float(Extinc)
-slp = 10 ** (-0.4 * float(Zpoint))
+# TOTO : IL FAUT DEPLACER CECI ET LES EPHEMERIDES DANS LA BOUCLE DES FILTRES
+# files names provided by NightMon are formatted in the following way
+# YYYYY-MM-DD_hh-mm-ss_V.dng , the V letter represents the filter and can thus be
+# replaced by R. Time and date are in UTC.
+# time=ts.utc(2020, 9, 22, 4, 22, 53)
+# time = ts.now()
+# yesterday = time - timedelta(days = 1)
+datearr = Ifile.replace("_", "-").split("-")
+time = ts.utc(
+    int(datearr[0]),
+    int(datearr[1]),
+    int(datearr[2]),
+    int(datearr[3]),
+    int(datearr[4]),
+    int(datearr[5]),
+)
+Cam = int(datearr[6])
+print("Camera is :", Cam)
+Tint = int(datearr[7])
+Gain = int(datearr[8])
 # determine the R, G, B coefficients according to the band and the camera model
 if Model == "A7S":
     if Band == "JV":
@@ -203,7 +218,7 @@ elif Model == "RpiHQ-JFilters":
     if Band == "JV":
         RC = 1
         GC = 1
-        BC = 1
+        BC = 0.6
     elif Band == "JR":
         RC = 1
         GC = 1
@@ -232,6 +247,7 @@ with open(configpath) as f:
     p = yaml.safe_load(f)
 Site = p["Site"]
 Calmetconfig = p["Calmet"]
+DefaultItime = p["Default_itime"]
 if Cam == "A":
     deltax = p["ShiftxA"].split()
     deltay = p["ShiftyA"].split()
@@ -246,6 +262,7 @@ if (
     Zpoint == 0 and ZpointConfig != 0
 ):  # if no zero point is provided in argument then use the value of the config file
     Zpoint = ZpointConfig
+slp = 10 ** (-0.4 * float(Zpoint))
 if (
     Calmet == "0" and Calmetconfig != "0"
 ):  # if no calib method is provided in argument then use the value of the config file
@@ -365,22 +382,8 @@ Rbkg = np.zeros([ny, nx])
 Sstars = np.zeros([ny, nx])
 
 print(f"Processing Johnson {Band} camera...")
-# TOTO : IL FAUT DEPLACER CECI ET LES EPHEMERIDES DANS LA BOUCLE DES FILTRES
-# files names provided by NightMon are formatted in the following way
-# YYYYY-MM-DD_hh-mm-ss_V.dng , the V letter represents the filter and can thus be
-# replaced by R. Time and date are in UTC.
-# time=ts.utc(2020, 9, 22, 4, 22, 53)
-# time = ts.now()
-# yesterday = time - timedelta(days = 1)
-datearr = Ifile.replace("_", "-").split("-")
-time = ts.utc(
-    int(datearr[0]),
-    int(datearr[1]),
-    int(datearr[2]),
-    int(datearr[3]),
-    int(datearr[4]),
-    int(datearr[5]),
-)
+
+
 basename = time.utc_strftime("%Y-%m-%d")
 outname = path + "calibrated_" + Band + "_" + basename + "_sky.csv"
 timestamp = time.utc_strftime("%Y-%m-%dT%H:%M:%S")
@@ -612,6 +615,7 @@ if Calmet == "stars":
     if cloud_cover_okta > max_cloud_cover:
         print("Can't process the data for stars calibration methods under cloudy skies")
     else:
+        Itime_cor = 1
         # Search for stars only if cloud_cover is lower than max_cloud_cover
         mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
         daofind = DAOStarFinder(fwhm=2, threshold=5.0 * std)
@@ -769,6 +773,7 @@ if Calmet == "stars":
         plt.savefig(file)
 elif Calmet == "fixed":
     calsb = 1
+    Itime_cor = DefaultItime / Tint
 if calsb == 1:
     # print calibration slope slp
     print("Calibration slope (slp) :", slp)
@@ -779,9 +784,9 @@ if calsb == 1:
     imag = imagtmp
     imstars[imstars <= 0] = 0.0001
     clouds = imstars[imstars > 0.001]
-    calMagTot = -2.5 * np.log10(imag * slp)
-    calMagBkg = -2.5 * np.log10(imbkg * slp)
-    calMagStr = -2.5 * np.log10(imstars * slp)
+    calMagTot = -2.5 * np.log10(imag * Itime_cor * slp)
+    calMagBkg = -2.5 * np.log10(imbkg * Itime_cor * slp)
+    calMagStr = -2.5 * np.log10(imstars * Itime_cor * slp)
     zeropoint = float(-2.5 * np.log10(slp))
     print("Zero point (mag) =", zeropoint)
     print("Mag(pixel) = Zeropoint +-2.5 * log10(R(pixel))")

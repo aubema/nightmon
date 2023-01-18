@@ -716,7 +716,9 @@ if Calmet == "stars":
         c = open(calname, "w")
         for nc in range(np.shape(StarMatch)[0]):
             # Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux"
-
+            # to find the extinction after the night one can make a linear regression of the uncalibrated magnitude of a star
+            # as a function of the airmass. Equation is m= m_0 + k * airmass
+            # so that k is the slope for a given stars mesures at various airmass.
             cal_line = (
                 StarMatch[nc, 10]
                 + " , "

@@ -140,7 +140,7 @@ do time1=`date +%s`
 	 while read -r line; do
 		 echo $line > $path"/ligne.tmp"
 		 read Ye Me De Ve Re bidon < $path"/ligne.tmp"
-		 if [ $Ye != "#"]; then
+		 if [ $Ye != "#"] ; then
 			  timee=`date --date=$Ye"-"$Me"-"$De" 00:00:01" +%s`
 				let DTe=time1-timee
 				DTe="${DTe/#-}"   # absolute value

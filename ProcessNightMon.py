@@ -71,7 +71,7 @@ def input(argv):
     # RGO, D. K. (1985). Atmospheric Extinction at the Roque de los Muchachos Observatory, La Palma.
     # extinc_r = 0.0547
     # extinc_v = 0.102
-    Extinc = 0.102
+    Extinc = 0
     Model = "RpiHQ"
     Cam = "A"
     Band = "JV"

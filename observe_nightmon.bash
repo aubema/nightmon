@@ -97,8 +97,6 @@ model="RpiHQ-JFilters"  # other choices are "RpiHQ" and "A7S"
 cams=(A B)
 # listen to gpio 5 (limit switch)  state=1 means cams inside, state=0 means cams out
 echo "5" > /sys/class/gpio/export
-# Standard extinctions for Observatorio Roque de los Muchachos (0.102 0.0547) (JV JR)
-extinct=(0.102 0.0547)
 basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
@@ -137,6 +135,23 @@ do time1=`date +%s`
    echo $basenameA
    baseday=`date --date="2 minutes ago" +%Y-%m-%d`
    basename[0]="$basenameA"
+	 # find the closest extinction in time from /home/sand/extinction_data
+	 Emindelay=10000000000
+	 while read -r line; do
+		 echo $line > $path"/ligne.tmp"
+		 read Ye Me De Ve Re bidon < $path"/ligne.tmp"
+		 if [ $Ye != "#"]; then
+			  timee=`date --date=$Ye"-"$Me"-"$De" 00:00:01" +%s`
+				let DTe=time1-timee
+				DTe="${DTe/#-}"   # absolute value
+				if [ $DTe -lt $Emindelay ] ; then
+					let Emindelay=DTe
+					extinct[0]=$Ve
+					extinct[1]=$Re
+				fi
+		 fi
+	 done < $path"/extinction_data"
+
    read  tv toto < $path"/Current_tint.tmp"
 	 read  gain toto < $path"/Current_gain.tmp"
    if [ ! -d $basepath/$y ]

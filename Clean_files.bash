@@ -21,5 +21,5 @@ rm  -f /home/sand/data/$path_to_delete/*$day_to_delete_*.dng.gz
 rm  -f /home/sand/data/$path_to_delete/*$day_to_delete_*.jpg
 # suffix for archiving log file
 logsuf=`date "+_%Y-%j"`
-cp -f /home/sand/nightmon.log "nightmon.log_"$logsuf
+cp -f /home/sand/nightmon.log "nightmon.log"$logsuf
 echo "" > /home/sand/nightmon.log

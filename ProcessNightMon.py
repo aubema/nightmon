@@ -166,7 +166,7 @@ k = float(Extinc)
 # time=ts.utc(2020, 9, 22, 4, 22, 53)
 # time = ts.now()
 # yesterday = time - timedelta(days = 1)
-datearr = Ifile.replace("_", "-").split("-")
+datearr = Ifile.replace("_", "-").replace(".", "-").split("-")
 ts = load.timescale()
 time = ts.utc(
     int(datearr[0]),

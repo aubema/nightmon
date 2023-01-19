@@ -176,7 +176,7 @@ time = ts.utc(
     int(datearr[4]),
     int(datearr[5]),
 )
-Cam = int(datearr[6])
+Cam = datearr[6]
 print("Camera is :", Cam)
 Tint = int(datearr[7])
 Gain = int(datearr[8])

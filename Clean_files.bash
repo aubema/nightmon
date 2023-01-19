@@ -20,6 +20,6 @@ gzip /home/sand/data/$path_to_compress/*$day_to_compress_*.dng
 rm  -f /home/sand/data/$path_to_delete/*$day_to_delete_*.dng.gz
 rm  -f /home/sand/data/$path_to_delete/*$day_to_delete_*.jpg
 # suffix for archiving log file
-logsuf=`date "+_%j"`
+logsuf=`date "+_%Y-%j"`
 cp -f /home/sand/nightmon.log "nightmon.log_"$logsuf
 echo "" > /home/sand/nightmon.log

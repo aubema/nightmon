@@ -167,6 +167,7 @@ k = float(Extinc)
 # time = ts.now()
 # yesterday = time - timedelta(days = 1)
 datearr = Ifile.replace("_", "-").split("-")
+ts = load.timescale()
 time = ts.utc(
     int(datearr[0]),
     int(datearr[1]),
@@ -284,7 +285,6 @@ for line in pt:
 pt.close()
 num_pts = np.shape(tpt)[0]
 print("Number of points to extract :", num_pts)
-ts = load.timescale()
 # set observer position
 eph = load("de421.bsp")
 here = eph["earth"] + wgs84.latlon(

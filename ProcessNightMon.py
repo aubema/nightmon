@@ -123,7 +123,7 @@ def input(argv):
     print("Extinction is :", Extinc)
     print("Camera model is :", Model)
     print("Calibration method :", Calmet)
-    return Ifile, Dfile, Band, Extinc, Cam, Model, Calmet, Zpoint
+    return Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint
 
 
 def fit_func(x, a):

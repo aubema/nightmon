@@ -120,9 +120,6 @@ def input(argv):
     print("Sky image file is :", Ifile)
     print("Dark frame file is :", Dfile)
     print("Band is :", Band)
-    print("Extinction is :", Extinc)
-    print("Camera model is :", Model)
-    print("Calibration method :", Calmet)
     return Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint
 
 
@@ -284,6 +281,9 @@ for line in pt:
     ept.append(float(words[2]))
 pt.close()
 num_pts = np.shape(tpt)[0]
+print("Camera model is :", Model)
+print("Calibration method :", Calmet)
+print("Extinction is :", Extinc)
 print("Number of points to extract :", num_pts)
 # set observer position
 eph = load("de421.bsp")

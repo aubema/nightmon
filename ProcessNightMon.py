@@ -657,13 +657,6 @@ if Calmet == "stars":
         xpoli = float(positions[indtopol, 0])
         ypoli = float(positions[indtopol, 1])
         apertures = CircularAperture(positions, r=4.0)
-        # save stars match information for future Calibration
-        if os.path.exists(calname) == False:
-            c = open(calname, "w")
-            first_line = "Ident,Band,Airmass,Ext_coef,Catalog_magnitude,Instrumental_flux,Rcoef,Gcoef,Bcoef \n"
-            c.write(first_line)
-            c.close()
-
         StarMatch = np.zeros([ishape, 10])
         StarName = np.empty(ishape, dtype="object")
         n = 0
@@ -716,7 +709,10 @@ if Calmet == "stars":
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
         StarName = np.delete(StarName, np.where(StarMatch[:, 9] == 0), axis=0)
         print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
+        # save stars match information for future Calibration
         c = open(calname, "w")
+        first_line = "Ident,Band,Airmass,Ext_coef,Catalog_magnitude,Instrumental_flux,Rcoef,Gcoef,Bcoef \n"
+        c.write(first_line)
         for nc in range(np.shape(StarMatch)[0]):
             # Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux"
             # to find the extinction after the night one can make a linear regression of the uncalibrated magnitude of a star
@@ -734,6 +730,7 @@ if Calmet == "stars":
                 + str("{:5.3f}".format(StarMatch[nc, 7]))
                 + ","
                 + str("{:5.3f}".format(StarMatch[nc, 9]))
+                + ","
                 + str(RC)
                 + ","
                 + str(GC)

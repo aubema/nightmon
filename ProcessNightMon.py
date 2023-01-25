@@ -496,10 +496,8 @@ AirM = airmass(altstar)
 # create the data file if it do not exists
 if os.path.exists(outname) == False:
     o = open(outname, "w")
-    first_line = "# Loc_Name,Band,CCD_XY_position,,AzAlt_position,,Airmass,Ext_coef,\
-    Date,Moon,Clouds,SkyBrightness,err,Zeropoint,CorCoef,Sun_Ang,Moon_Ang,Galactic_Lat,Moon_Phase \n"
-    second_line = "#,,(pixel),(pixel),(deg),(deg),,,,\
-    ,(oktas),(mag/arcsec^2),,(mag),,(deg),(deg),(deg),(deg), \n"
+    first_line = "Loc_Name,Band,CCD_XY_position, ,AzAlt_position, ,Airmass,Ext_coef,Date,Moon,Clouds,SkyBrightness,err,Zeropoint,CorCoef,Sun_Ang,Moon_Ang,Galactic_Lat,Moon_Phase \n"
+    second_line = " , ,(pixel),(pixel),(deg),(deg), , , , ,(oktas),(mag/arcsec^2), ,(mag), ,(deg),(deg),(deg),(deg) \n"
     o.write(first_line)
     o.write(second_line)
     o.close()
@@ -662,7 +660,7 @@ if Calmet == "stars":
         # save stars match information for future Calibration
         if os.path.exists(calname) == False:
             c = open(calname, "w")
-            first_line = "# Ident,Band,Airmass,Ext_coef,Catalog_magnitude,Instrumental_flux,Rcoef,Gcoef,Bcoef,\n"
+            first_line = "Ident,Band,Airmass,Ext_coef,Catalog_magnitude,Instrumental_flux,Rcoef,Gcoef,Bcoef \n"
             c.write(first_line)
             c.close()
 
@@ -741,7 +739,7 @@ if Calmet == "stars":
                 + str(GC)
                 + ","
                 + str(BC)
-                + ",\n"
+                + " \n"
             )
             c.write(cal_line)
         c.close()

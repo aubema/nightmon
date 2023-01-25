@@ -573,7 +573,7 @@ plt.colorbar()
 
 stars_full[z > cld_deg] = 0
 # set cloud detection window to about 5 deg (51)
-window = 161  #  1 deg ~= 10
+window = 171  #  1 deg ~= 17
 kernel = Box2DKernel(width=window, mode="integrate")
 stars_count = convolve(stars_binary_small, kernel)
 stars_count = stars_count * window * window

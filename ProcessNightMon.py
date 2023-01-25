@@ -141,7 +141,7 @@ FWHM = 7
 zeropoint = np.nan
 Zpoint = 0
 Zpointconfig = 0
-max_cloud_cover = 3
+max_cloud_cover = 4
 Calmet = "0"
 Calmetconfig = "0"
 norm = ImageNormalize(stretch=SqrtStretch())

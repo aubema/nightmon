@@ -141,7 +141,7 @@ FWHM = 7
 zeropoint = np.nan
 Zpoint = 0
 Zpointconfig = 0
-max_cloud_cover = 2
+max_cloud_cover = 3
 Calmet = "0"
 Calmetconfig = "0"
 norm = ImageNormalize(stretch=SqrtStretch())
@@ -666,7 +666,8 @@ if Calmet == "stars":
             c.write(first_line)
             c.close()
 
-        StarMatch = np.zeros([ishape, 11])
+        StarMatch = np.zeros([ishape, 10])
+        StarName = np.zeros([ishape, 1])
         n = 0
         nistars = ishape
         # searching for correspondance between stars in simbad and found stars in image
@@ -700,18 +701,22 @@ if Calmet == "stars":
                     StarMatch[n, 7] = magb[ns]
                 StarMatch[n, 8] = AirM[ns]
                 StarMatch[n, 9] = Flux[dweight_min_index]
-                StarMatch[n, 10] = iden[ns]
+                StarName[n, 1] = iden[ns]
                 n = n + 1
         print("Number of matching stars : ", n, "/", ishape)
         StarMatch[np.isnan(StarMatch)] = 0
         StarMatch = np.delete(StarMatch, np.where(StarMatch == 0), axis=0)
+        StarName = np.delete(StarName, np.where(StarMatch == 0), axis=0)
         avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
         print("Average gap between nearest star :", avggap, "+/-", stdgap)
         StarMatch = np.delete(
             StarMatch, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
         )
+        StarName = np.delete(
+            StarName, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
+        )
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
-
+        StarName = np.delete(StarName, np.where(StarMatch[:, 9] == 0), axis=0)
         print("Number of matching stars : ", np.shape(StarMatch)[0], "/", ishape)
         c = open(calname, "w")
         for nc in range(np.shape(StarMatch)[0]):
@@ -720,7 +725,7 @@ if Calmet == "stars":
             # as a function of the airmass. Equation is m= m_0 + k * airmass
             # so that k is the slope for a given stars mesures at various airmass.
             cal_line = (
-                StarMatch[nc, 10]
+                StarName[nc, 1]
                 + " , "
                 + Band
                 + " , "

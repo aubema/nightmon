@@ -667,7 +667,7 @@ if Calmet == "stars":
             c.close()
 
         StarMatch = np.zeros([ishape, 10])
-        StarName = np.zeros([ishape])
+        StarName = np.empty(ishape, dtype=str)
         n = 0
         nistars = ishape
         # searching for correspondance between stars in simbad and found stars in image
@@ -725,11 +725,11 @@ if Calmet == "stars":
             # as a function of the airmass. Equation is m= m_0 + k * airmass
             # so that k is the slope for a given stars mesures at various airmass.
             cal_line = (
-                StarName[nc, 1]
+                StarName[nc]
                 + " , "
                 + Band
                 + " , "
-                + str("{:4.2f}".format(airmo))
+                + str("{:4.2f}".format(StarMatch[nc, 8]))
                 + " , "
                 + str("{:5.3f}".format(k))
                 + " , "

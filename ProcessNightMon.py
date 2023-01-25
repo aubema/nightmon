@@ -667,7 +667,7 @@ if Calmet == "stars":
             c.close()
 
         StarMatch = np.zeros([ishape, 10])
-        StarName = np.zeros([ishape, 0])
+        StarName = np.zeros([ishape])
         n = 0
         nistars = ishape
         # searching for correspondance between stars in simbad and found stars in image
@@ -701,7 +701,7 @@ if Calmet == "stars":
                     StarMatch[n, 7] = magb[ns]
                 StarMatch[n, 8] = AirM[ns]
                 StarMatch[n, 9] = Flux[dweight_min_index]
-                StarName[n, 0] = iden[ns]
+                StarName[n] = iden[ns]
                 n = n + 1
         print("Number of matching stars : ", n, "/", ishape)
         StarMatch[np.isnan(StarMatch)] = 0

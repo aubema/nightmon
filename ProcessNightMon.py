@@ -496,10 +496,10 @@ AirM = airmass(altstar)
 # create the data file if it do not exists
 if os.path.exists(outname) == False:
     o = open(outname, "w")
-    first_line = "# Loc_Name , Band , CCD_XY_position , ,  AzAlt_position , , Airmass , Ext_coef ,    \
-    Date , Moon , Clouds ,   SkyBrightness , err , Zeropoint , CorCoef , Sun_Ang, Moon_Ang , Galactic_Lat , Moon_Phase \n"
-    second_line = "# ,  , (pixel) , (pixel) , (deg) , (deg) ,  ,  ,  , \
-    , (oktas) , (mag/arcsec^2) ,  , mag , , deg , deg ,  deg , deg , \n"
+    first_line = "# Loc_Name,Band,CCD_XY_position,,AzAlt_position,,Airmass,Ext_coef,\
+    Date,Moon,Clouds,SkyBrightness,err,Zeropoint,CorCoef,Sun_Ang,Moon_Ang,Galactic_Lat,Moon_Phase \n"
+    second_line = "#,,(pixel),(pixel),(deg),(deg),,,,\
+    ,(oktas),(mag/arcsec^2),,(mag),,(deg),(deg),(deg),(deg), \n"
     o.write(first_line)
     o.write(second_line)
     o.close()
@@ -662,12 +662,12 @@ if Calmet == "stars":
         # save stars match information for future Calibration
         if os.path.exists(calname) == False:
             c = open(calname, "w")
-            first_line = "# Ident , Band , Airmass , Ext_coef , Catalog_magnitude , Instrumental_flux , Rcoef, Gcoef, Bcoef , \n"
+            first_line = "# Ident,Band,Airmass,Ext_coef,Catalog_magnitude,Instrumental_flux,Rcoef,Gcoef,Bcoef,\n"
             c.write(first_line)
             c.close()
 
         StarMatch = np.zeros([ishape, 10])
-        StarName = np.empty(ishape, dtype=str)
+        StarName = np.empty(ishape, dtype="object")
         n = 0
         nistars = ishape
         # searching for correspondance between stars in simbad and found stars in image
@@ -726,22 +726,22 @@ if Calmet == "stars":
             # so that k is the slope for a given stars mesures at various airmass.
             cal_line = (
                 StarName[nc]
-                + " , "
+                + ","
                 + Band
-                + " , "
+                + ","
                 + str("{:4.2f}".format(StarMatch[nc, 8]))
-                + " , "
+                + ","
                 + str("{:5.3f}".format(k))
-                + " , "
+                + ","
                 + str("{:5.3f}".format(StarMatch[nc, 7]))
-                + " , "
+                + ","
                 + str("{:5.3f}".format(StarMatch[nc, 9]))
                 + str(RC)
-                + " , "
+                + ","
                 + str(GC)
-                + " , "
+                + ","
                 + str(BC)
-                + ", \n"
+                + ",\n"
             )
             c.write(cal_line)
         c.close()
@@ -901,41 +901,41 @@ for no in range(num_pts - 1):
     o = open(outname, "a")
     outputline = (
         Site
-        + " , "
+        + ","
         + Band
-        + " , "
+        + ","
         + posx
-        + " , "
+        + ","
         + posy
-        + " , "
+        + ","
         + str("{:6.2f}".format(apt[no]))
-        + " , "
+        + ","
         + str("{:5.2f}".format(ept[no]))
-        + " , "
+        + ","
         + str("{:4.2f}".format(airmo))
-        + " , "
+        + ","
         + str("{:5.3f}".format(k))
-        + " , "
+        + ","
         + timestamp
-        + " , "
+        + ","
         + mflag
-        + " , "
+        + ","
         + str("{:d}".format(cloud_cover_okta))
-        + " , "
+        + ","
         + str("{:6.3f}".format(mago))
-        + " , "
+        + ","
         + str("{:6.3f}".format(sberr))
-        + " , "
+        + ","
         + str("{:6.3f}".format(zeropoint))
-        + " , "
+        + ","
         + str("{:6.3f}".format(corcoef))
-        + " , "
+        + ","
         + str("{:6.2f}".format(theta_sun))
-        + " , "
+        + ","
         + str("{:6.2f}".format(theta_moon))
-        + " , "
+        + ","
         + str("{:6.2f}".format(galactic_lat))
-        + " , "
+        + ","
         + str("{:6.2f}".format(moonphase))
         + "\n"
     )

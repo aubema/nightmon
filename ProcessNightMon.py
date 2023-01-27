@@ -633,8 +633,8 @@ if Calmet == "stars":
         for nd in range(np.shape(positions)[0]):
             xsa = positions[nd, 0]
             ysa = positions[nd, 1]
-            Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
-            Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 2, xsa - 2 : xsa + 2])
+            Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 3, xsa - 2 : xsa + 3])
+            Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 3, xsa - 2 : xsa + 3])
 
         rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
         sources = sources[rn < rnmax]

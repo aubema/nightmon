@@ -92,6 +92,7 @@ gain=16
 max_lum=100000  # 1000000 = 1sec
 darkimg="dark-gain16-t100000.dng"
 pointing=(U D) # up or down
+bands=(JB JV JR)
 model="RpiHQ"  # other choices are "RpiHQ" and "A7S"
 cams=(A C)
 basepath="/var/www/html/data"
@@ -187,59 +188,61 @@ while : ; do
 	echo "=============================="
 	# process sky IMAGES
 	let n=0
-	for b in ${pointing[@]}
-	do 
-		if [ $n -eq 0 ] ; then
-			let t=ta
-		else
-			let t=tb
-         	fi
-		# determine the zeropoint according to the integration time and camera
-		#
-		#
-		#
+	for p in ${pointing[@]} ; do 
+		for b in ${bands[@]} ; do	
+			
+			if [ $n -eq 0 ] ; then
+				let t=ta
+			else
+				let t=tb
+         		fi
+			# determine the zeropoint according to the integration time and camera
+			#
+			#
+			#
 
-		/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -m $model
-		if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ] ; then
-			mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
-			cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-		fi
-		if [ -f $path"/"$b"_calSbBkg_"${basename[$n]}".png" ] ; then
-			mv $path"/"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
-			cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-		fi
-		if [ -f $path"/"$b"_calSbTot_"${basename[$n]}".png" ] ; then
-			mv $path"/"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-			cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-		fi
-		if [ -f $path"/"$b"_Stars_Match_"${basename[$n]}".png" ] ; then
-			mv $path"/"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
-			cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-		fi
-		# backup calibration file
-		if [ -f $path"/"$b"_calibration_stars_"${basename[$n]}".csv" ] ; then 
-			mv $path"/"$b"_calibration_stars_"${basename[$n]}".csv" $basepath/$y/$mo/
-			cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
-		fi
-
-
-
-
-		# backup output files
-		if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ] ; then
-			cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
-         	else
-         		cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
-		fi
-		cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
+			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -e ${extinct[$n]} -m $model
+			if [ -f $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" ] ; then
+				mv $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			fi
+			if [ -f $path"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" ] ; then
+				mv $path"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			fi
+			if [ -f $path"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" ] ; then
+				mv $path"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			fi
+			if [ -f $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" ] ; then
+				mv $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			fi
+			# backup calibration file
+			if [ -f $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" ] ; then 
+				mv $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
+			fi
 
 
 
 
-		# clean directory
-		rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
-		rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
-		let n=n+1
+			# backup output files
+			if [ -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" ] ; then
+				cat $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
+         		else
+         			cat $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
+			fi
+			cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
+
+
+
+
+			# clean directory
+			rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
+			rm $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
+			let n=n+1
+		done
 	done
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

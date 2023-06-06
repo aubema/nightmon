@@ -202,14 +202,14 @@ while : ; do
 	# rename pictures
 	if [ $ta -ge $max_lum ] ; then
 		# daytime image only keep the jpg
-		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_"$ta"_"$gain".dng"
-		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"$ta"_"$gain".dng"
-		cp -f $path"/capture_1.dng" $path/$basenameA"_"$ta"_"$gain".dng"
+		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
+		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
+		cp -f $path"/capture_1.dng" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
 		processflag=0
 	fi
-	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"
-	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"
-	cp -f $path"/capture_1.jpg" $path/$basenameA"_"$ta"_"$gain".jpg"
+	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
+	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
+	cp -f $path"/capture_1.jpg" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	read  tb toto < $path"/Current_tint.tmp"
 	echo "=============================="
 	if [ $processflag -eq 1 ] ; then

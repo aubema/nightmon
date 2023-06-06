@@ -75,6 +75,42 @@ take_picture() {
 	/usr/bin/echo 3 > /proc/sys/vm/drop_caches
 }
 
+# ==================================
+# global positioning system
+globalpos () {
+
+     rm -f /root/*.tmp
+     bash -c '/usr/bin/gpspipe -w -n 2 | sed -e "s/,/\n/g" | grep activated | tail -1 | sed "s/n\"/ /g" |sed -e "s/\"/ /g" |  sed -e"s/activated//g" | sed -e "s/ //g" > /home/sand/coords.tmp'
+     read gpstime1 < /home/sand/coords.tmp
+     gpstime1="${gpstime1:1}"
+     bash -c '/usr/bin/gpspipe -w -n 4 | sed -e "s/,/\n/g" | grep time | tail -1 | sed "s/n\"/ /g" |sed -e "s/\"/ /g" |  sed -e"s/time//g" | sed -e "s/ //g" > /home/sand/coords.tmp'
+     read gpstime2 < /home/sand/coords.tmp
+     gpstime2="${gpstime2:1}"
+     echo "t" $gpstime1 $gpstime2
+     sec1=`/usr/bin/date -d "$gpstime1" +%s`
+     sec2=`/usr/bin/date -d "$gpstime2" +%s`
+     if [ $sec1 -gt $sec2 ]
+     then gpstime=$gpstime1
+     else gpstime=$gpstime2
+     fi
+     echo $gpstime
+     bash -c '/usr/bin/gpspipe -w -n 5 | sed -e "s/,/\n/g" | grep lat | tail -1 | sed "s/n\"/ /g" |sed -e "s/\"/ /g" | sed -e "s/:/ /g" | sed -e"s/lat//g" | sed -e "s/ //g" > /home/sand/coords.tmp'
+     read lat < /home/sand/coords.tmp
+     bash -c '/usr/bin/gpspipe -w -n 5 | sed -e "s/,/\n/g" | grep lon | tail -1 | sed "s/n\"/ /g" |sed -e "s/\"/ /g" | sed -e "s/:/ /g" | sed -e "s/lo//g" | sed -e "s/ //g" > /home/sand/coords.tmp'
+     read lon < /home/sand/coords.tmp
+     bash -c '/usr/bin/gpspipe -w -n 5 | sed -e "s/,/\n/g" | grep alt | tail -1 | sed "s/n\"/ /g" |sed -e "s/\"/ /g" | sed -e "s/:/ /g" | sed -e "s/alt//g" | sed -e "s/ //g" > /home/sand/coords.tmp'
+     read alt < /home/sand/coords.tmp
+     echo $lat $lon $alt
+     if [ -z "${lon}" ]
+     then let lon=0
+          let lat=0
+          let alt=0
+     fi 
+     # /bin/echo "GPS gives Latitude:" $lat ", Longitude:" $lon "and Altitude:" $alt
+     /bin/echo "Lat.:" $lat ", Lon.:" $lon " Alt.:" $alt  > /home/sand/gps.log
+     echo $gpsdate > /home/sand/date_gps.log
+}
+
 
 #
 # ==================================
@@ -100,6 +136,10 @@ read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 echo "Waiting 2 min before starting measurements..."
 /bin/sleep 120
+# set master date with the gps
+globalpos
+echo "gpstime="$gpstime $lat $lon $alt
+echo "Sync time with gps."
 #OPTIONS
 gopt=0
 while getopts 'k:' OPTION ; do

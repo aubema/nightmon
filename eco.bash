@@ -163,13 +163,13 @@ while : ; do
 	time1=`date +%s`
 	echo "Shooting..."
 	take_pictures
-	y=`date --date="14 seconds ago" +%Y`
-	mo=`date --date="14 seconds ago" +%m`
-	dA=`date --date="14 seconds ago" +%d`
-	basenameA=`date --date="14 seconds ago" +%Y-%m-%d_%H-%M-%S`
+	y=`date --date="2 minutes ago" +%Y`
+	mo=`date --date="2 minutes ago" +%m`
+	dA=`date --date="2 minutes ago" +%d`
+	basenameA=`date --date="2 minutes ago" +%Y-%m-%d_%H-%M-%S`
 	basenameB=`date +%Y-%m-%d_%H-%M-%S`
 	echo $basenameA
-	baseday=`date --date="14 seconds ago" +%Y-%m-%d`
+	baseday=`date --date="2 minutes ago" +%Y-%m-%d`
 	basename[0]="$basenameA"
 	# find the closest extinction in time from /home/sand/extinction_data
 	Emindelay=10000000000

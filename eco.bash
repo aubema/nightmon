@@ -139,7 +139,7 @@ path="/home/"$user
 read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 echo "Waiting 2 min before starting measurements..."
-/bin/sleep 120
+/bin/sleep 2
 # set master date with the gps
 globalpos
 echo "gpstime="$gpstime $lat $lon $alt

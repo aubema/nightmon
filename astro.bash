@@ -118,7 +118,6 @@ globalpos () {
 #
 # setting constants
 user="sand"
-processflag=1
 zpoint=1.0
 gain=16
 max_lum=100000  # 1000000 = 1sec
@@ -157,6 +156,7 @@ fi
 
 
 while : ; do
+	processflag=1
 	time1=`date +%s`
 	echo "Shooting..."
 	take_picture
@@ -201,9 +201,11 @@ while : ; do
 	echo "=============================="
 	# rename pictures
 	if [ $ta -ge $max_lum ] ; then
+		# daytime image only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $path/$basenameA"_"$ta"_"$gain".dng"
+		processflag=0
 	fi
 	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"

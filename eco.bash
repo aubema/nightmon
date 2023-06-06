@@ -161,6 +161,7 @@ fi
 
 
 while : ; do
+	processflag=1
 	time1=`date +%s`
 	echo "Shooting..."
 	take_pictures
@@ -206,9 +207,11 @@ while : ; do
 	echo "=============================="
 	# rename pictures
 	if [ $ta -ge $max_lum ] ; then
+		# daytime only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $path/$basenameA"_A_"$ta"_"$gain".dng"
+		processflag=0
 	fi
 	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".jpg"

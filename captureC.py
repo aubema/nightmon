@@ -31,7 +31,7 @@ def input(argv):
 
 
 def main():
-    print("Start testing the camera A")
+    print("Start testing the camera C")
     itime, gain = input(sys.argv[1:])
     i2c = "i2cset -y 1 0x70 0x00 0x04"
     os.system(i2c)

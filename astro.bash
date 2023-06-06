@@ -36,7 +36,6 @@ take_picture() {
 	let gain=nightg
 	let satmax=1000
 	rm -f $path"/capture_1*"
-	rm -f $path"/capture_2*"
 	/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
 	if [ -f $path"/capture_1.dng" ] ; then
 		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
@@ -136,7 +135,7 @@ path="/home/"$user
 read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 echo "Waiting 2 min before starting measurements..."
-/bin/sleep 120
+/bin/sleep 2
 # set master date with the gps
 globalpos
 echo "gpstime="$gpstime $lat $lon $alt
@@ -165,7 +164,6 @@ while : ; do
 	mo=`date --date="2 minutes ago" +%m`
 	dA=`date --date="2 minutes ago" +%d`
 	basenameA=`date --date="2 minutes ago" +%Y-%m-%d_%H-%M-%S`
-	basenameB=`date +%Y-%m-%d_%H-%M-%S`
 	echo $basenameA
 	baseday=`date --date="2 minutes ago" +%Y-%m-%d`
 	basename[0]="$basenameA"
@@ -210,7 +208,6 @@ while : ; do
 	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $path/$basenameA"_"$ta"_"$gain".jpg"
-	basename[1]="$basenameB"
 	read  tb toto < $path"/Current_tint.tmp"
 	echo "=============================="
 	if [ $processflag -eq 1 ] ; then

@@ -107,7 +107,7 @@ globalpos () {
      fi 
      # /bin/echo "GPS gives Latitude:" $lat ", Longitude:" $lon "and Altitude:" $alt
      /bin/echo "Lat.:" $lat ", Lon.:" $lon " Alt.:" $alt  > /home/sand/gps.log
-     echo $gpsdate > /home/sand/date_gps.log
+     echo $gpstime > /home/sand/date_gps.log
 }
 
 
@@ -134,11 +134,7 @@ path="/home/"$user
 read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 echo "Waiting 2 min before starting measurements..."
-/bin/sleep 2
-# set master date with the gps
-globalpos
-echo "gpstime="$gpstime $lat $lon $alt
-echo "Sync time with gps."
+/bin/sleep 120
 #OPTIONS
 gopt=0
 while getopts 'k:' OPTION ; do
@@ -158,6 +154,11 @@ fi
 while : ; do
 	processflag=0
 	time1=`date +%s`
+	globalpos
+	secg=`/usr/bin/date -d "$gpstime" +%s`
+	if [ $secg -gt $time1 ] ; then
+		/usr/bin/date -s $gpstime
+	fi
 	echo "Shooting..."
 	take_picture
 	y=`date --date="2 minutes ago" +%Y`

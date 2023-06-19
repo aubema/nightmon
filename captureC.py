@@ -33,13 +33,13 @@ def input(argv):
 def main():
     print("Start testing the camera C")
     itime, gain = input(sys.argv[1:])
-    i2c = "i2cset -y 1 0x70 0x00 0x04"
+    i2c = "i2cset -y 1 0x70 0x00 0x06"
     os.system(i2c)
     gp.output(7, False)
-    gp.output(11, False)
-    gp.output(12, True)
-    print("Selected integration A : ", itime, "Selected gain : ", gain)
-    capture(1, itime, gain)
+    gp.output(11, True)
+    gp.output(12, False)
+    print("Selected integration : ", itime, "Selected gain : ", gain)
+    capture(itime, gain)
 
 
 def capture(cam, itime, gain):

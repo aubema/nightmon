@@ -39,7 +39,7 @@ def main():
     gp.output(11, True)
     gp.output(12, False)
     print("Selected integration : ", itime, "Selected gain : ", gain)
-    capture(itime, gain)
+    capture(3, itime, gain)
 
 
 def capture(cam, itime, gain):

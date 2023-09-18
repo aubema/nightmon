@@ -169,10 +169,10 @@ while : ; do
 	processflag=0
 	time1=`date +%s`
 	# globalpos
-	secg=`/usr/bin/date -d "$gpstime" +%s`
-	if [ $secg -gt $time1 ] ; then
-		/usr/bin/date -s $gpstime
-	fi
+	# secg=`/usr/bin/date -d "$gpstime" +%s`
+	# if [ $secg -gt $time1 ] ; then
+	#	/usr/bin/date -s $gpstime
+	# fi
 	echo "Shooting..."
 	take_picture
 	y=`date --date="2 minutes ago" +%Y`

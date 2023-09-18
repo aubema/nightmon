@@ -43,7 +43,7 @@ take_picture() {
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
-		if [ "$satmax" -ge 66 ] ; then
+		if [ "$satmax" -ge 97 ] ; then
 		   let ta=moont
 		   let gain=nightg
 		   rm -f $path"/capture_1*"
@@ -54,8 +54,8 @@ take_picture() {
 		      /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		      read satmax bidon  < $path"/capture.tmp"
 		      echo "satmax=" $satmax
-		      if [ "$satmax" -ge 66 ] ; then
-		         let ta=dayt*10
+		      if [ "$satmax" -ge 97 ] ; then
+		         let ta=dayt*100
 			 let gain=dayg
 			 rm -f $path"/capture_1*"
                          echo "Shooting "$ta" micro seconds..."
@@ -65,7 +65,7 @@ take_picture() {
 			    /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 			    read satmax bidon  < $path"/capture.tmp"
 			    echo "satmax=" $satmax
-			    if [ "$satmax" -ge 66 ] ; then
+			    if [ "$satmax" -ge 97 ] ; then
 			       let ta=dayt
 			       let gain=dayg
 			       rm -f $path"/capture_1*"

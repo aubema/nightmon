@@ -36,33 +36,47 @@ take_picture() {
 	let gain=nightg
 	let satmax=1000
 	rm -f $path"/capture_1*"
+        echo "Shooting "$ta" micro seconds..."
 	/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
 	if [ -f $path"/capture_1.dng" ] ; then
 		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
-		if [ "$satmax" -ge 100 ] ; then
-			let ta=moont
-			let gain=nightg
-			rm -f $path"/capture_1*"
-			/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
-			if [ -f $path"/capture_1.dng" ] ; then
-				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-				read satmax bidon  < $path"/capture.tmp"
-				echo "satmax=" $satmax
-				if [ "$satmax" -ge 100 ] ; then
-					let ta=dayt
-					let gain=dayg
-					rm -f $path"/capture_1*"
-					/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
-				fi
-			else
-				echo "Problem with camera."
-				exit 0
-			fi
-		fi
+		if [ "$satmax" -ge 66 ] ; then
+		   let ta=moont
+		   let gain=nightg
+		   rm -f $path"/capture_1*"
+                   echo "Shooting "$ta" micro seconds..."
+		   /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
+		   if [ -f $path"/capture_1.dng" ] ; then
+		      /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+		      /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+		      read satmax bidon  < $path"/capture.tmp"
+		      echo "satmax=" $satmax
+		      if [ "$satmax" -ge 66 ] ; then
+		         let ta=dayt*10
+			 let gain=dayg
+			 rm -f $path"/capture_1*"
+                         echo "Shooting "$ta" micro seconds..."
+			 /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
+			 if [ -f $path"/capture_1.dng" ] ; then
+			    /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+			    /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+			    read satmax bidon  < $path"/capture.tmp"
+			    echo "satmax=" $satmax
+			    if [ "$satmax" -ge 66 ] ; then
+			       let ta=dayt
+			       let gain=dayg
+			       rm -f $path"/capture_1*"
+                               echo "Shooting "$ta" micro seconds..."
+			       /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
+                            fi
+                         fi
+		      fi
+	           fi
+                fi
+           echo "Selected exposure time: "$ta" micro seconds"
 	else
 		echo "Problem with camera."
 		exit 0
@@ -133,8 +147,8 @@ path="/home/"$user
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
-echo "Waiting 2 min before starting measurements..."
-/bin/sleep 120
+# echo "Waiting 2 min before starting measurements..."
+# /bin/sleep 120
 #OPTIONS
 gopt=0
 while getopts 'k:' OPTION ; do
@@ -154,7 +168,7 @@ fi
 while : ; do
 	processflag=0
 	time1=`date +%s`
-	globalpos
+	# globalpos
 	secg=`/usr/bin/date -d "$gpstime" +%s`
 	if [ $secg -gt $time1 ] ; then
 		/usr/bin/date -s $gpstime

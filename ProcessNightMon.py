@@ -235,7 +235,7 @@ elif Model == "RpiHQ-JFilters":
     Zthird = 0
     Zfourth = 0
 # open images
-print("Reading images...")
+print("Process raw image: ",path + Ifile)
 Simg = open_raw(path + Ifile)
 print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)

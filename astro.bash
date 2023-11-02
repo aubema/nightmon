@@ -40,7 +40,6 @@ take_picture() {
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
-<<<<<<< HEAD
 		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
 		do let ta=ta/10
 			rm -f $path"/capture_1*"
@@ -69,42 +68,6 @@ take_picture() {
 				  exit 0
 			  fi
 		fi	
-=======
-		if [ "$satmax" -ge 80 ] ; then
-		   let ta=moont
-		   let gain=nightg
-		   rm -f $path"/capture_1*"
-                   echo "Shooting "$ta" micro seconds..."
-		   /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
-		   if [ -f $path"/capture_1.dng" ] ; then
-		      /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-		      /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-		      read satmax bidon  < $path"/capture.tmp"
-		      echo "satmax=" $satmax
-		      if [ "$satmax" -ge 80 ] ; then
-		         let ta=dayt*100
-			 let gain=dayg
-			 rm -f $path"/capture_1*"
-                         echo "Shooting "$ta" micro seconds..."
-			 /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
-			 if [ -f $path"/capture_1.dng" ] ; then
-			    /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-			    /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-			    read satmax bidon  < $path"/capture.tmp"
-			    echo "satmax=" $satmax
-			    if [ "$satmax" -ge 80 ] ; then
-			       let ta=dayt
-			       let gain=dayg
-			       rm -f $path"/capture_1*"
-                               echo "Shooting "$ta" micro seconds..."
-			       /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
-                            fi
-                         fi
-		      fi
-	           fi
-                fi
-           echo "Selected exposure time: "$ta" micro seconds"
->>>>>>> 2f5956d208107bbe9632ccc0b8b18bf1eb384500
 	else
 		echo "Problem with camera."
 		exit 0
@@ -196,7 +159,6 @@ fi
 while : ; do
 	processflag=0
 	time1=`date +%s`
-<<<<<<< HEAD
 	nanswer=`gpspipe -w -n 4 -x 2 | wc -l`
    if [ $nanswer -eq 4 ] ; then
 	   globalpos
@@ -213,7 +175,6 @@ while : ; do
 	# if [ $secg -gt $time1 ] ; then
 	#	/usr/bin/date -s $gpstime
 	# fi
->>>>>>> 2f5956d208107bbe9632ccc0b8b18bf1eb384500
 	echo "Shooting..."
 	take_picture
 	y=`date --date="2 minutes ago" +%Y`

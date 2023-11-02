@@ -246,8 +246,6 @@ deltay = np.empty([3], dtype=float)
 angle = np.empty([3], dtype=float)
 configpath = "/home/" + user + "/nightmon_config"
 
-configpath = "./nightmon_config"
-
 with open(configpath) as f:
 
     p = yaml.safe_load(f)
@@ -288,10 +286,6 @@ if Calmet == "0":
     Calmet = "stars"  # if no calib method is provided either in argument or in the configfile then use stars
 # load sky brightness extraction points
 pointspath = "/home/" + user + "/points_list"
-
-
-pointspath = "./points_list"
-
 
 pt = open(pointspath, "r")
 pt.readline()  # skip one line

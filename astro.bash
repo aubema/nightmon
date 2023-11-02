@@ -128,7 +128,7 @@ globalpos () {
 user="sand"
 zpoint=1.0
 gain=16
-max_lum=100000  # 1000000 = 1sec
+min_gain=5  # if below the image will not be calibrated
 darkimg="dark-gain16-t100000.dng"
 # List of bands (possible bands JB JV JR)
 bands=(JB JV JR)
@@ -220,7 +220,7 @@ while : ; do
 	fi
 	echo "=============================="
 	# rename pictures
-	if [ $ta -ge $max_lum ] ; then
+	if [ $gain -ge $min_gain ] ; then
 		# daytime image only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"

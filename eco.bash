@@ -129,7 +129,7 @@ globalpos () {
 user="sand"
 zpoint=1.0
 gain=16
-max_lum=100000  # 1000000 = 1sec
+min_gain=5  # if below the image will not be calibrated
 darkimg="dark-gain16-t100000.dng"
 pointing=(U D) # up or down
 bands=(JB JV JR)
@@ -211,7 +211,7 @@ while : ; do
 	fi
 	echo "=============================="
 	# rename pictures
-	if [ $ta -ge $max_lum ] ; then
+	if [ $gain -ge $min_gain ] ; then
 		# daytime only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"

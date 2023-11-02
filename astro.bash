@@ -169,7 +169,7 @@ while : ; do
 	if [ $secg -gt $time1 ] ; then
 		/usr/bin/date -s $gpstime
 	fi
-=======
+
 	# globalpos
 	# secg=`/usr/bin/date -d "$gpstime" +%s`
 	# if [ $secg -gt $time1 ] ; then

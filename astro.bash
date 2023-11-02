@@ -24,9 +24,6 @@
 # find appropriate integration time
 #
 take_picture() {
-	dayt=800
-	dayg=2
-	moont=12000000     # 12 sec
 	nightt=120000000   # 2 minutes
 	nightg=16
 	#  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
@@ -43,6 +40,36 @@ take_picture() {
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
+<<<<<<< HEAD
+		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
+		do let ta=ta/10
+			rm -f $path"/capture_1*"
+			/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
+			if [ -f $path"/capture_1.dng" ] ; then
+				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				read satmax bidon  < $path"/capture.tmp"
+				echo "satmax=" $satmax
+			else
+				echo "Problem with camera."
+				exit 0
+			fi
+		done
+		if [ "$satmax" -ge 80 ]
+		then let gain=2
+			  rm -f $path"/capture_1*"
+			  /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
+			  if [ -f $path"/capture_1.dng" ] ; then
+				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				  /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				  read satmax bidon  < $path"/capture.tmp"
+				  echo "satmax=" $satmax
+			  else
+			     echo "Problem with camera."
+				  exit 0
+			  fi
+		fi	
+=======
 		if [ "$satmax" -ge 80 ] ; then
 		   let ta=moont
 		   let gain=nightg
@@ -77,6 +104,7 @@ take_picture() {
 	           fi
                 fi
            echo "Selected exposure time: "$ta" micro seconds"
+>>>>>>> 2f5956d208107bbe9632ccc0b8b18bf1eb384500
 	else
 		echo "Problem with camera."
 		exit 0
@@ -136,7 +164,7 @@ zpoint=1.0
 gain=16
 max_lum=100000  # 1000000 = 1sec
 darkimg="dark-gain16-t100000.dng"
-# possible bands JB JV JR R G B (max 2 bands)
+# List of bands (possible bands JB JV JR)
 bands=(JB JV JR)
 model="RpiHQ"  # other choices are "RpiHQ" and "A7S"
 cams=(A)
@@ -168,11 +196,24 @@ fi
 while : ; do
 	processflag=0
 	time1=`date +%s`
+<<<<<<< HEAD
+	nanswer=`gpspipe -w -n 4 -x 2 | wc -l`
+   if [ $nanswer -eq 4 ] ; then
+	   globalpos
+	else
+	   echo "Problem with gps"
+   fi
+	secg=`/usr/bin/date -d "$gpstime" +%s`
+	if [ $secg -gt $time1 ] ; then
+		/usr/bin/date -s $gpstime
+	fi
+=======
 	# globalpos
 	# secg=`/usr/bin/date -d "$gpstime" +%s`
 	# if [ $secg -gt $time1 ] ; then
 	#	/usr/bin/date -s $gpstime
 	# fi
+>>>>>>> 2f5956d208107bbe9632ccc0b8b18bf1eb384500
 	echo "Shooting..."
 	take_picture
 	y=`date --date="2 minutes ago" +%Y`

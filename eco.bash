@@ -24,9 +24,6 @@
 # find appropriate integration time
 #
 take_pictures() {
-	dayt=800
-	dayg=2
-	moont=12000000     # 12 sec
 	nightt=120000000   # 2 minutes
 	nightg=16
 	#  Take pictures of various integration times starting from a smaller to get the right integration time (max around 0.8)
@@ -43,6 +40,36 @@ take_pictures() {
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
+<<<<<<< HEAD
+		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
+		do let ta=ta/10
+			rm -f $path"/capture_1*"
+			/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+			if [ -f $path"/capture_1.dng" ] ; then
+				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				read satmax bidon  < $path"/capture.tmp"
+				echo "satmax=" $satmax
+			else
+				echo "Problem with camera A."
+				exit 0
+			fi
+		done
+		if [ "$satmax" -ge 80 ]
+		then let gain=2
+			  rm -f $path"/capture_1*"
+			  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+			  if [ -f $path"/capture_1.dng" ] ; then
+				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				  /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				  read satmax bidon  < $path"/capture.tmp"
+				  echo "satmax=" $satmax
+			  else
+			     echo "Problem with camera A."
+				  exit 0
+			  fi
+		fi
+=======
 		if [ "$satmax" -ge 80 ] ; then
 		   let ta=moont
 		   let gain=nightg
@@ -77,16 +104,17 @@ take_pictures() {
 	           fi
                 fi
                 echo "Selected exposure time: "$ta" micro seconds"
+>>>>>>> 2f5956d208107bbe9632ccc0b8b18bf1eb384500
 		/usr/bin/python3 /usr/local/bin/captureC.py -t $ta -g $gain
 	else
-		echo "Problem with A camera."
+		echo "Problem with camera A."
 		exit 0
 	fi
 	echo  $ta > $path"/Current_tint.tmp"
 	echo  $gain > $path"/Current_gain.tmp"
 	# flush ram cache to correct a memory leak in the camera library
 	/usr/bin/sync
-	/usr/bin/echo 3 > /proc/sys/vm/drop_caches
+	/usr/bin/echo 3 > /proc/sys/vm/drop_caches	
 }
 
 # ==================================

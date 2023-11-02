@@ -1,0 +1,15 @@
+# input parameters for NightMon
+Site : Dome   # No spaces in site name
+Longitude : -71.67681  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+Latitude : 45.73536
+Altitude : 242
+ShiftxA :  -2.00000000e+01 -2.16190643e-01  1.95357863e-02
+ShiftyA :  27.          0.55880842  0.03409552
+AngleA :   2.89035783  0.03388806 -0.00292868
+ShiftxB :  -6.          0.50721338 -0.03903491
+ShiftyB :   4.40000000e+01 -1.23706796e-01 -3.77662997e-02
+AngleB :   0.88461794 -0.07771373  0.00590247
+ZpointA : 4.3
+ZpointB : 2.6
+Calmet : stars    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
+Default_itime : 120000000  # 2 minutes

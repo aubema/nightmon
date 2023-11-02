@@ -136,7 +136,6 @@ def fit_func(x, a):
 # default Parameters
 user = "sand"
 path = "/home/" + user + "/"
-path = ""
 sberr = 0
 calsb = 0
 corcoef = 0
@@ -235,7 +234,7 @@ elif Model == "RpiHQ-JFilters":
     Zthird = 0
     Zfourth = 0
 # open images
-print("Process raw image: ",path + Ifile)
+print("Process raw image: ", path + Ifile)
 Simg = open_raw(path + Ifile)
 print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)

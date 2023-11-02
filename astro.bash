@@ -33,7 +33,7 @@ take_picture() {
 	let gain=nightg
 	let satmax=1000
 	rm -f $path"/capture_1*"
-        echo "Shooting "$ta" micro seconds..."
+   echo "Shooting "$ta" micro seconds... with gain " $gain 
 	/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --nopreview -o /home/sand/capture_1.jpg
 	if [ -f $path"/capture_1.dng" ] ; then
 		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
@@ -43,6 +43,7 @@ take_picture() {
 		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
 		do let ta=ta/10
 			rm -f $path"/capture_1*"
+			echo "Shooting "$ta" micro seconds... with gain " $gain 
 			/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
 			if [ -f $path"/capture_1.dng" ] ; then
 				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
@@ -57,6 +58,7 @@ take_picture() {
 		if [ "$satmax" -ge 80 ]
 		then let gain=2
 			  rm -f $path"/capture_1*"
+			  echo "Shooting "$ta" micro seconds... with gain " $gain 
 			  /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
 			  if [ -f $path"/capture_1.dng" ] ; then
 				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"

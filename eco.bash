@@ -34,6 +34,7 @@ take_pictures() {
 	let satmax=1000
 	rm -f $path"/capture_1*"
 	rm -f $path"/capture_3*"
+	echo "Shooting "$ta" micro seconds... with gain " $gain 
 	/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 	if [ -f $path"/capture_1.dng" ] ; then
 		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
@@ -43,6 +44,7 @@ take_pictures() {
 		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
 		do let ta=ta/10
 			rm -f $path"/capture_1*"
+			echo "Shooting "$ta" micro seconds... with gain " $gain
 			/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 			if [ -f $path"/capture_1.dng" ] ; then
 				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
@@ -57,6 +59,7 @@ take_pictures() {
 		if [ "$satmax" -ge 80 ]
 		then let gain=2
 			  rm -f $path"/capture_1*"
+			  echo "Shooting "$ta" micro seconds... with gain " $gain
 			  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 			  if [ -f $path"/capture_1.dng" ] ; then
 				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"

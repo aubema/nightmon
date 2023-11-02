@@ -40,8 +40,8 @@ take_picture() {
 		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
-		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
-		do let ta=ta/10
+		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 800 ]
+		do let ta=ta/5
 			rm -f $path"/capture_1*"
 			echo "Shooting "$ta" micro seconds... with gain " $gain 
 			/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg
@@ -57,6 +57,7 @@ take_picture() {
 		done
 		if [ "$satmax" -ge 80 ]
 		then let gain=2
+		     let ta=800
 			  rm -f $path"/capture_1*"
 			  echo "Shooting "$ta" micro seconds... with gain " $gain 
 			  /usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg

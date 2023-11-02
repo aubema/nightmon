@@ -186,7 +186,6 @@ while : ; do
 	basenameA=`date --date="2 minutes ago" +%Y-%m-%d_%H-%M-%S`
 	echo $basenameA
 	baseday=`date --date="2 minutes ago" +%Y-%m-%d`
-	basename[0]="$basenameA"
 	# find the closest extinction in time from /home/sand/extinction_data
 	Emindelay=10000000000
 	while read -r line; do
@@ -246,27 +245,27 @@ while : ; do
 			#
 			#
 
-			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
-			if [ -f $path"/"$b"_calibration_"${basename[$n]}".png" ] ; then
-				mv $path"/"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
+			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
+			if [ -f $path"/"$b"_calibration_"$basenameA".png" ] ; then
+				mv $path"/"$b"_calibration_"$basenameA".png" $basepath/$y/$mo/
 				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_calSbBkg_"${basename[$n]}".png" ] ; then
-				mv $path"/"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
+			if [ -f $path"/"$b"_calSbBkg_"$basenameA".png" ] ; then
+				mv $path"/"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
 				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_CalSbTot_"${basename[$n]}".png" ] ; then
-				mv $path"/"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"$b"_CalSbTot_"$basenameA".png" ] ; then
+				mv $path"/"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_Stars_Match_"${basename[$n]}".png" ] ; then
-				mv $path"/"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"$b"_Stars_Match_"$basenameA".png" ] ; then
+				mv $path"/"$b"_Stars_Match_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			# backup calibration file
-			if [ -f $path"/"$b"_calibration_stars_"${basename[$n]}".csv" ] ; then 
-				mv $path"/"$b"_calibration_stars_"${basename[$n]}".csv" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"$b"_calibration_stars_"$basenameA".csv" ] ; then 
+				mv $path"/"$b"_calibration_stars_"$basenameA".csv" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"$basenameA".csv" $backpath"/"$y"/"$mo"/"
 			fi
 
 
@@ -284,7 +283,7 @@ while : ; do
 
 
 			# clean directory
-			rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
+			rm $path"/"$basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
 			rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
 			let n=n+1
 		done

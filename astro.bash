@@ -244,15 +244,15 @@ while : ; do
 			#
 			#
 			#
-         echo "Try to process file :" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
-			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
+         echo "Try to process file :" $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
+			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
 			if [ -f $path"/"$b"_calibration_"$basenameA".png" ] ; then
 				mv $path"/"$b"_calibration_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			if [ -f $path"/"$b"_calSbBkg_"$basenameA".png" ] ; then
 				mv $path"/"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
+				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			if [ -f $path"/"$b"_CalSbTot_"$basenameA".png" ] ; then
 				mv $path"/"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/

@@ -249,8 +249,7 @@ while : ; do
 				#
 				#
 				#
-
-				/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
+				/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basepath/$y/$mo/${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
 				if [ -f $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" ] ; then
 					mv $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"

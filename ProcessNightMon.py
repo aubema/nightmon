@@ -77,10 +77,13 @@ def input(argv):
     Band = "JV"
     Calmet = "0"  # other option is fixed
     Zpoint = 0  # this value is only useful when selecting fixed calibration method otherwise ignored
+    ExpF = 1. # this is the exposure correction factor compared to the exposure used for calibration. 
+    # E.g. if the exposure is 12000 and the exposure used for calibration is 120000000, then exposure 
+    # factor will be 12000/120000000 = 1/10000 = 0.0001
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:i:d:b:e:m:k:z:",
+            "h:i:d:b:e:m:k:z",
             [
                 "help=",
                 "ifile=",
@@ -131,8 +134,9 @@ def fit_func(x, a):
 # ================================================
 # MAIN
 # default Parameters
-user = "sand"
+user = "aubema"
 path = "/home/" + user + "/"
+path = ""
 sberr = 0
 calsb = 0
 corcoef = 0
@@ -140,17 +144,17 @@ mflag = "False"
 FWHM = 7
 zeropoint = np.nan
 Zpoint = 0
-Zpointconfig = 0
+ZpointConfig = 0
 max_cloud_cover = 4
 Calmet = "0"
 Calmetconfig = "0"
 norm = ImageNormalize(stretch=SqrtStretch())
 
-elmin = 10  # set the minimum elevation
+elmin = 15  # set the minimum elevation
 # selecting magnitude limits for reference stars in the simbad database
 # limits allow to remove saturated stars in the images
 limiti = (
-    3.7  # limitting stars magnitude NEED TO BE LOWER THAN 6 but 3.7 is a magic number
+    4.7  # limitting stars magnitude NEED TO BE LOWER THAN 6 but 3.7 is a magic number
 )
 limits = -1
 # load command line parameters
@@ -174,6 +178,7 @@ time = ts.utc(
     int(datearr[5]),
 )
 Cam = datearr[6]
+
 print("Camera is :", Cam)
 Tint = int(datearr[7])
 Gain = int(datearr[8])
@@ -197,21 +202,21 @@ if Model == "A7S":
     Zfourth = 4.63754847e-13
 elif Model == "RpiHQ":
     if Band == "JV":
-        RC = 1
-        GC = 1
-        BC = 1
+        RC = 1.0
+        GC = 1.0
+        BC = -0.2
     elif Band == "JR":
-        RC = 1
-        GC = 1
-        BC = 1
+        RC = 1.0
+        GC = 0.6
+        BC = -0.8
     elif Band == "JB":
-        RC = 1
-        GC = 1
-        BC = 1
-    Zslope = 1.18620894e-01
-    Zquad = 1.41321994e-05
-    Zthird = -3.80934963e-08
-    Zfourth = 4.52138304e-11
+        RC = 0.1
+        GC = -0.3
+        BC = 1.0
+    Zslope = 1.1362e-01 #1.13538e-01
+    Zquad = 1.e-11 #1.0e-06
+    Zthird = 0.
+    Zfourth = 0.
 elif Model == "RpiHQ-JFilters":
     if Band == "JV":
         RC = 1
@@ -240,22 +245,36 @@ deltax = np.empty([3], dtype=float)
 deltay = np.empty([3], dtype=float)
 angle = np.empty([3], dtype=float)
 configpath = "/home/" + user + "/nightmon_config"
+
+configpath = "./nightmon_config"
+
 with open(configpath) as f:
 
     p = yaml.safe_load(f)
 Site = p["Site"]
 Calmetconfig = p["Calmet"]
-DefaultItime = p["Default_itime"]
+DefaultItime = p["Calib_itime"]
+DefaultGain = p["Calib_gain"]
 if Cam == "A":
-    deltax = p["ShiftxA"].split()
-    deltay = p["ShiftyA"].split()
-    angle = p["AngleA"].split()
-    ZpointConfig = p["ZpointB"]
+    deltax = p["ShiftxA"]
+    deltay = p["ShiftyA"]
+    angle = p["AngleA"]
+    if Band == "JB":
+       ZpointConfig = p["ZpointA-JB"]
+    elif Band == "JV":
+       ZpointConfig = p["ZpointA-JV"]  
+    elif Band == "JR": 
+       ZpointConfig = p["ZpointA-JR"]      
 elif Cam == "B":
-    deltax = p["ShiftxB"].split()
-    deltay = p["ShiftyB"].split()
-    angle = p["AngleB"].split()
-    ZpointConfig = p["ZpointB"]
+    deltax = p["ShiftxB"]
+    deltay = p["ShiftyB"]
+    angle = p["AngleB"]
+    if Band == "JB":
+       ZpointConfig = p["ZpointB-JB"]
+    elif Band == "JV":
+       ZpointConfig = p["ZpointB-JV"]  
+    elif Band == "JR": 
+       ZpointConfig = p["ZpointB-JR"] 
 if (
     Zpoint == 0 and ZpointConfig != 0
 ):  # if no zero point is provided in argument then use the value of the config file
@@ -269,6 +288,11 @@ if Calmet == "0":
     Calmet = "stars"  # if no calib method is provided either in argument or in the configfile then use stars
 # load sky brightness extraction points
 pointspath = "/home/" + user + "/points_list"
+
+
+pointspath = "./points_list"
+
+
 pt = open(pointspath, "r")
 pt.readline()  # skip one line
 tpt = []
@@ -442,6 +466,27 @@ polindex = polindex.reshape(polshape, 2)
 polindex = np.delete(polindex, (0), axis=0)
 polshape = int(np.shape(polindex)[0])
 print("Polaris located at : ", polindex[0, 1], polindex[0, 0])
+
+# position of Pole on the image grid
+print("Position Pole on the image grid...")
+
+altpole = np.empty([2], dtype=float)
+azipole = np.empty([2], dtype=float)
+azipole[0] = 0.
+altpole[0] = p["Latitude"]
+azipole[1] = 0.
+altpole[1] = p["Latitude"]
+poleindex = find_close_indices(az, el, azipole, altpole)
+poleshape = int(np.shape(poleindex)[0])
+poleshape = int(poleshape / 2)
+poleindex = poleindex.reshape(poleshape, 2)
+poleindex = np.delete(poleindex, (0), axis=0)
+poleshape = int(np.shape(poleindex)[0])
+print("Pole ideally located at : ", poleindex[0, 1], poleindex[0, 0])
+print(altpole,azipole)
+
+
+
 stars_selected = ds[(ds["MagV"] < limiti) & (ds["MagV"] > limits)]
 coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
 coords = coordsradec.to_numpy(dtype="str")
@@ -504,13 +549,13 @@ if os.path.exists(outname) == False:
 imag = Sgray
 shiftx = 0
 shifty = 0
-for i in range(3):
-    shiftx = float(deltax[i])
-    shifty = float(deltay[i])
-    theta = float(angle[i])
+for i in range(1):
+    shiftx = float(deltax)
+    shifty = float(deltay)
+    theta = float(angle)
     imag = ndimage.shift(imag, [shifty, shiftx], mode="nearest")
-    padX = [imag.shape[1] - polindex[0, 1], polindex[0, 1]]
-    padY = [imag.shape[0] - polindex[0, 0], polindex[0, 0]]
+    padX = [imag.shape[1] - poleindex[0, 1], poleindex[0, 1]]
+    padY = [imag.shape[0] - poleindex[0, 0], poleindex[0, 0]]
     imgP = np.pad(imag, [padY, padX], "constant")
     imag = ndimage.rotate(imgP, theta, reshape=False, mode="nearest")
     imag = imag[padY[0] : -padY[1], padX[0] : -padX[1]]
@@ -616,7 +661,7 @@ if Calmet == "stars":
     else:
         Itime_cor = 1
         # Search for stars only if cloud_cover is lower than max_cloud_cover
-        mean, median, std = sigma_clipped_stats(imstars, sigma=3.0)
+        mean, median, std = sigma_clipped_stats(imstars, sigma=5.0)
         daofind = DAOStarFinder(fwhm=2, threshold=5.0 * std)
         sources = daofind(imstars)
         print(sources)
@@ -635,7 +680,6 @@ if Calmet == "stars":
             ysa = positions[nd, 1]
             Flux[nd] = np.sum(imstars[ysa - 2 : ysa + 3, xsa - 2 : xsa + 3])
             Back[nd] = np.sum(imbkg[ysa - 2 : ysa + 3, xsa - 2 : xsa + 3])
-
         rn = np.hypot(positions[:, 0] - nx / 2, positions[:, 1] - ny / 2)
         sources = sources[rn < rnmax]
         positions = positions[rn < rnmax]
@@ -671,8 +715,8 @@ if Calmet == "stars":
             dweight_min = np.amin(dweight)
             dweight_min_index = dweight.argmin()
             dmin = np.amin(dstar)
-            # try to match if distance is lower that 3 deg
-            if dmin < 30:
+            # try to match if distance is lower that 1 deg
+            if dmin < 10:
                 StarMatch[n, 0] = index[ns, 1]
                 StarMatch[n, 1] = index[ns, 0]
                 StarMatch[n, 2] = positions[dweight_min_index, 0]  # noeuds[0]
@@ -701,10 +745,10 @@ if Calmet == "stars":
         avggap, mediangap, stdgap = sigma_clipped_stats(StarMatch[:, 4], sigma=2.0)
         print("Average gap between nearest star :", avggap, "+/-", stdgap)
         StarMatch = np.delete(
-            StarMatch, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
+           StarMatch, np.where(StarMatch[:, 4] > avggap + 3 * stdgap), axis=0
         )
         StarName = np.delete(
-            StarName, np.where(StarMatch[:, 4] > avggap + 2 * stdgap), axis=0
+            StarName, np.where(StarMatch[:, 4] > avggap + 3 * stdgap), axis=0
         )
         StarMatch = np.delete(StarMatch, np.where(StarMatch[:, 9] == 0), axis=0)
         StarName = np.delete(StarName, np.where(StarMatch[:, 9] == 0), axis=0)
@@ -761,7 +805,7 @@ if Calmet == "stars":
         params = curve_fit(fit_func, ax, ay)
         slp = float(params[0])
         print("n ax=", np.shape(ax)[0])
-        # filtering outliers (may be stars behing semi-transparent cloud or bad matching)
+        # filtering outliers (may be stars behind semi-transparent cloud or bad matching)
         deltacor = 1000
         ndelta = 0
         while deltacor > 0.001:
@@ -784,6 +828,14 @@ if Calmet == "stars":
                 break
             ndelta += 1
             npts = np.shape(axp)[0]
+            
+            plt.figure()
+            plt.plot(gx, gy, "r")
+            plt.plot(ax, ay, "ob")
+            plt.plot(axp, ayp, "or")
+            plt.xlabel("Star's pixel values")
+            plt.ylabel("10^(-0.4*CalMag)")
+            #plt.show()
         if corcoef > 0.7 and npts > 9:
             calsb = 1
 
@@ -810,7 +862,7 @@ if Calmet == "stars":
         plt.savefig(file)
 elif Calmet == "fixed":
     calsb = 1
-    Itime_cor = DefaultItime / Tint
+    Itime_cor = DefaultItime / Tint * DefaultGain / Gain
 if calsb == 1:
     # print calibration slope slp
     print("Calibration slope (slp) :", slp)

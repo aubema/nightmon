@@ -243,9 +243,6 @@ print("Process raw image: ", path + Ifile)
 Simg = open_raw(path + Ifile)
 print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)
-if Flip == "1":
-   # flip image vertically
-   Dimg = np.flipud(Dimg)
 # read site coordinates
 # Load Parameters
 deltax = np.empty([3], dtype=float)

@@ -285,8 +285,8 @@ while : ; do
 			let n=n+1
 		done
 		# clean directory
-		rm -f $path/*${basename[$n]}*
-		rm -f $path/*$baseday*
+		rm $path/*${basename[$n]}*
+		rm $path/*$baseday*
 
 	fi
 	time2=`date +%s`

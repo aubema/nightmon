@@ -283,8 +283,8 @@ while : ; do
       cp *.png $basepath/$y/$mo/
       mv *.png $backpath"/"$y"/"$mo"/"      
 		# clean directory
-		rm -f $path/$basenameA*
-		rm -f $path/*$baseday*
+		rm $path/$basenameA*
+		rm $path/*$baseday*
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

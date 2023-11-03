@@ -264,23 +264,22 @@ while : ; do
 					mv $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
 				fi
-				# backup calibration file
-				if [ -f $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" ] ; then 
-					mv $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" 
-					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
+
+				
+				if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
+				   if [ -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" ] ; then
+				      cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
+         	   else
+        		 		cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
+				   fi
+				   rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
+				   cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
 				fi
-            cp *.png $basepath/$y/$mo/
-            mv *.png $backpath"/"$y"/"$mo"/"
 
 
 
 				# backup output files
-				if [ -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" ] ; then
-					cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
-         	else
-        		 			cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
-				fi
-				cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
+
 			done
 			let n=n+1
 		done

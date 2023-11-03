@@ -282,8 +282,8 @@ while : ; do
 				cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
 			done
 			# clean directory
-			rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
-			rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
+			rm $path"/"*${basename[$n]}*
+			rm $path"/*$baseday*
 			let n=n+1
 		done
 	fi

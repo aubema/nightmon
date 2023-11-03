@@ -131,7 +131,6 @@ zpoint=1.0
 gain=16
 min_gain=5  # if below the image will not be calibrated
 darkimg="dark-gain16-t100000.dng"
-pointing=(U D) # up or down
 bands=(JB JV JR)
 model="RpiHQ"  # other choices are "RpiHQ" and "A7S"
 cams=(A C)
@@ -237,7 +236,7 @@ while : ; do
 	if [ $processflag -eq 1 ] ; then
 		# process sky IMAGES
 		let n=0
-		for p in ${pointing[@]} ; do 
+		for p in ${cams[@]} ; do 
 			for b in ${bands[@]} ; do	
 			
 				if [ $n -eq 0 ] ; then
@@ -282,15 +281,11 @@ while : ; do
         		 			cat $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv"
 				fi
 				cp -f $basepath"/"$y"/"$mo"/calibrated_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
-
-
-
-
-				# clean directory
-				rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
-				rm $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
-				let n=n+1
 			done
+			let n=n+1
+			# clean directory
+			rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
+			rm $path"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
 		done
 	fi
 	time2=`date +%s`

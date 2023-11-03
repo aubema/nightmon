@@ -889,7 +889,7 @@ if calsb == 1:
     title = Band + " background Surface Brightness"
     file = path + Band + "_calSbBkg_" + baseout + ".png"
     plt.figure()
-    plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-16)
+    plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-12)
     plt.colorbar()
     plt.title(title)
     plt.savefig(file)
@@ -898,7 +898,7 @@ if calsb == 1:
     title = Band + " total Surface Brightness"
     file = path + Band + "_calSbTot_" + baseout + ".png"
     plt.figure()
-    plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-16)
+    plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-12)
     plt.colorbar()
     plt.title(title)
     plt.savefig(file)

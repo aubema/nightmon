@@ -282,18 +282,17 @@ while : ; do
       done
       cp *.png $basepath/$y/$mo/
       mv *.png $backpath"/"$y"/"$mo"/"      
-		# clean directory
-		rm $path/$basenameA*
-		rm $path/*$baseday*
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)
 	if [ $idle -lt 0 ] ; then 
 		let idle=0
 	fi
+	rm -f $path/*.dng
+	rm -f $path/*.jpg
+	rm -f $path/*.png	
 	echo "Wait " $idle "s before next reading."
 	/bin/sleep $idle
 	time1=`date +%s`
-	rm -f $path/*.dng
-	rm -f $path/*.jpg
+
 done

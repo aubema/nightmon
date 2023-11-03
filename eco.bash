@@ -284,9 +284,6 @@ while : ; do
 			done
 			let n=n+1
 		done
-		# clean directory
-		rm $path/*${basename[$n]}*
-		rm $path/*$baseday*
 
 	fi
 	time2=`date +%s`
@@ -294,9 +291,11 @@ while : ; do
 	if [ $idle -lt 0 ] ; then 
 		let idle=0
 	fi
+	rm -f $path/*.dng
+	rm -f $path/*.jpg
+	rm -f $path/*.png
 	echo "Wait " $idle "s before next reading."
 	/bin/sleep $idle
 	time1=`date +%s`
-	rm -f $path/*.dng
-	rm -f $path/*.jpg
+
 done

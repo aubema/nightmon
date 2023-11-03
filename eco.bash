@@ -225,7 +225,7 @@ while : ; do
 	read  tb toto < $path"/Current_tint.tmp"
 	echo "=============================="
 	# rename pictures
-	if [ $ta -ge $max_lum ] ; then
+	if [ $ta -ge $max_int ] ; then
 		cp -f $path"/capture_3.dng" $basepath/$y/$mo/$basenameC"_C_"$tb"_"$gain".dng"
 		cp -f $path"/capture_3.dng" $backpath/$y/$mo/$basenameC"_C_"$tb"_"$gain".dng"
 		cp -f $path"/capture_3.dng" $path/$basenameC"_C_"$tb"_"$gain".dng"

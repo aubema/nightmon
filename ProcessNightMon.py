@@ -480,54 +480,8 @@ print(altpole,azipole)
 
 
 
-stars_selected = ds[(ds["MagV"] < limiti) & (ds["MagV"] > limits)]
-coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
-coords = coordsradec.to_numpy(dtype="str")
-identity = stars_selected["identifier"]
-iden = identity.to_numpy(dtype="str")
-magnitudev = stars_selected["MagV"]
-magv = magnitudev.to_numpy(dtype="float")
-magnituder = stars_selected["MagR"]
-magr = magnituder.to_numpy(dtype="float")
-magnitudeb = stars_selected["MagB"]
-magb = magnitudeb.to_numpy(dtype="float")
-# find pixel positions of the SIMBAD stars on the array grid corresponding to image size
-print("Position simbad stars on the image grid...")
-altstar = np.zeros(np.shape(coords)[0])
-azistar = np.zeros(np.shape(coords)[0])
-# create np array for stars
-for i in range(np.shape(coords)[0]):
-    posstar = coords[i].split(" ")
-    rah = float(posstar[0])
-    ram = float(posstar[1])
-    ras = float(posstar[2])
-    ded = float(posstar[3])
-    dem = float(posstar[4])
-    des = float(posstar[5])
-    etoile = Star(ra_hours=(rah, ram, ras), dec_degrees=(ded, dem, des))
-    etoi = here_now.observe(etoile).apparent()
-    alt_star, azi_star, distance = etoi.altaz()
-    alt_star = alt_star.degrees
-    azi_star = azi_star.degrees
-    azistar[i] = azi_star
-    altstar[i] = alt_star
-# keep stars above horizon limitz = 0.95 * ny/2 * Zslope
-azistar = np.delete(azistar, np.where(altstar < elmin))
-magv = np.delete(magv, np.where(altstar < elmin))
-magr = np.delete(magr, np.where(altstar < elmin))
-magb = np.delete(magb, np.where(altstar < elmin))
-iden = np.delete(iden, np.where(altstar < elmin))
-altstar = np.delete(altstar, np.where(altstar < elmin))
-brightest = np.amin(magv)
-# find position of simbad stars on the image array
-index = find_close_indices(az, el, azistar, altstar)
-ishape = int(np.shape(index)[0])
-ishape = int(ishape / 2)
-index = index.reshape(ishape, 2)
-index = np.delete(index, (0), axis=0)
-ishape = int(np.shape(index)[0])
-# index first column = y and second = x
-print("Number of SIMBAD reference stars above", elmin, "degrees :", ishape)
+
+
 # calculating airmass with A. T. Young, "AIR-MASS AND REFRACTION," Applied Optics, vol. 33,
 #    pp. 1108-1110, Feb 1994.
 AirM = airmass(altstar)
@@ -652,6 +606,54 @@ if Calmet == "stars":
     if cloud_cover_okta > max_cloud_cover:
         print("Can't process the data for stars calibration methods under cloudy skies")
     else:
+        stars_selected = ds[(ds["MagV"] < limiti) & (ds["MagV"] > limits)]
+        coordsradec = stars_selected["coord1_ICRS,J2000/2000_"]
+        coords = coordsradec.to_numpy(dtype="str")
+        identity = stars_selected["identifier"]
+        iden = identity.to_numpy(dtype="str")
+        magnitudev = stars_selected["MagV"]
+        magv = magnitudev.to_numpy(dtype="float")
+        magnituder = stars_selected["MagR"]
+        magr = magnituder.to_numpy(dtype="float")
+        magnitudeb = stars_selected["MagB"]
+        magb = magnitudeb.to_numpy(dtype="float")
+        # find pixel positions of the SIMBAD stars on the array grid corresponding to image size
+        print("Position simbad stars on the image grid...")
+        altstar = np.zeros(np.shape(coords)[0])
+        azistar = np.zeros(np.shape(coords)[0])
+        # create np array for stars
+        for i in range(np.shape(coords)[0]):
+            posstar = coords[i].split(" ")
+            rah = float(posstar[0])
+            ram = float(posstar[1])
+            ras = float(posstar[2])
+            ded = float(posstar[3])
+            dem = float(posstar[4])
+            des = float(posstar[5])
+            etoile = Star(ra_hours=(rah, ram, ras), dec_degrees=(ded, dem, des))
+            etoi = here_now.observe(etoile).apparent()
+            alt_star, azi_star, distance = etoi.altaz()
+            alt_star = alt_star.degrees
+            azi_star = azi_star.degrees
+            azistar[i] = azi_star
+            altstar[i] = alt_star
+            # keep stars above horizon limitz = 0.95 * ny/2 * Zslope
+            azistar = np.delete(azistar, np.where(altstar < elmin))
+            magv = np.delete(magv, np.where(altstar < elmin))
+            magr = np.delete(magr, np.where(altstar < elmin))
+            magb = np.delete(magb, np.where(altstar < elmin))
+            iden = np.delete(iden, np.where(altstar < elmin))
+            altstar = np.delete(altstar, np.where(altstar < elmin))
+            brightest = np.amin(magv)
+            # find position of simbad stars on the image array
+            index = find_close_indices(az, el, azistar, altstar)
+            ishape = int(np.shape(index)[0])
+            ishape = int(ishape / 2)
+            index = index.reshape(ishape, 2)
+            index = np.delete(index, (0), axis=0)
+            ishape = int(np.shape(index)[0])
+            # index first column = y and second = x
+        print("Number of SIMBAD reference stars above", elmin, "degrees :", ishape)
         Itime_cor = 1
         # Search for stars only if cloud_cover is lower than max_cloud_cover
         mean, median, std = sigma_clipped_stats(imstars, sigma=5.0)

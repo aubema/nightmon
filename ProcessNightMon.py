@@ -269,7 +269,7 @@ elif Cam == "C":
     deltay = p["ShiftyC"]
     angle = p["AngleC"]
     if Band == "JB":
-       ZpointConfig = p["ZpointCJB"]
+       ZpointConfig = p["ZpointC-JB"]
     elif Band == "JV":
        ZpointConfig = p["ZpointC-JV"]  
     elif Band == "JR": 

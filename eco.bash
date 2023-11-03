@@ -283,10 +283,10 @@ while : ; do
 				fi
 				cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
 			done
-			let n=n+1
 			# clean directory
 			rm $path"/"${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng"
 			rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
+			let n=n+1
 		done
 	fi
 	time2=`date +%s`

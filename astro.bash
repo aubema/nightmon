@@ -137,6 +137,7 @@ cams=(A)
 basepath="/var/www/html/data"
 backpath="/home/"$user"/data"
 path="/home/"$user
+let n=0
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
@@ -233,7 +234,6 @@ while : ; do
 	echo "=============================="
 	if [ $processflag -eq 1 ] ; then
 		# process sky IMAGES
-		let n=0
 		for b in ${bands[@]} ; do
 			if [ $n -eq 0 ] ; then
 				let t=ta
@@ -285,7 +285,6 @@ while : ; do
 			# clean directory
 			rm $path"/"$basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
 			rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
-			let n=n+1
 		done
 	fi
 	time2=`date +%s`

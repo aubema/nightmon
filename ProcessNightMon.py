@@ -245,9 +245,6 @@ print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)
 # read site coordinates
 # Load Parameters
-deltax = np.empty([3], dtype=float)
-deltay = np.empty([3], dtype=float)
-angle = np.empty([3], dtype=float)
 configpath = "/home/" + user + "/nightmon_config"
 
 with open(configpath) as f:

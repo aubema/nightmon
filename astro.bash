@@ -279,10 +279,12 @@ while : ; do
         		cat $path"/calibrated_"$baseday"_sky.csv"  > $basepath"/"$y"/"$mo"/calibrated_"${cams[$n]}"_"$baseday"_sky.csv"
 			fi
 			cp -f $basepath"/"$y"/"$mo"/calibrated_"${cams[$n]}"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
-			done
-			# clean directory
-			rm $path/$basenameA*
-			rm $path/*$baseday*
+      done
+      cp *.png $basepath/$y/$mo/
+      mv *.png $backpath"/"$y"/"$mo"/"      
+		# clean directory
+		rm -f $path/$basenameA*
+		rm -f $path/*$baseday*
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

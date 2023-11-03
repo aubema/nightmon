@@ -266,10 +266,11 @@ while : ; do
 				fi
 				# backup calibration file
 				if [ -f $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" ] ; then 
-					mv $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" $basepath/$y/$mo/
+					mv $path"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" 
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_stars_"${basename[$n]}".csv" $backpath"/"$y"/"$mo"/"
 				fi
-
+            cp *.png $basepath/$y/$mo/
+            mv *.png $backpath"/"$y"/"$mo"/"
 
 
 
@@ -284,8 +285,8 @@ while : ; do
 			let n=n+1
 		done
 		# clean directory
-		rm $path/*${basename[$n]}*
-		rm $path/*$baseday*
+		rm -f $path/*${basename[$n]}*
+		rm -f $path/*$baseday*
 
 	fi
 	time2=`date +%s`

@@ -130,6 +130,7 @@ user="sand"
 zpoint=1.0
 gain=16
 min_gain=5  # if below the image will not be calibrated
+max_int=12000
 darkimg="dark-gain16-t100000.dng"
 bands=(JB JV JR)
 model="RpiHQ"  # other choices are "RpiHQ" and "A7S"
@@ -210,7 +211,7 @@ while : ; do
 	fi
 	echo "=============================="
 	# rename pictures
-	if [ $gain -ge $min_gain ] ; then
+	if [ $ta -ge $max_int ] ; then
 		# daytime only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_A_"$ta"_"$gain".dng"

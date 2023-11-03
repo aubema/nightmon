@@ -841,7 +841,7 @@ if Calmet == "stars":
         if corcoef > 0.7 and npts > 9:
             calsb = 1
 
-        file = path + Band + "_Stars_Match_" + baseout + ".png"
+        file = path + Cam + "_" + Band + "_Stars_Match_" + baseout + ".png"
         title = Band + " Stars correspondance"
         plt.figure()
         plt.plot(StarMatch[:, 2], StarMatch[:, 3], "or", markersize=2)
@@ -853,7 +853,7 @@ if Calmet == "stars":
         plt.savefig(file)
 
         title = Band + " calibration"
-        file = path + Band + "_calibration_" + baseout + ".png"
+        file = path + Cam + "_"  + Band + "_calibration_" + baseout + ".png"
         plt.figure()
         plt.plot(gx, gy, "r")
         plt.plot(ax, ay, "ob")
@@ -893,7 +893,7 @@ if calsb == 1:
 
     norm1 = simple_norm(calSbBkg, "sqrt")
     title = Band + " background Surface Brightness"
-    file = path + Band + "_calSbBkg_" + baseout + ".png"
+    file = path + Cam + "_"  + Band + "_calSbBkg_" + baseout + ".png"
     plt.figure()
     plt.imshow(-calSbBkg, cmap="magma", vmin=-22, vmax=-12)
     plt.colorbar()
@@ -902,7 +902,7 @@ if calsb == 1:
 
     norm1 = simple_norm(calSbTot, "sqrt")
     title = Band + " total Surface Brightness"
-    file = path + Band + "_calSbTot_" + baseout + ".png"
+    file = path + Cam + "_"  + Band + "_calSbTot_" + baseout + ".png"
     plt.figure()
     plt.imshow(-calSbTot, cmap="magma", vmin=-22, vmax=-12)
     plt.colorbar()

@@ -264,16 +264,16 @@ if Cam == "A":
        ZpointConfig = p["ZpointA-JV"]  
     elif Band == "JR": 
        ZpointConfig = p["ZpointA-JR"]      
-elif Cam == "B":
-    deltax = p["ShiftxB"]
-    deltay = p["ShiftyB"]
-    angle = p["AngleB"]
+elif Cam == "C":
+    deltax = p["ShiftxC"]
+    deltay = p["ShiftyC"]
+    angle = p["AngleC"]
     if Band == "JB":
-       ZpointConfig = p["ZpointB-JB"]
+       ZpointConfig = p["ZpointCJB"]
     elif Band == "JV":
-       ZpointConfig = p["ZpointB-JV"]  
+       ZpointConfig = p["ZpointC-JV"]  
     elif Band == "JR": 
-       ZpointConfig = p["ZpointB-JR"] 
+       ZpointConfig = p["ZpointC-JR"] 
 if (
     Zpoint == 0 and ZpointConfig != 0
 ):  # if no zero point is provided in argument then use the value of the config file

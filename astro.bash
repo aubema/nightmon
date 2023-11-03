@@ -232,7 +232,6 @@ while : ; do
 	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	read  tb toto < $path"/Current_tint.tmp"
-	echo "=============================="
 	if [ $processflag -eq 1 ] ; then
 		# process sky IMAGES
 		for b in ${bands[@]} ; do

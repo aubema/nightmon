@@ -223,7 +223,6 @@ while : ; do
 	cp -f $path"/capture_1.jpg" $path/$basenameA"_A_"$ta"_"$gain".jpg"
 	basename[1]="$basenameC"
 	read  tb toto < $path"/Current_tint.tmp"
-	echo "=============================="
 	# rename pictures
 	if [ $ta -ge $max_int ] ; then
 		cp -f $path"/capture_3.dng" $basepath/$y/$mo/$basenameC"_C_"$tb"_"$gain".dng"
@@ -233,7 +232,6 @@ while : ; do
 	cp -f $path"/capture_3.jpg" $basepath/$y/$mo/$basenameC"_C_"$tb"_"$gain".jpg"
 	cp -f $path"/capture_3.jpg" $backpath/$y/$mo/$basenameC"_C_"$tb"_"$gain".jpg"
 	cp -f $path"/capture_3.jpg" $path/$basenameC"_C_"$tb"_"$gain".jpg"
-	echo "=============================="
 	if [ $processflag -eq 1 ] ; then
 		# process sky IMAGES
 		let n=0

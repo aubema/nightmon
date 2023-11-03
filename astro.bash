@@ -244,7 +244,6 @@ while : ; do
 			#
 			#
 			#
-			ls /home/sand
          echo "Try to process file :" $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
 			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
 			if [ -f $path"/"$b"_calibration_"$basenameA".png" ] ; then

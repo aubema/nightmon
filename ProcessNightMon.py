@@ -78,12 +78,13 @@ def input(argv):
     Calmet = "0"  # other option is fixed
     Zpoint = 0  # this value is only useful when selecting fixed calibration method otherwise ignored
     ExpF = 1. # this is the exposure correction factor compared to the exposure used for calibration. 
+    Flip = 0
     # E.g. if the exposure is 12000 and the exposure used for calibration is 120000000, then exposure 
     # factor will be 12000/120000000 = 1/10000 = 0.0001
     try:
         opts, args = getopt.getopt(
             argv,
-            "h:i:d:b:e:m:k:z",
+            "h:i:d:b:e:m:k:z:f:",
             [
                 "help=",
                 "ifile=",
@@ -93,17 +94,18 @@ def input(argv):
                 "model=",
                 "calib=",
                 "zerop=",
+                "flip=",
             ],
         )
     except getopt.GetoptError:
         print(
-            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint>"
+            "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint> -f <1>"
         )
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print(
-                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint>"
+                "ProcessNighMon.py -i <Ifile> -d <Dfile> -b <Band> -e <Extinc> -m <Model> -k <Calibration method> -z <Zeropoint> -f <1>"
             )
             sys.exit()
         elif opt in ("-i", "--ifile"):
@@ -120,10 +122,12 @@ def input(argv):
             Calmet = arg
         elif opt in ("-z", "--zerop"):
             Zpoint = arg
+        elif opt in ("-f", "--flip"):
+            Flip = arg
     print("Sky image file is :", Ifile)
     print("Dark frame file is :", Dfile)
     print("Band is :", Band)
-    return Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint
+    return Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint, Flip
 
 
 def fit_func(x, a):
@@ -157,7 +161,8 @@ limiti = (
 )
 limits = -1
 # load command line parameters
-Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint = input(sys.argv[1:])
+Ifile, Dfile, Band, Extinc, Model, Calmet, Zpoint, Flip = input(sys.argv[1:])
+# Flip = 1 only for the bottom camera (camera C) in the NightMon-eco device
 k = float(Extinc)
 # TOTO : IL FAUT DEPLACER CECI ET LES EPHEMERIDES DANS LA BOUCLE DES FILTRES
 # files names provided by NightMon are formatted in the following way
@@ -238,6 +243,9 @@ print("Process raw image: ", path + Ifile)
 Simg = open_raw(path + Ifile)
 print("Looking for image: ", path + Ifile)
 Dimg = open_raw(Dfile)
+if Flip == "1":
+   # flip image vertically
+   Dimg = np.flipud(Dimg)
 # read site coordinates
 # Load Parameters
 deltax = np.empty([3], dtype=float)
@@ -310,6 +318,10 @@ here = eph["earth"] + wgs84.latlon(
 # create the grayscale images
 Sgray = to_grayscale(Simg, [RC, GC, BC], normalize=False)
 Dgray = to_grayscale(Dimg, [RC, GC, BC], normalize=False)
+if Flip == "1":
+    print("Flipping image vertically...")
+    Sgray = np.flipud(Sgray)
+    Dgray = np.flipud(Dgray)
 ny = np.shape(Sgray)[0]
 nx = np.shape(Sgray)[1]
 # set the minimum elevation to the limit of the image if required

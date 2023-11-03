@@ -281,11 +281,11 @@ while : ; do
 				fi
 				cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"
 			done
-			# clean directory
-			rm $path/*${basename[$n]}*
-			rm $path/*$baseday*
-			let n=n+1
 		done
+		# clean directory
+		rm $path/*${basename[$n]}*
+		rm $path/*$baseday*
+		let n=n+1
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

@@ -482,9 +482,7 @@ print(altpole,azipole)
 
 
 
-# calculating airmass with A. T. Young, "AIR-MASS AND REFRACTION," Applied Optics, vol. 33,
-#    pp. 1108-1110, Feb 1994.
-AirM = airmass(altstar)
+
 # create the data file if it do not exists
 if os.path.exists(outname) == False:
     o = open(outname, "w")
@@ -654,6 +652,9 @@ if Calmet == "stars":
             ishape = int(np.shape(index)[0])
             # index first column = y and second = x
         print("Number of SIMBAD reference stars above", elmin, "degrees :", ishape)
+        # calculating airmass with A. T. Young, "AIR-MASS AND REFRACTION," Applied Optics, vol. 33,
+        #    pp. 1108-1110, Feb 1994.
+        AirM = airmass(altstar)
         Itime_cor = 1
         # Search for stars only if cloud_cover is lower than max_cloud_cover
         mean, median, std = sigma_clipped_stats(imstars, sigma=5.0)

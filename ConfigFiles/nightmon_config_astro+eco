@@ -6,15 +6,15 @@ Altitude : 242
 ShiftxA :  -57
 ShiftyA :  17
 AngleA :   2.7064398349260728
-ShiftxB :  0
-ShiftyB :  0 
-AngleB :   0
+ShiftxC :  0
+ShiftyC :  0 
+AngleC :   0
 ZpointA-JB : 4.0825
 ZpointA-JV : 4.6685
 ZpointA-JR : 2.8147
-ZpointB-JB : 4.0825
-ZpointB-JV : 4.6685
-ZpointB-JR : 2.8147
-Calmet : stars    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
+ZpointC-JB : 4.0825
+ZpointC-JV : 4.6685
+ZpointC-JR : 2.8147
+Calmet : fixed    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
 Calib_itime : 120000000  # 2 minutes
 Calib_gain : 16

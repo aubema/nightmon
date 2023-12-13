@@ -233,6 +233,7 @@ while : ; do
 	cp -f $path"/capture_1.jpg" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	read  tb toto < $path"/Current_tint.tmp"
 	if [ $processflag -eq 1 ] ; then
+	   let n=1
 		# process sky IMAGES
 		for b in ${bands[@]} ; do
 			if [ $n -eq 0 ] ; then
@@ -282,7 +283,7 @@ while : ; do
             rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
             cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
          fi
-         
+      done
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

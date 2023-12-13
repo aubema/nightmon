@@ -239,7 +239,7 @@ while : ; do
 				let t=ta
 			else
 				let t=tb
-         		fi
+         fi
 			# determine the zeropoint according to the integration time and camera
 			#
 			#

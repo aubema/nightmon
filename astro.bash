@@ -273,15 +273,15 @@ while : ; do
 
 			# append and backup output files
 			# backup output files
-				if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
-				   if [ -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" ] ; then
-				      cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv"
-         	   else
-        		 		cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv"
-				   fi
-				   rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
-				   cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
-				fi   
+         if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
+            if [ -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" ] ; then
+               cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv"
+            else
+               cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv"
+            fi
+            rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
+            cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
+         fi   
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

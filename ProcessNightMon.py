@@ -932,7 +932,7 @@ index = index.reshape(pshape, 2)
 index = np.delete(index, (0), axis=0)
 pshape = int(np.shape(index)[0])
 
-for no in range(num_pts - 1):
+for no in range(num_pts):
     posx = str(index[no, 1])
     posy = str(index[no, 0])
     direction = here_now.from_altaz(alt_degrees=ept[no], az_degrees=apt[no])

@@ -255,7 +255,7 @@ while : ; do
 				mv $path"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
 				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"${cams[$n]}"_"$b"_CalSbTot_"$basenameA".png" ] ; then
+			if [ -f $path"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" ] ; then
 				mv $path"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/
 				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi

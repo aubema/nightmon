@@ -247,21 +247,21 @@ while : ; do
 			#
          echo "Try to process file :" $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng"
 			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
-			if [ -f $path"/"$b"_calibration_"$basenameA".png" ] ; then
-				mv $path"/"$b"_calibration_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" ] ; then
+				mv $path"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_calSbBkg_"$basenameA".png" ] ; then
-				mv $path"/"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" ] ; then
+				mv $path"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_CalSbTot_"$basenameA".png" ] ; then
-				mv $path"/"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"${cams[$n]}"_"$b"_CalSbTot_"$basenameA".png" ] ; then
+				mv $path"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
-			if [ -f $path"/"$b"_Stars_Match_"$basenameA".png" ] ; then
-				mv $path"/"$b"_Stars_Match_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_Stars_Match_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+			if [ -f $path"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" ] ; then
+				mv $path"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" $basepath/$y/$mo/
+				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			# backup calibration file
 			if [ -f $path"/"$b"_calibration_stars_"$basenameA".csv" ] ; then 
@@ -273,6 +273,7 @@ while : ; do
 
 
 			# append and backup output files
+			# add the camera name
 			# backup output files
          if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
             if [ -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" ] ; then

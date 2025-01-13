@@ -447,7 +447,7 @@ ds = pd.read_csv(csvpath, header=0, sep=";")
 # stars_selected=ds[ds['MagR'] < limit]
 
 # try to find Polaris and shift and rotate image accordingly only when northern hemisphere
-if p["Latitude"] > 0:
+if float(p["Latitude"]) > 0:
     # locating Polaris
     polaris = ds.loc[ds["identifier"] == "* alf UMi"]
     radpolaris = polaris["coord1_ICRS,J2000/2000_"]

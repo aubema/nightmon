@@ -483,7 +483,7 @@ if float(p["Latitude"]) > 0:
     altpole = np.empty([2], dtype=float)
     azipole = np.empty([2], dtype=float)
     azipole[0] = 0.
-    altpole[0] =  
+    altpole[0] = p["Latitude"]
     azipole[1] = 0.
     altpole[1] = p["Latitude"]
     poleindex = find_close_indices(az, el, azipole, altpole)

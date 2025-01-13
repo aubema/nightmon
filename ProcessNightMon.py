@@ -403,7 +403,7 @@ Sgray = Sgray / flat
 Vbkg = np.zeros([ny, nx])
 Rbkg = np.zeros([ny, nx])
 Sstars = np.zeros([ny, nx])
-
+imag = Sgray
 print(f"Processing Johnson {Band} camera...")
 
 
@@ -430,65 +430,6 @@ print(f"Moon altitude: {altm:.4f}")
 print(f"Moon azimuth: {azim:.4f}")
 print(f"Sun altitude: {alts:.4f}")
 print(f"Sun azimuth: {azis:.4f}")
-# creating star map with the SIMBAD stars database
-# TODO: restore the two following lines
-# ds = pd.read_csv(
-#    "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
-csvpath = "/home/" + user + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv"
-ds = pd.read_csv(csvpath, header=0, sep=";")
-# stars_selected=ds[ds['MagR'] < limit]
-# locating Polaris
-polaris = ds.loc[ds["identifier"] == "* alf UMi"]
-radpolaris = polaris["coord1_ICRS,J2000/2000_"]
-coordspolaris = radpolaris.to_numpy(dtype="str")
-cpolaris = coordspolaris[0].split(" ")
-etoilepol = Star(
-    ra_hours=(float(cpolaris[0]), float(cpolaris[1]), float(cpolaris[2])),
-    dec_degrees=(float(cpolaris[3]), float(cpolaris[4]), float(cpolaris[5])),
-)
-epol = here_now.observe(etoilepol).apparent()
-alt_star, azi_star, distance = epol.altaz()
-alt_pol = alt_star.degrees
-azi_pol = azi_star.degrees
-altpol = np.empty([2], dtype=float)
-azipol = np.empty([2], dtype=float)
-azipol[0] = azi_pol
-altpol[0] = alt_pol
-azipol[1] = azi_pol
-altpol[1] = alt_pol
-# position of Polaris on the image grid
-print("Position Polaris on the image grid...")
-polindex = find_close_indices(az, el, azipol, altpol)
-polshape = int(np.shape(polindex)[0])
-polshape = int(polshape / 2)
-polindex = polindex.reshape(polshape, 2)
-polindex = np.delete(polindex, (0), axis=0)
-polshape = int(np.shape(polindex)[0])
-print("Polaris located at : ", polindex[0, 1], polindex[0, 0])
-
-# position of Pole on the image grid
-print("Position Pole on the image grid...")
-
-altpole = np.empty([2], dtype=float)
-azipole = np.empty([2], dtype=float)
-azipole[0] = 0.
-altpole[0] = p["Latitude"]
-azipole[1] = 0.
-altpole[1] = p["Latitude"]
-poleindex = find_close_indices(az, el, azipole, altpole)
-poleshape = int(np.shape(poleindex)[0])
-poleshape = int(poleshape / 2)
-poleindex = poleindex.reshape(poleshape, 2)
-poleindex = np.delete(poleindex, (0), axis=0)
-poleshape = int(np.shape(poleindex)[0])
-print("Pole ideally located at : ", poleindex[0, 1], poleindex[0, 0])
-print(altpole,azipole)
-
-
-
-
-
-
 # create the data file if it do not exists
 if os.path.exists(outname) == False:
     o = open(outname, "w")
@@ -497,19 +438,74 @@ if os.path.exists(outname) == False:
     o.write(first_line)
     o.write(second_line)
     o.close()
-imag = Sgray
-shiftx = 0
-shifty = 0
-for i in range(1):
-    shiftx = float(deltax)
-    shifty = float(deltay)
-    theta = float(angle)
-    imag = ndimage.shift(imag, [shifty, shiftx], mode="nearest")
-    padX = [imag.shape[1] - poleindex[0, 1], poleindex[0, 1]]
-    padY = [imag.shape[0] - poleindex[0, 0], poleindex[0, 0]]
-    imgP = np.pad(imag, [padY, padX], "constant")
-    imag = ndimage.rotate(imgP, theta, reshape=False, mode="nearest")
-    imag = imag[padY[0] : -padY[1], padX[0] : -padX[1]]
+# creating star map with the SIMBAD stars database
+# TODO: restore the two following lines
+# ds = pd.read_csv(
+#    "/home/sand/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv", header=0, sep=";"
+csvpath = "/home/" + user + "/git/nightmon/data/simbad_lt_6Vmag_r1.8.csv"
+ds = pd.read_csv(csvpath, header=0, sep=";")
+# stars_selected=ds[ds['MagR'] < limit]
+
+# try to find Polaris and shift and rotate image accordingly only when northern hemisphere
+if p["Latitude"] > 0:
+    # locating Polaris
+    polaris = ds.loc[ds["identifier"] == "* alf UMi"]
+    radpolaris = polaris["coord1_ICRS,J2000/2000_"]
+    coordspolaris = radpolaris.to_numpy(dtype="str")
+    cpolaris = coordspolaris[0].split(" ")
+    etoilepol = Star(
+        ra_hours=(float(cpolaris[0]), float(cpolaris[1]), float(cpolaris[2])),
+        dec_degrees=(float(cpolaris[3]), float(cpolaris[4]), float(cpolaris[5])),
+    )
+    epol = here_now.observe(etoilepol).apparent()
+    alt_star, azi_star, distance = epol.altaz()
+    alt_pol = alt_star.degrees
+    azi_pol = azi_star.degrees
+    altpol = np.empty([2], dtype=float)
+    azipol = np.empty([2], dtype=float)
+    azipol[0] = azi_pol
+    altpol[0] = alt_pol
+    azipol[1] = azi_pol
+    altpol[1] = alt_pol
+    # position of Polaris on the image grid
+    print("Position Polaris on the image grid...")
+    polindex = find_close_indices(az, el, azipol, altpol)
+    polshape = int(np.shape(polindex)[0])
+    polshape = int(polshape / 2)
+    polindex = polindex.reshape(polshape, 2)
+    polindex = np.delete(polindex, (0), axis=0)
+    polshape = int(np.shape(polindex)[0])
+    print("Polaris located at : ", polindex[0, 1], polindex[0, 0])
+
+    # position of Pole on the image grid
+    print("Position Pole on the image grid...")
+
+    altpole = np.empty([2], dtype=float)
+    azipole = np.empty([2], dtype=float)
+    azipole[0] = 0.
+    altpole[0] =  
+    azipole[1] = 0.
+    altpole[1] = p["Latitude"]
+    poleindex = find_close_indices(az, el, azipole, altpole)
+    poleshape = int(np.shape(poleindex)[0])
+    poleshape = int(poleshape / 2)
+    poleindex = poleindex.reshape(poleshape, 2)
+    poleindex = np.delete(poleindex, (0), axis=0)
+    poleshape = int(np.shape(poleindex)[0])
+    print("Pole ideally located at : ", poleindex[0, 1], poleindex[0, 0])
+    print(altpole,azipole)
+    shiftx = 0
+    shifty = 0
+    for i in range(1):
+        shiftx = float(deltax)
+        shifty = float(deltay)
+        theta = float(angle)
+        imag = ndimage.shift(imag, [shifty, shiftx], mode="nearest")
+        padX = [imag.shape[1] - poleindex[0, 1], poleindex[0, 1]]
+        padY = [imag.shape[0] - poleindex[0, 0], poleindex[0, 0]]
+        imgP = np.pad(imag, [padY, padX], "constant")
+        imag = ndimage.rotate(imgP, theta, reshape=False, mode="nearest")
+        imag = imag[padY[0] : -padY[1], padX[0] : -padX[1]]
 # find background
 sigma_clip = SigmaClip(sigma=3.0)
 bkg_estimator = MedianBackground()

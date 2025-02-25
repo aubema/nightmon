@@ -433,8 +433,8 @@ print(f"Sun azimuth: {azis:.4f}")
 # create the data file if it do not exists
 if os.path.exists(outname) == False:
     o = open(outname, "w")
-    first_line = "Loc_Name,Band,CCD_XY_position, ,AzAlt_position, ,Airmass,Ext_coef,Date,Moon,Clouds,SkyBrightness,err,Zeropoint,CorCoef,Sun_Ang,Moon_Ang,Galactic_Lat,Moon_Phase \n"
-    second_line = " , ,(pixel),(pixel),(deg),(deg), , , , ,(oktas),(mag/arcsec^2), ,(mag), ,(deg),(deg),(deg),(deg) \n"
+    first_line = "Loc_Name;Band;CCD_X_Position;CCD_Y_Position;Azimuth_Angle;Altitude_Angle;Airmass;Ext_Coef;Date;Moon;Clouds_Cover;Background_Sky_Brightness;err,Zero_Point,Cor_Coef,Sun_Angle,Moon_Angle,Galactic_Latitude,Moon_Phase \n"
+    second_line = " ; ;(pixel);(pixel);(deg);(deg); ; ; ; ;(oktas);(mag/arcsec^2); ;(mag); ;(deg);(deg);(deg);(deg) \n"
     o.write(first_line)
     o.write(second_line)
     o.close()
@@ -946,41 +946,41 @@ for no in range(num_pts):
     o = open(outname, "a")
     outputline = (
         Site
-        + ","
+        + ";"
         + Band
-        + ","
+        + ";"
         + posx
-        + ","
+        + ";"
         + posy
-        + ","
+        + ";"
         + str("{:6.2f}".format(apt[no]))
-        + ","
+        + ";"
         + str("{:5.2f}".format(ept[no]))
-        + ","
+        + ";"
         + str("{:4.2f}".format(airmo))
-        + ","
+        + ";"
         + str("{:5.3f}".format(k))
-        + ","
+        + ";"
         + timestamp
         + ","
         + mflag
-        + ","
+        + ";"
         + str("{:d}".format(cloud_cover_okta))
-        + ","
+        + ";"
         + str("{:6.3f}".format(mago))
-        + ","
+        + ";"
         + str("{:6.3f}".format(sberr))
-        + ","
+        + ";"
         + str("{:6.3f}".format(zeropoint))
-        + ","
+        + ";"
         + str("{:6.3f}".format(corcoef))
-        + ","
+        + ";"
         + str("{:6.2f}".format(theta_sun))
-        + ","
+        + ";"
         + str("{:6.2f}".format(theta_moon))
-        + ","
+        + ";"
         + str("{:6.2f}".format(galactic_lat))
-        + ","
+        + ";"
         + str("{:6.2f}".format(moonphase))
         + "\n"
     )

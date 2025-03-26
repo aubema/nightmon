@@ -41,7 +41,7 @@ take_picture() {
 		read satmax bidon  < $path"/capture.tmp"
 		echo "satmax=" $satmax
 		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
-		do let ta=ta/10
+		do let ta=ta/4
 			rm -f $path"/capture_1*"
 			echo "Shooting "$ta" micro seconds... with gain " $gain 
 			/usr/bin/libcamera-still --analoggain $gain --shutter $ta --denoise off --rawfull --raw --awbgains 1,1 --immediate --immediate --nopreview -o /home/sand/capture_1.jpg

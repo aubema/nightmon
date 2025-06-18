@@ -37,50 +37,50 @@ take_pictures() {
 	echo "Shooting "$ta" micro seconds... with gain " $gain 
 	/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 	if [ -f $path"/capture_1.dng" ] ; then
-		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-		read satmax bidon  < $path"/capture.tmp"
-		echo "satmax=" $satmax
-		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
-		do let ta=ta/10
-			rm -f $path"/capture_1*"
-			echo "Shooting "$ta" micro seconds... with gain " $gain
-			/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-			if [ -f $path"/capture_1.dng" ] ; then
-				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-				read satmax bidon  < $path"/capture.tmp"
-				echo "satmax=" $satmax
-			else
-				echo "Problem with camera A."
-				exit 0
-			fi
-		done
-		if [ "$satmax" -ge 80 ]
-		then let gain=2
-			  rm -f $path"/capture_1*"
-			  echo "Shooting "$ta" micro seconds... with gain " $gain
-			  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-			  if [ -f $path"/capture_1.dng" ] ; then
-				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-				  /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-				  read satmax bidon  < $path"/capture.tmp"
-				  echo "satmax=" $satmax
-			  else
-			     echo "Problem with camera A."
-				  exit 0
-			  fi
-		fi
-		/usr/bin/python3 /usr/local/bin/captureC.py -t $ta -g $gain
-	else
-		echo "Problem with camera A."
-		exit 0
-	fi
-	echo  $ta > $path"/Current_tint.tmp"
-	echo  $gain > $path"/Current_gain.tmp"
-	# flush ram cache to correct a memory leak in the camera library
-	/usr/bin/sync
-	/usr/bin/echo 3 > /proc/sys/vm/drop_caches	
+	   /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+           /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+           read satmax bidon  < $path"/capture.tmp"
+           echo "satmax=" $satmax
+           while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
+           do let ta=ta/10
+              rm -f $path"/capture_1*"
+              echo "Shooting "$ta" micro seconds... with gain " $gain
+              /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+              if [ -f $path"/capture_1.dng" ] ; then
+                 /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+                 /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+                 read satmax bidon  < $path"/capture.tmp"
+                 echo "satmax=" $satmax
+              else
+                 echo "Problem with camera A."
+                 exit 0
+              fi
+           done
+           if [ "$satmax" -ge 80 ]
+           then let gain=2
+              rm -f $path"/capture_1*"
+              echo "Shooting "$ta" micro seconds... with gain " $gain
+              /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+              if [ -f $path"/capture_1.dng" ] ; then
+                 /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+                 /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+                 read satmax bidon  < $path"/capture.tmp"
+                 echo "satmax=" $satmax
+              else
+                 echo "Problem with camera A."
+                 exit 0
+              fi
+           fi
+           /usr/bin/python3 /usr/local/bin/captureC.py -t $ta -g $gain
+        else
+           echo "Problem with camera A."
+           exit 0
+        fi
+        echo  $ta > $path"/Current_tint.tmp"
+        echo  $gain > $path"/Current_gain.tmp"
+        # flush ram cache to correct a memory leak in the camera library
+        /usr/bin/sync
+        /usr/bin/echo 3 > /proc/sys/vm/drop_caches	
 }
 
 # ==================================
@@ -141,6 +141,8 @@ path="/home/"$user
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
+/bin/grep "Keep" $path"/nightmon_config" > $path"/ligne.tmp"
+read bidon bidon keep bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 # echo "Waiting 2 min before starting measurements..."
 # /bin/sleep 120
@@ -159,8 +161,9 @@ if [ "$gopt" != "1" ] ; then
 fi
 
 
-
+keepcount=0
 while : ; do
+	let keepcount=keepcount+1
 	processflag=0
 	time1=`date +%s`
 	# globalpos
@@ -237,44 +240,41 @@ while : ; do
 		let n=0
 		for p in ${cams[@]} ; do 
 			for b in ${bands[@]} ; do	
-			
-				if [ $n -eq 0 ] ; then
-				let t=ta
+			        if [ $n -eq 0 ] ; then
+				    let t=ta
 				else
-					let t=tb
-        		fi
+				    let t=tb
+        		        fi
 				# determine the zeropoint according to the integration time and camera
 				#
 				#
 				#
 				/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i ${basename[$n]}"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
-				if [ -f $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" ] ; then
+				  if [ -f $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" ] ; then
 					mv $path"/"$p"_"$b"_calibration_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calibration_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-				fi
-				if [ -f $path"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" ] ; then
+				  fi
+				  if [ -f $path"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" ] ; then
 					mv $path"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calSbBkg_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-				fi
-				if [ -f $path"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" ] ; then
+				  fi
+				  if [ -f $path"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" ] ; then
 					mv $path"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_calSbTot_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-				fi
-				if [ -f $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" ] ; then
+				  fi
+				  if [ -f $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" ] ; then
 					mv $path"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $basepath/$y/$mo/
 					cp -f $basepath"/"$y"/"$mo"/"$p"_"$b"_Stars_Match_"${basename[$n]}".png" $backpath"/"$y"/"$mo"/"
-				fi
-
-				
-				if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
-				   if [ -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" ] ; then
-				      cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
-         	   else
-        		 		cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
-				   fi
-				   rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
-				   cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
-				fi
+				  fi
+				  if [ -f $path"/calibrated_"$b"_"$baseday"_sky.csv" ] ; then
+				        if [ -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" ] ; then
+				        cat $path"/calibrated_"$b"_"$baseday"_sky.csv" | grep -v "Loc_Name" | grep -v "(pixel)"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
+         	                  else
+        		 	        cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv"
+				  fi
+				  rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
+				  cp -f $basepath"/"$y"/"$mo"/calibrated_"$p"_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
+	fi
 
 
 
@@ -284,6 +284,22 @@ while : ; do
 			let n=n+1
 		done
 
+	fi
+	if [ $keepcount -ne $keep ] ; then
+	   	 rm $basepath"/"$y"/"$mo"/"*$basenameA".png"
+                 rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
+		 rm $basepath"/"$y"/"$mo"/"$basenameA*".dng"
+                 rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
+		 rm $basepath"/"$y"/"$mo"/"$basenameA*".jpg"
+		 rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
+                 rm $basepath"/"$y"/"$mo"/"*$basenameC".png"
+                 rm $backpath"/"$y"/"$mo"/"*$basenameC".png"
+		 rm $basepath"/"$y"/"$mo"/"$basenameC*".dng"
+                 rm $backpath"/"$y"/"$mo"/"$basenameC*".dng"
+		 rm $basepath"/"$y"/"$mo"/"$basenameC*".jpg"
+		 rm $backpath"/"$y"/"$mo"/"$basenameC*".jpg"
+        else 
+		let keepcount=0
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

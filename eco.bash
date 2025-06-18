@@ -37,50 +37,50 @@ take_pictures() {
 	echo "Shooting "$ta" micro seconds... with gain " $gain 
 	/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
 	if [ -f $path"/capture_1.dng" ] ; then
-	   /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-           /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-           read satmax bidon  < $path"/capture.tmp"
-           echo "satmax=" $satmax
-           while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
-           do let ta=ta/10
-              rm -f $path"/capture_1*"
-              echo "Shooting "$ta" micro seconds... with gain " $gain
-              /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-              if [ -f $path"/capture_1.dng" ] ; then
-                 /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-                 /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-                 read satmax bidon  < $path"/capture.tmp"
-                 echo "satmax=" $satmax
-              else
-                 echo "Problem with camera A."
-                 exit 0
-              fi
-           done
-           if [ "$satmax" -ge 80 ]
-           then let gain=2
-              rm -f $path"/capture_1*"
-              echo "Shooting "$ta" micro seconds... with gain " $gain
-              /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
-              if [ -f $path"/capture_1.dng" ] ; then
-                 /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
-                 /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
-                 read satmax bidon  < $path"/capture.tmp"
-                 echo "satmax=" $satmax
-              else
-                 echo "Problem with camera A."
-                 exit 0
-              fi
-           fi
-           /usr/bin/python3 /usr/local/bin/captureC.py -t $ta -g $gain
-        else
-           echo "Problem with camera A."
-           exit 0
-        fi
-        echo  $ta > $path"/Current_tint.tmp"
-        echo  $gain > $path"/Current_gain.tmp"
-        # flush ram cache to correct a memory leak in the camera library
-        /usr/bin/sync
-        /usr/bin/echo 3 > /proc/sys/vm/drop_caches	
+		/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+		/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+		read satmax bidon  < $path"/capture.tmp"
+		echo "satmax=" $satmax
+		while [ "$satmax" -ge 80 ] && [ "$ta" -gt 1200 ]
+		do let ta=ta/10
+			rm -f $path"/capture_1*"
+			echo "Shooting "$ta" micro seconds... with gain " $gain
+			/usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+			if [ -f $path"/capture_1.dng" ] ; then
+				/usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				/usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				read satmax bidon  < $path"/capture.tmp"
+				echo "satmax=" $satmax
+			else
+				echo "Problem with camera A."
+				exit 0
+			fi
+		done
+		if [ "$satmax" -ge 80 ]
+		then let gain=2
+			  rm -f $path"/capture_1*"
+			  echo "Shooting "$ta" micro seconds... with gain " $gain
+			  /usr/bin/python3 /usr/local/bin/captureA.py -t $ta -g $gain
+			  if [ -f $path"/capture_1.dng" ] ; then
+				  /usr/local/bin/lisc perc $path"/capture_1.dng" -p 99.9  > $path"/saturation.tmp"
+				  /usr/bin/python3 /usr/local/bin/maxsatpercent.py > $path"/capture.tmp"
+				  read satmax bidon  < $path"/capture.tmp"
+				  echo "satmax=" $satmax
+			  else
+			     echo "Problem with camera A."
+				  exit 0
+			  fi
+		fi
+		/usr/bin/python3 /usr/local/bin/captureC.py -t $ta -g $gain
+	else
+		echo "Problem with camera A."
+		exit 0
+	fi
+	echo  $ta > $path"/Current_tint.tmp"
+	echo  $gain > $path"/Current_gain.tmp"
+	# flush ram cache to correct a memory leak in the camera library
+	/usr/bin/sync
+	/usr/bin/echo 3 > /proc/sys/vm/drop_caches	
 }
 
 # ==================================

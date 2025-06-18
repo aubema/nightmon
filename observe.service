@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-RestartSec=5
+RestartSec=60
 User=root
 ExecStart=/bin/bash /usr/local/bin/observe_nightmon.bash
 

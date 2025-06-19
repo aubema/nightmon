@@ -285,19 +285,21 @@ while : ; do
 		done
 
 	fi
+	# erase raw files and png plots
+   	 rm $basepath"/"$y"/"$mo"/"*$basenameA".png"
+         rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
+	 rm $basepath"/"$y"/"$mo"/"$basenameA*".dng"
+         rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
+         rm $basepath"/"$y"/"$mo"/"*$basenameC".png"
+         rm $backpath"/"$y"/"$mo"/"*$basenameC".png"
+         rm $basepath"/"$y"/"$mo"/"$basenameC*".dng"
+         rm $backpath"/"$y"/"$mo"/"$basenameC*".dng"
+        # erase keep-1 jpg images over a total of keep, keep is defined in the nightmon_config file
 	if [ $keepcount -ne $keep ] ; then
-	   	 rm $basepath"/"$y"/"$mo"/"*$basenameA".png"
-                 rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
-		 rm $basepath"/"$y"/"$mo"/"$basenameA*".dng"
-                 rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
-		 rm $basepath"/"$y"/"$mo"/"$basenameA*".jpg"
-		 rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
-                 rm $basepath"/"$y"/"$mo"/"*$basenameC".png"
-                 rm $backpath"/"$y"/"$mo"/"*$basenameC".png"
-		 rm $basepath"/"$y"/"$mo"/"$basenameC*".dng"
-                 rm $backpath"/"$y"/"$mo"/"$basenameC*".dng"
-		 rm $basepath"/"$y"/"$mo"/"$basenameC*".jpg"
-		 rm $backpath"/"$y"/"$mo"/"$basenameC*".jpg"
+		rm $basepath"/"$y"/"$mo"/"$basenameA*".jpg"
+		rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
+		rm $basepath"/"$y"/"$mo"/"$basenameC*".jpg"
+		rm $backpath"/"$y"/"$mo"/"$basenameC*".jpg"
         else 
 		let keepcount=0
 	fi

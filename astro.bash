@@ -142,6 +142,8 @@ let n=0
 # get the site name
 /bin/grep "SITE" $path"/nightmon_config" > $path"/ligne.tmp"
 read bidon bidon sitename bidon < $path"/ligne.tmp"
+/bin/grep "Keep" $path"/nightmon_config" > $path"/ligne.tmp"
+read bidon bidon keep bidon < $path"/ligne.tmp"
 # wait 2 min to start (enough time for ntp sync)
 # echo "Waiting 2 min before starting measurements..."
 # /bin/sleep 120
@@ -160,8 +162,9 @@ if [ "$gopt" != "1" ] ; then
 fi
 
 
-
+keepcount=0
 while : ; do
+        let keepcount=keepcount+1
 	processflag=0
 	time1=`date +%s`
 	nanswer=`gpspipe -w -n 4 -x 2 | wc -l`
@@ -285,6 +288,17 @@ while : ; do
             cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
          fi
       done
+	fi
+	# erase keep-1 images over a total of keep, keep is defined in the nightmon_config file
+        if [ $keepcount -ne $keep ] ; then	
+    	   rm $basepath"/"$y"/"$mo"/"*$basenameA".png"
+           rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
+	   rm $basepath"/"$y"/"$mo"/"$basenameA*".dng"
+           rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
+	   rm $basepath"/"$y"/"$mo"/"$basenameA*".jpg"
+	   rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
+	else
+	   let keepcount=0
 	fi
 	time2=`date +%s`
 	let idle=900-time2+time1  # one measurement every 15 min (15*60=900)

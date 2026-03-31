@@ -18,4 +18,4 @@ ZpointC-JR : 2.8147
 Calmet : fixed    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
 Calib_itime : 120000000  # 2 minutes
 Calib_gain : 16
-Keep : 1
+Keep : 17520    # keep about one image per year...

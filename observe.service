@@ -7,7 +7,7 @@ Type=simple
 Restart=always
 RestartSec=60
 User=root
-ExecStart=/bin/bash /usr/local/bin/observe_nightmon.bash
+ExecStart=/bin/bash /usr/local/bin/astro.bash
 
 StandardOutput=append:/home/sand/nightmon.log
 StandardError=append:/home/sand/nightmon.log

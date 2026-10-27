@@ -136,7 +136,7 @@ bands=(JB JV JR)
 model="RpiHQ"  # other choices are "RpiHQ" and "A7S"
 cams=(A)
 basepath="/var/www/html/data"
-backpath="/home/"$user"/data"
+# backpath="/home/"$user"/data"
 path="/home/"$user
 let n=0
 # get the site name
@@ -216,23 +216,23 @@ while : ; do
 	if [ ! -d $basepath/$y/$mo ] ; then
 		/bin/mkdir $basepath/$y/$mo
 	fi
-	if [ ! -d $backpath/$y ] ; then
-		mkdir $backpath/$y
-	fi
-	if [ ! -d $backpath/$y/$mo ] ; then
+	#if [ ! -d $backpath/$y ] ; then
+	#	mkdir $backpath/$y
+	#fi
+	#if [ ! -d $backpath/$y/$mo ] ; then
 		/bin/mkdir $backpath/$y/$mo
-	fi
+	#fi
 	echo "=============================="
 	# rename pictures
 	if [ $ta -ge $max_int ] ; then
 		# daytime image only keep the jpg
 		cp -f $path"/capture_1.dng" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
-		cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
+		#cp -f $path"/capture_1.dng" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
 		cp -f $path"/capture_1.dng" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".dng"
 		processflag=1
 	fi
 	cp -f $path"/capture_1.jpg" $basepath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
-	cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
+	#cp -f $path"/capture_1.jpg" $backpath/$y/$mo/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	cp -f $path"/capture_1.jpg" $path/$basenameA"_"${cams[$n]}"_"$ta"_"$gain".jpg"
 	read  tb toto < $path"/Current_tint.tmp"
 	if [ $processflag -eq 1 ] ; then
@@ -252,24 +252,24 @@ while : ; do
 			/usr/bin/python3 /usr/local/bin/ProcessNightMon.py -i $basenameA"_"${cams[$n]}"_"$t"_"$gain".dng" -d $path"/git/nightmon/data/Darks/"$darkimg -b $b -k fixed -m $model
 			if [ -f $path"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" ] ; then
 				mv $path"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+				#cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calibration_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			if [ -f $path"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" ] ; then
 				mv $path"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+				#cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbBkg_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			if [ -f $path"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" ] ; then
 				mv $path"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+				#cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_calSbTot_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			if [ -f $path"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" ] ; then
 				mv $path"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" $backpath"/"$y"/"$mo"/"
+				#cp -f $basepath"/"$y"/"$mo"/"${cams[$n]}"_"$b"_Stars_Match_"$basenameA".png" $backpath"/"$y"/"$mo"/"
 			fi
 			# backup calibration file
 			if [ -f $path"/"$b"_calibration_stars_"$basenameA".csv" ] ; then 
 				mv $path"/"$b"_calibration_stars_"$basenameA".csv" $basepath/$y/$mo/
-				cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"$basenameA".csv" $backpath"/"$y"/"$mo"/"
+				#cp -f $basepath"/"$y"/"$mo"/"$b"_calibration_stars_"$basenameA".csv" $backpath"/"$y"/"$mo"/"
 			fi
 
 
@@ -285,18 +285,18 @@ while : ; do
                cat $path"/calibrated_"$b"_"$baseday"_sky.csv"  >> $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv"
             fi
             rm $path"/calibrated_"$b"_"$baseday"_sky.csv"
-            cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
+            #cp -f $basepath"/"$y"/"$mo"/calibrated_A_"$b"_"$baseday"_sky.csv" $backpath"/"$y"/"$mo"/"				
          fi
       done
 	fi
 	# erase keep-1 images over a total of keep, keep is defined in the nightmon_config file
         if [ $keepcount -ne $keep ] ; then	
     	   rm $basepath"/"$y"/"$mo"/"*$basenameA".png"
-           rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
+           #rm $backpath"/"$y"/"$mo"/"*$basenameA".png"
 	   rm $basepath"/"$y"/"$mo"/"$basenameA*".dng"
-           rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
+           #rm $backpath"/"$y"/"$mo"/"$basenameA*".dng"
 	   rm $basepath"/"$y"/"$mo"/"$basenameA*".jpg"
-	   rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
+	   #rm $backpath"/"$y"/"$mo"/"$basenameA*".jpg"
 	else
 	   let keepcount=0
 	fi

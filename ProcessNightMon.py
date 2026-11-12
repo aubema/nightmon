@@ -70,7 +70,7 @@ def input(argv):
     # default extinction values will be replaces if provided to the command line arguments
     # RGO, D. K. (1985). Atmospheric Extinction at the Roque de los Muchachos Observatory, La Palma.
     # extinc_r = 0.0547
-    # extinc_v = 0.102
+    # extinc_v = 0.102bsd
     Extinc = 0
     Model = "RpiHQ"
     Cam = "A"
@@ -305,7 +305,8 @@ print("Calibration method :", Calmet)
 print("Extinction is :", Extinc)
 print("Number of points to extract :", num_pts)
 # set observer position
-eph = load("de421.bsp")
+#eph = load("de421.bsp")
+eph = load('/home/sand/git/nightmon/data/de421.bsp')
 here = eph["earth"] + wgs84.latlon(
     p["Latitude"] * N, p["Longitude"] * E, elevation_m=p["Altitude"]
 )

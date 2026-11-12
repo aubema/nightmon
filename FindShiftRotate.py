@@ -166,7 +166,8 @@ with open(configpath) as f:
 Site = p["Site"]
 ts = load.timescale()
 # set observer position
-eph = load("de421.bsp")
+#eph = load("de421.bsp")
+eph = load('/home/sand/git/nightmon/data/de421.bsp')
 here = eph["earth"] + wgs84.latlon(
     p["Latitude"] * N, p["Longitude"] * E, elevation_m=p["Altitude"]
 )

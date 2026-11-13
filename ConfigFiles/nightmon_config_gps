@@ -1,0 +1,21 @@
+# input parameters for NightMon
+Site : Marion_Dufresne   # No spaces in site name
+Longitude : -55.  # eastward i.e. western longitudes higher than 180 can be expressed as negative e.g. -70.0
+Latitude : 55.
+Altitude : 0.
+ShiftxA :  0
+ShiftyA :  0
+AngleA :   0
+ShiftxC :  0
+ShiftyC :  0 
+AngleC :   0
+ZpointA-JB : 4.0825
+ZpointA-JV : 4.6685
+ZpointA-JR : 2.8147
+ZpointC-JB : 4.0825
+ZpointC-JV : 4.6685
+ZpointC-JR : 2.8147
+Calmet : fixed    # calibration method stars or fixed. If fixed the provided zeropoints ZpointA and ZpointB will be used
+Calib_itime : 120000000  # 2 minutes
+Calib_gain : 16
+Keep : 1    # 17520 keep about one image per year...

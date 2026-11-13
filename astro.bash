@@ -114,7 +114,8 @@ globalpos () {
           let alt=0
      fi 
      # /bin/echo "GPS gives Latitude:" $lat ", Longitude:" $lon "and Altitude:" $alt
-     /bin/echo "Lat.:" $lat ", Lon.:" $lon " Alt.:" $alt  > /home/sand/gps.log
+     timest=`date`
+     /bin/echo $timest "Lat.:" $lat ", Lon.:" $lon " Alt.:" $alt  >> /home/sand/gps.log
      echo $gpstime > /home/sand/date_gps.log
      sed 's/Latitude : 55./Latitude : '"$lat"'/g' /home/sand/nightmon_config_gps > /home/sand/conf.tmp
      sed 's/Latitude : -55./Longitude : '"$lon"'/g' /home/sand/conf.tmp > /home/sand/nightmon_config

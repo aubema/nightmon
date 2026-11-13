@@ -118,7 +118,8 @@ globalpos () {
      /bin/echo $timest "Lat.:" $lat ", Lon.:" $lon " Alt.:" $alt  >> /home/sand/gps.log
      echo $gpstime > /home/sand/date_gps.log
      sed 's/Latitude : 55./Latitude : '"$lat"'/g' /home/sand/nightmon_config_gps > /home/sand/conf.tmp
-     sed 's/Latitude : -55./Longitude : '"$lon"'/g' /home/sand/conf.tmp > /home/sand/nightmon_config
+     sed 's/Latitude : -55./Longitude : '"$lon"'/g' /home/sand/conf.tmp > /home/sand/conf.tmp1
+     sed 's/Altitude : 0./Longitude : '"$alt"'/g' /home/sand/conf.tmp1 > /home/sand/nightmon_config
 
 }
 
